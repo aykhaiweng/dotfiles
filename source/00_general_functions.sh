@@ -9,6 +9,9 @@ export DOTFILES=~/.dotfiles
 export CLICOLOR=1
 export LSCOLORS=GxFxCxDxBxegedabagaced
 
+# gpg
+export GPG_TTY=$(tty)
+
 # configuration options for pyenv
 # export PYTHON_CONFIGURE_OPTS="--enable-framework"
 
