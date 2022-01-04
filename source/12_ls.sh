@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 is_osx && alias ls="ls -ACF"
 is_ubuntu && alias ls="ls -aCF --color=auto"
 
