@@ -7,6 +7,7 @@
 .undodir
 Session.vim
 workspace.vim
+*.code-workspace
 tmp/
 *.DS_Store
 Brewfile.lock.json
