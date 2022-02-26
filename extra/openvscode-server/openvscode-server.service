@@ -1,0 +1,13 @@
+[Unit]
+Description=openvscode-server
+After=nginx.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/openvscode-server/
+Environment=PASSWORD="PleaseForTheLoveOfGodRememberToChangeThisPassword"
+ExecStart=/opt/openvscode-server/bin/openvscode-server --host 127.0.0.1 --port 59999
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
