@@ -17,4 +17,4 @@ export LDFLAGS="-L/opt/homebrew/opt/openssl@3/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/openssl@3/include"
 
 # To get clang to work
-export ARCHFLAGS="-arch x86_64"
+# export ARCHFLAGS="-arch x86_64"
