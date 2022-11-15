@@ -63,7 +63,8 @@ imap <C-e> <Plug>(neosnippet_expand_or_jump)
 smap <C-e> <Plug>(neosnippet_expand_or_jump)
 xmap <C-e> <Plug>(neosnippet_expand_target)
 " Tagbar
-Plug 'majutsushi/tagbar'
+Plug 'preservim/tagbar'
+nmap <F9> :TagbarToggle<CR>
 
 
 """ AUTOCOMPLETE
