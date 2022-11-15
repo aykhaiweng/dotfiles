@@ -16,4 +16,4 @@ fi
 e_arrow "Updating Homebrew"
 brew doctor
 brew update
-brew bundle --file "$DOTFILES/brew/Brewfile-osx"
+brew bundle --file "$DOTFILES/brew/Brewfile"
