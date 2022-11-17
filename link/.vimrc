@@ -1,15 +1,20 @@
 set encoding=utf-8
 set nocompatible              " required
-
 filetype off                  " required
 let g:python3_host_prog=$HOME."/.pyenv/versions/neovim3/bin/python3"
 let mapleader=","
-call plug#begin('~/.vim/plugged')
 
+call plug#begin('~/.vim/plugged')
 set rtp+=~/.vim/my-colors
+
+" ==========================================================
+"  gruvbox Theme
+" ==========================================================
 Plug 'morhetz/gruvbox'
 
-" TmuxVimNavigation
+" ==========================================================
+"  vim-tmux-navigator Plugin
+" ==========================================================
 Plug 'christoomey/vim-tmux-navigator'
 let g:tmux_navigator_no_mappings = 1
 let g:tmux_navigator_disable_when_zoomed = 1
@@ -18,9 +23,9 @@ nnoremap <silent> <C-J> :TmuxNavigateDown<cr>
 nnoremap <silent> <C-K> :TmuxNavigateUp<cr>
 nnoremap <silent> <C-L> :TmuxNavigateRight<cr>
 
-
-""" Editor
-" Asynchronous Linting
+" ==========================================================
+"  Ale Plugin
+" ==========================================================
 Plug 'dense-analysis/ale'
 let g:ale_sign_error = '✗'
 let g:ale_sign_warning = '!'
@@ -33,106 +38,140 @@ let g:ale_set_quickfix = 1
 let g:ale_echo_msg_error_str = 'E'
 let g:ale_echo_msg_warning_str = 'W'
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-" Workspace
-Plug 'thaerkh/vim-workspace'
-nnoremap <Leader>ws :ToggleWorkspace<CR>
-let g:workspace_session_name='workspace.vim'
-let g:workspace_session_disable_on_args=1
-let g:workspace_autosave_ignore = [
-    \ 'gitcommit',
-    \ '__flygrep__',
-    \ 'netrw',
-    \ 'nerdtree',
-    \ 'tagbar' ]
-" Indentation
-Plug 'Yggdroot/indentLine'
-let g:indentLine_showFirstIndentLevel = 1
-let g:indentLine_char_list = ['|']
-" because I miss sublime text
+
+" ==========================================================
+"  indentLine Plugin
+" ==========================================================
+if has('nvim')
+    Plug 'lukas-reineke/indent-blankline.nvim'
+else
+    Plug 'Yggdroot/indentLine'
+    let g:indentLine_showFirstIndentLevel = 0
+    let g:indentLine_char_list = ['|']
+endif
+
+" ==========================================================
+"  vim-multiple-cursors Plugin
+" ==========================================================
 Plug 'terryma/vim-multiple-cursors'
 let g:multi_cursor_use_default_mapping=1
-" for noobs like me who have no idea how to use motions
+
+" ==========================================================
+"  vim-easymotion Plugin
+" ==========================================================
 Plug 'easymotion/vim-easymotion'
-" surround
+
+" ==========================================================
+"  vim-surround Plugin
+" ==========================================================
 Plug 'tpope/vim-surround'
-" Neosnippets
+
+" ==========================================================
+"  neosnippet Plugin
+" ==========================================================
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
 let g:neosnippet#snippets_directory='~/.vim/neosnippets/'
 imap <C-e> <Plug>(neosnippet_expand_or_jump)
 smap <C-e> <Plug>(neosnippet_expand_or_jump)
 xmap <C-e> <Plug>(neosnippet_expand_target)
-" Tagbar
+
+" ==========================================================
+"  Tagbar Plugin
+" ==========================================================
 Plug 'preservim/tagbar'
-nmap <F9> :TagbarToggle<CR>
+nmap <C-S-b> :TagbarToggle<CR>
 
-
-""" AUTOCOMPLETE
-" Deoplete
-if has('nvim')
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plug 'Shougo/deoplete.nvim'
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
-endif
-let g:deoplete#enable_at_startup = 1
-
-inoremap <expr> <C-Space> deoplete#manual_complete()
-
-""" Explorers
-" fzfinder
+" ==========================================================
+"  fzf Plugin
+" ==========================================================
 Plug 'junegunn/fzf.vim' ", { 'on': ['FZF', 'Buffers', 'Marks'] }
 set rtp+=~/.fzf
+nnoremap <C-P> :Files<CR>
+nnoremap <C-F> :Ag<CR>
 
-" nerdtree
-Plug 'preservim/nerdtree', { 'on':  ['NERDTreeToggle', 'NERDTreeFind', 'NERDTreeFocus'] }
-let NERDTreeIgnore=['\.pyc$', '\~$', '\.swo$', '\.swp$', '\.DS_Store$', '__pycache__']
-let NERDTreeShowHidden=1
-let g:NERDTreeQuitOnOpen=0
-let g:NERDTreeWinSize=35
-let g:NERDTreeHighlightCursorLine=1
-let g:NERDTreeDirArrowExpandable = '▸'
-let g:NERDTreeDirArrowCollapsible = '▾'
-let g:NERDTreeMinimalUI = 1
-let g:NERDTreeDirArrows = 1
-" Disable arrow icons at the left side of folders for NERDTree.
-let g:NERDTreeDirArrowExpandable = "\u00a0"
-let g:NERDTreeDirArrowCollapsible = "\u00a0"
-Plug 'Xuyuanp/nerdtree-git-plugin'
-let g:NERDTreeGitStatusIndicatorMapCustom = {
-                \ 'Modified'  :'✹',
-                \ 'Staged'    :'✚',
-                \ 'Untracked' :'✭',
-                \ 'Renamed'   :'➜',
-                \ 'Unmerged'  :'═',
-                \ 'Deleted'   :'✖',
-                \ 'Dirty'     :'✗',
-                \ 'Ignored'   :'☒',
-                \ 'Clean'     :'✔︎',
-                \ 'Unknown'   :'?',
-                \ }
-let g:NERDTreeGitStatusUseNerdFonts = 1 " you should install nerdfonts by yourself. default: 0
+" ==========================================================
+"  Deoplete Plugin
+" ==========================================================
+if has('nvim')
+    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+    Plug 'Shougo/deoplete.nvim'
+    Plug 'roxma/nvim-yarp'
+    Plug 'roxma/vim-hug-neovim-rpc'
+endif
+let g:deoplete#enable_at_startup = 1
+inoremap <expr> <C-Space> deoplete#manual_complete()
 
-" git icons
-" Plug 'Xuyuanp/nerdtree-git-plugin'
-" devicons fun fun fun
-Plug 'ryanoasis/vim-devicons'
-let g:webdevicons_conceal_nerdtree_brackets=0
-let g:WebDevIconsNerdTreeBeforeGlyphPadding=" "
-let g:WebDevIconsNerdTreeAfterGlyphPadding=" "
-let g:WebDevIconsUnicodeDecorateFolderNodes = v:true
+" ==========================================================
+"  fern Plugin
+" ==========================================================
+Plug 'lambdalisue/fern.vim'
+Plug 'lambdalisue/fern-hijack.vim'
+Plug 'lambdalisue/fern-git-status.vim'
+Plug 'lambdalisue/glyph-palette.vim'
+Plug 'lambdalisue/nerdfont.vim'
+Plug 'lambdalisue/fern-renderer-nerdfont.vim'
+Plug 'yuki-yano/fern-preview.vim'
+" Disable netrw.
+let g:loaded_netrw  = 1
+let g:loaded_netrwPlugin = 1
+let g:loaded_netrwSettings = 1
+let g:loaded_netrwFileHandlers = 1
+let g:fern#default_hidden = 1
+let g:fern#renderer = "nerdfont"
+nnoremap <C-B> :Fern . -drawer -reveal=% -toggle -width=40<CR><C-w>=
+function! FernInit() abort
+    nmap <buffer><expr>
+        \ <Plug>(fern-my-open-expand-collapse)
+        \ fern#smart#leaf(
+        \   "\<Plug>(fern-action-open:select)",
+        \   "\<Plug>(fern-action-expand)",
+        \   "\<Plug>(fern-action-collapse)",
+        \ )
+    nmap <buffer> <CR> <Plug>(fern-my-open-expand-collapse)
+    nmap <buffer> <2-LeftMouse> <Plug>(fern-my-open-expand-collapse)
+    nmap <buffer> n <Plug>(fern-action-new-path)
+    nmap <buffer> d <Plug>(fern-action-remove)
+    nmap <buffer> m <Plug>(fern-action-move)
+    nmap <buffer> M <Plug>(fern-action-rename)
+    nmap <buffer> r <Plug>(fern-action-reload)
+    nmap <buffer> b <Plug>(fern-action-open:split)
+    nmap <buffer> v <Plug>(fern-action-open:vsplit)
+    nmap <silent> <buffer> p <Plug>(fern-action-preview:toggle)
+    nmap <buffer><nowait> < <Plug>(fern-action-leave)
+    nmap <buffer><nowait> > <Plug>(fern-action-enter)
+    nmap <buffer><silent> <C-H> :TmuxNavigateLeft<cr>
+    nmap <buffer><silent> <C-J> :TmuxNavigateDown<cr>
+    nmap <buffer><silent> <C-K> :TmuxNavigateUp<cr>
+    nmap <buffer><silent> <C-L> :TmuxNavigateRight<cr> nmap <silent><buffer> p <Plug>(fern-action-preview:toggle)
+endfunction
+augroup FernGroup
+    autocmd!
+    autocmd FileType fern call glyph_palette#apply()
+    autocmd FileType fern call FernInit()
+augroup END
 
+" ==========================================================
+"  vim-fugitive Plugin
+" ==========================================================
+Plug 'tpope/vim-fugitive'
 
-""" git
-Plug 'airblade/vim-gitgutter'
+" ==========================================================
+"  vim-gitgutter Plugin
+" ==========================================================
+if has('nvim')
+    Plug 'lewis6991/gitsigns.nvim'
+else
+    Plug 'airblade/vim-gitgutter'
+endif
+
+" ==========================================================
+"  Lightline
+" ==========================================================
 let g:gitgutter_terminal_reports_focus=0
 let g:gitgutter_max_signs=1000
 " git wrapper for vim
-Plug 'tpope/vim-fugitive'
-
-
-""" status
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
 let g:lightline = {
@@ -145,8 +184,7 @@ let g:lightline = {
 \   'active': {
 \       'left': [
 \           [ 'mode', 'paste', ],
-\           [ 'gitbranch' ],
-\           [ 'readonly', 'filepath' ],
+\           [ 'gitbranch', 'readonly', 'filepath'],
 \           [ 'modified' ],
 \           [ 'tagbar' ],
 \       ],
@@ -171,16 +209,16 @@ let g:lightline = {
 \       'linter_warnings': 'lightline#ale#warnings',
 \       'linter_errors': 'lightline#ale#errors',
 \       'linter_ok': 'lightline#ale#ok',
-\       'gitbranch': 'fugitive#head',
+\       'gitbranch': 'FugitiveHead',
 \       'filepath': 'LightlineFilepath',
 \   }
 \}
 
 command! LightlineReload call LightlineReload()
 function! LightlineReload()
-  silent! call lightline#init()
-  silent! call lightline#colorscheme()
-  silent! call lightline#update()
+    silent! call lightline#init()
+    silent! call lightline#colorscheme()
+    silent! call lightline#update()
 endfunction
 
 function! LightlineFilepath()
@@ -195,56 +233,28 @@ let g:lightline.component_type = {
   \  'linter_ok': 'left',
   \ }
 
+au! BufEnter *
+    \ :LightlineReload
 
-""" Syntax Highlighting
+" ==========================================================
+"  vim-polyglot Plugin
+" ==========================================================
 Plug 'sheerun/vim-polyglot'
 let g:polyglot_disabled = ['vue', 'json']
 
-
-""" Python
-" python indentation for vim
-Plug 'vim-scripts/indentpython.vim', {'for': 'python'}
-" JEDI
-Plug 'zchee/deoplete-jedi', {'for': 'python'}
-let g:deoplete#sources#jedi#statement_length = 60
-let g:deoplete#sources#jedi#enable_typeinfo = 1
-let g:deoplete#sources#jedi#enable_short_types = 1
-let g:deoplete#sources#jedi#show_docstring = 1
-let g:deoplete#sources#jedi#enable_cache = 1
-Plug 'davidhalter/jedi-vim', {'for': 'python'}
-let g:jedi#completions_enabled = 0
-let g:jedi#smart_auto_mappings = 0
-let g:jedi#show_call_signatures = 0
-let g:jedi#auto_vim_configuration = 0
-let g:jedi#popup_select_first = 0
-let g:jedi#use_tabs_not_buffers = 0  " Opens a tab using Go To command
-let g:jedi#goto_command = "<leader>jc"
-let g:jedi#rename_command = "<leader>jr"
-let g:jedi#goto_assignments_command = "<leader>ja"
-let g:jedi#goto_definitions_command = "F12"
-" beautifier
-" Plug 'psf/black', {'for': 'python'}
-
-
-""" HTML & CSS
-Plug 'mattn/emmet-vim', {'for': ['html', 'js', 'css', 'vue']}
-" ternjs
-Plug 'carlitux/deoplete-ternjs', {'for': ['html', 'js', 'css', 'vue']}
-Plug 'ternjs/tern_for_vim', {'do': 'sudo npm install -g tern', 'for': ['html', 'js', 'css', 'vue', 'json']}
-
-
-""" Docker
-Plug 'ekalinin/Dockerfile.vim'
-
+" ==========================================================
+"  Plug End
+" ==========================================================
 call plug#end()
-" =========================================================================== "
 
-" --------------------------------------------------------------------------- "
+" ==========================================================
+"  Buffer and Toggle List
+" ==========================================================
 function! GetBufferList()
-  redir =>buflist
-  silent! ls!
-  redir END
-  return buflist
+    redir =>buflist
+    silent! ls!
+    redir END
+    return buflist
 endfunction
 
 function! ToggleList(bufname, pfx)
@@ -267,23 +277,10 @@ function! ToggleList(bufname, pfx)
     endif
 endfunction
 
-
-" FZF
-nnoremap <C-P> :Files<CR>
-nnoremap <C-F> :Ag<CR>
-
-
-" NerdTree
-noremap <Leader>0 :NERDTreeFocus<CR>
-noremap <Leader>- :NERDTreeFind<CR>
-noremap <C-B> :NERDTreeToggle<CR>
-
-
-" Folding and shit
+" ==========================================================
+"  Keybinds
+" ==========================================================
 nnoremap <space> za
-
-
-" Vim-style tab navigation
 nnoremap tj  :tabfirst<CR>
 nnoremap tl  :tabnext<CR>
 nnoremap th  :tabprev<CR>
@@ -293,16 +290,15 @@ nnoremap tn  :tabnew<CR>
 nnoremap tm  :tabm<Space>
 nnoremap tx  :tabclose<CR>
 vnoremap <silent> <F5> :sort i<CR>
-nnoremap <silent> <F5> :so $MYVIMRC<CR>:LightlineReload<CR>:call webdevicons#refresh()<CR>
+nnoremap <silent> <F5> :so $MYVIMRC<CR>:LightlineReload<CR>
 nnoremap <F8> :set tabstop=4 shiftwidth=4 expandtab<CR>:retab!<CR>
-
 nnoremap <Leader>lx :lclose<CR>
 nnoremap <silent> <leader>ll :call ToggleList("Location List", 'l')<CR>
 nnoremap <silent> <leader>ee :call ToggleList("Quickfix List", 'c')<CR>
-" =========================================================================== "
 
-
-" LOOK & FEEL --------------------------------------------------------------- "
+" ==========================================================
+"  Theme
+" ==========================================================
 syntax on
 set termguicolors
 set background=dark
@@ -318,7 +314,9 @@ let g:gruvbox_improved_warnings=0
 let g:gruvbox_hls_cursor='orange'
 silent! colorscheme gruvbox
 
-" current line highlights
+" ==========================================================
+"  Line Highlights
+" ==========================================================
 highlight CursorLine cterm=NONE ctermbg=black guibg=#151515
 highlight CursorColumn cterm=NONE ctermbg=black guibg=#151515
 augroup CursorLine
@@ -329,20 +327,9 @@ augroup end
 set laststatus=2
 set statusline=\ %<%l:%v\ [%P]%=%a\ %h%m%r\ %F\
 
-" netrw
-let g:netrw_banner=1
-let g:netrw_liststyle=3
-let g:netrw_browse_split=0
-let g:netrw_altv = 0
-let g:netrw_winsize=20
-" augroup ProjectDrawer
-" 	autocmd!
-" 	autocmd VimEnter * :Explore
-" augroup END
-
-
-" EDITOR -------------------------------------------------------------------- "
-" definitions
+" ==========================================================
+"  vim Config
+" ==========================================================
 set splitright
 set splitbelow
 set exrc             " allow project specific .vimrc
@@ -369,22 +356,21 @@ set shortmess=a      " Decrease the message size
 set cmdheight=1      " Change height of the cmd prompt
 set redrawtime=20000 " Fixes syntax highlighting on large files
 set noshowmode       " No showmode
-" set cursorline       " Show the cursorline
 set mouse=a          " MOUSE MODE
 set showtabline=2    " Show tabline
 set guioptions-=e    " Don't use GUI tabline
+set encoding=UTF-8
 let g:autoclose_on=1 " do not autoclose brackets
 
-" Refresh Airline theme on entering a buffer
-au! BufEnter *
-    \ :LightlineReload
 
 " show whitespaces
 set listchars=tab:--,trail:·,nbsp:~,extends:>,precedes:<,eol:¬
 set list
-" =========================================================================== "
 
 
+" ==========================================================
+"  Post Script
+" ==========================================================
 set directory=$HOME/.vim/swapfiles//
 set backupdir=$HOME/.vim/backup//
 set undodir=$HOME/.vim/undodir//
