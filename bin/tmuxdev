@@ -11,3 +11,9 @@ if [[ $(tmux ls -F "#S" | grep "htop") ]]; then
 else
     tmux new-session -d -s htop "htop"
 fi
+
+if [[ $(tmux ls -F "#S" | grep "dotfiles") ]]; then
+    echo "Tmux Session already running: dotfiles"
+else
+    tmux new-session -d -s dotfiles -c ~/.dotfiles
+fi
