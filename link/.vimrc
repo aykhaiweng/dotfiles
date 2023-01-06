@@ -120,6 +120,8 @@ let g:loaded_netrwSettings = 1
 let g:loaded_netrwFileHandlers = 1
 let g:fern#default_hidden = 1
 let g:fern#renderer = "nerdfont"
+let g:fern#renderer#nerdfont#leading = "    "
+let g:fern#renderer#default#leaf = "|   "
 nnoremap <C-B> :Fern . -drawer -reveal=% -toggle -width=40<CR><C-w>=
 function! FernInit() abort
     nmap <buffer><expr>
@@ -144,7 +146,8 @@ function! FernInit() abort
     nmap <buffer><silent> <C-H> :TmuxNavigateLeft<cr>
     nmap <buffer><silent> <C-J> :TmuxNavigateDown<cr>
     nmap <buffer><silent> <C-K> :TmuxNavigateUp<cr>
-    nmap <buffer><silent> <C-L> :TmuxNavigateRight<cr> nmap <silent><buffer> p <Plug>(fern-action-preview:toggle)
+    nmap <buffer><silent> <C-L> :TmuxNavigateRight<cr>
+    nmap <silent><buffer> p <Plug>(fern-action-preview:toggle)
 endfunction
 augroup FernGroup
     autocmd!

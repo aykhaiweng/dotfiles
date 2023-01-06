@@ -11,9 +11,6 @@ setlocal expandtab
 setlocal foldlevel=99
 setlocal foldmethod=indent
 
-" Removing trailing whitespaces
-autocmd BufWritePre * %s/\s\+$//e
-
 call deoplete#custom#option({
     \ 'auto_complete_delay': 100,
     \ 'smart_case': v:true,
