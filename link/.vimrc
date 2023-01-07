@@ -121,7 +121,7 @@ let g:loaded_netrwFileHandlers = 1
 let g:fern#default_hidden = 1
 let g:fern#renderer = "nerdfont"
 let g:fern#renderer#nerdfont#leading = "    "
-let g:fern#renderer#default#leaf = "|   "
+let g:fern#renderer#nerdfont#padding = "  "
 nnoremap <C-B> :Fern . -drawer -reveal=% -toggle -width=40<CR><C-w>=
 function! FernInit() abort
     nmap <buffer><expr>
@@ -314,12 +314,15 @@ set background=dark
 set t_Co=256
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+"let &t_ZH="\e[3m"  " Italics
+"let &t_ZR="\e[23m" " Italics
+let g:gruvbox_italic=1
 let g:gruvbox_contrast_dark='hard'
 let g:gruvbox_contrast_light='hard'
-let g:gruvbox_italicize_comments=0
+let g:gruvbox_italicize_comments=1
 let g:gruvbox_italicize_strings=0
 let g:gruvbox_improved_strings=0
-let g:gruvbox_improved_warnings=0
+let g:gruvbox_improved_warnings=1
 let g:gruvbox_hls_cursor='orange'
 silent! colorscheme gruvbox
 
