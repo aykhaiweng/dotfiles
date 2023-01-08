@@ -44,6 +44,7 @@ let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 " ==========================================================
 if has('nvim')
     Plug 'lukas-reineke/indent-blankline.nvim'
+    set rtp+=~/.config/nvim/lua/indent-blankline.lua
 else
     Plug 'Yggdroot/indentLine'
     let g:indentLine_showFirstIndentLevel = 0
@@ -80,7 +81,7 @@ xmap <C-e> <Plug>(neosnippet_expand_target)
 "  Tagbar Plugin
 " ==========================================================
 Plug 'preservim/tagbar'
-nmap <C-S-b> :TagbarToggle<CR>
+nmap <C-0> :TagbarToggle<CR>
 
 " ==========================================================
 "  fzf Plugin
@@ -120,9 +121,11 @@ let g:loaded_netrwSettings = 1
 let g:loaded_netrwFileHandlers = 1
 let g:fern#default_hidden = 1
 let g:fern#renderer = "nerdfont"
-let g:fern#renderer#nerdfont#leading = "    "
-let g:fern#renderer#nerdfont#padding = "  "
-nnoremap <C-B> :Fern . -drawer -reveal=% -toggle -width=40<CR><C-w>=
+let g:fern#renderer#nerdfont#root_leading = " "
+let g:fern#renderer#nerdfont#leading = "   "
+let g:fern#renderer#nerdfont#padding = " "
+let g:fern#renderer#nerdfont#indent_markers = 1  " This thing disables the leading
+nnoremap <C-B> :Fern . -drawer -reveal=% -toggle -width=40<CR>
 function! FernInit() abort
     nmap <buffer><expr>
         \ <Plug>(fern-my-open-expand-collapse)
@@ -140,7 +143,7 @@ function! FernInit() abort
     nmap <buffer> r <Plug>(fern-action-reload)
     nmap <buffer> b <Plug>(fern-action-open:split)
     nmap <buffer> v <Plug>(fern-action-open:vsplit)
-    nmap <silent> <buffer> p <Plug>(fern-action-preview:toggle)
+    nmap <silent><buffer> p <Plug>(fern-action-preview:toggle)
     nmap <buffer><nowait> < <Plug>(fern-action-leave)
     nmap <buffer><nowait> > <Plug>(fern-action-enter)
     nmap <buffer><silent> <C-H> :TmuxNavigateLeft<cr>
@@ -153,6 +156,9 @@ augroup FernGroup
     autocmd!
     autocmd FileType fern call glyph_palette#apply()
     autocmd FileType fern call FernInit()
+    autocmd FileType fern setlocal nonumber
+    autocmd FileType fern setlocal norelativenumber
+    autocmd FileType fern setlocal numberwidth=1
 augroup END
 
 " ==========================================================
@@ -165,21 +171,16 @@ Plug 'tpope/vim-fugitive'
 " ==========================================================
 if has('nvim')
     Plug 'lewis6991/gitsigns.nvim'
+    set rtp+=~/.config/nvim/lua/gitsigns.lua
 else
     Plug 'airblade/vim-gitgutter'
+    let g:gitgutter_terminal_reports_focus=0
+    let g:gitgutter_max_signs=1000
 endif
-
-" ==========================================================
-"  Python Plugins
-"  - deoplete-jedi
-" ==========================================================
-Plug 'deoplete-plugins/deoplete-jedi'
 
 " ==========================================================
 "  Lightline
 " ==========================================================
-let g:gitgutter_terminal_reports_focus=0
-let g:gitgutter_max_signs=1000
 " git wrapper for vim
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
@@ -245,6 +246,14 @@ let g:lightline.component_type = {
 au! BufEnter *
     \ :LightlineReload
 
+set laststatus=2
+
+" ==========================================================
+"  vim-smoothie Plugin
+" ==========================================================
+Plug 'psliwka/vim-smoothie'
+let g:smoothie_enabled = 1
+
 " ==========================================================
 "  vim-polyglot Plugin
 " ==========================================================
@@ -252,12 +261,18 @@ Plug 'sheerun/vim-polyglot'
 let g:polyglot_disabled = ['vue', 'json']
 
 " ==========================================================
+"  Python Plugins
+"  - deoplete-jedi
+" ==========================================================
+Plug 'deoplete-plugins/deoplete-jedi', {'for': ['python']}
+
+" ==========================================================
 "  Plug End
 " ==========================================================
 call plug#end()
 
 " ==========================================================
-"  Buffer and Toggle List
+"  Buffer and Toggle List for errors and warnings
 " ==========================================================
 function! GetBufferList()
     redir =>buflist
@@ -301,7 +316,6 @@ nnoremap tx  :tabclose<CR>
 vnoremap <silent> <F5> :sort i<CR>
 nnoremap <silent> <F5> :so $MYVIMRC<CR>:LightlineReload<CR>
 nnoremap <F8> :set tabstop=4 shiftwidth=4 expandtab<CR>:retab!<CR>
-nnoremap <Leader>lx :lclose<CR>
 nnoremap <silent> <leader>ll :call ToggleList("Location List", 'l')<CR>
 nnoremap <silent> <leader>ee :call ToggleList("Quickfix List", 'c')<CR>
 
@@ -330,13 +344,13 @@ silent! colorscheme gruvbox
 "  Line Highlights
 " ==========================================================
 highlight CursorLine cterm=NONE ctermbg=black guibg=#151515
+highlight LineNr guibg=#191919 guifg=#404040
 highlight CursorColumn cterm=NONE ctermbg=black guibg=#151515
 augroup CursorLine
     au!
     au VimEnter,WinEnter,BufWinEnter * setlocal cursorline
     au WinLeave * setlocal nocursorline
 augroup end
-set laststatus=2
 set statusline=\ %<%l:%v\ [%P]%=%a\ %h%m%r\ %F\
 
 " ==========================================================
@@ -374,11 +388,17 @@ set guioptions-=e    " Don't use GUI tabline
 set encoding=UTF-8
 let g:autoclose_on=1 " do not autoclose brackets
 
-
 " show whitespaces
 set listchars=tab:--,trail:·,nbsp:~,extends:>,precedes:<,eol:¬
 set list
 
+" ==========================================================
+"  Autocmd Bless
+" ==========================================================
+augroup AutoInit
+    autocmd!
+    " autocmd VimEnter,TabNew * TagbarToggle<CR>TagbarToggle<CR>
+augroup END
 
 " ==========================================================
 "  Post Script

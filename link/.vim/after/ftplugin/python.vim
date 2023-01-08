@@ -12,7 +12,7 @@ setlocal foldlevel=99
 setlocal foldmethod=indent
 
 call deoplete#custom#option({
-    \ 'auto_complete_delay': 100,
+    \ 'auto_complete_delay': 50,
     \ 'smart_case': v:true,
     \ 'auto_refresh_delay': 200,
     \ })
