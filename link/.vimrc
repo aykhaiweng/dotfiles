@@ -15,7 +15,6 @@ Plug 'morhetz/gruvbox'
 " ==========================================================
 "  Lightline
 " ==========================================================
-" git wrapper for vim
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
 let g:lightline = {
