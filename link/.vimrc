@@ -13,172 +13,6 @@ set rtp+=~/.vim/my-colors
 Plug 'morhetz/gruvbox'
 
 " ==========================================================
-"  vim-tmux-navigator Plugin
-" ==========================================================
-Plug 'christoomey/vim-tmux-navigator'
-let g:tmux_navigator_no_mappings = 1
-let g:tmux_navigator_disable_when_zoomed = 1
-nnoremap <silent> <C-H> :TmuxNavigateLeft<cr>
-nnoremap <silent> <C-J> :TmuxNavigateDown<cr>
-nnoremap <silent> <C-K> :TmuxNavigateUp<cr>
-nnoremap <silent> <C-L> :TmuxNavigateRight<cr>
-
-" ==========================================================
-"  Ale Plugin
-" ==========================================================
-Plug 'dense-analysis/ale'
-let g:ale_sign_error = '✗'
-let g:ale_sign_warning = '!'
-let g:ale_set_highlights = 1
-let g:ale_lint_delay = 1000
-let g:ale_lint_on_text_changed = 'never'
-let g:ale_lint_on_enter = 0
-let g:ale_set_loclist = 0
-let g:ale_set_quickfix = 1
-let g:ale_echo_msg_error_str = 'E'
-let g:ale_echo_msg_warning_str = 'W'
-let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-
-" ==========================================================
-"  indentLine Plugin
-" ==========================================================
-if has('nvim')
-    Plug 'lukas-reineke/indent-blankline.nvim'
-    set rtp+=~/.config/nvim/lua/indent-blankline.lua
-else
-    Plug 'Yggdroot/indentLine'
-    let g:indentLine_showFirstIndentLevel = 0
-    let g:indentLine_char_list = ['|']
-endif
-
-" ==========================================================
-"  vim-multiple-cursors Plugin
-" ==========================================================
-Plug 'terryma/vim-multiple-cursors'
-let g:multi_cursor_use_default_mapping=1
-
-" ==========================================================
-"  vim-easymotion Plugin
-" ==========================================================
-Plug 'easymotion/vim-easymotion'
-
-" ==========================================================
-"  vim-surround Plugin
-" ==========================================================
-Plug 'tpope/vim-surround'
-
-" ==========================================================
-"  neosnippet Plugin
-" ==========================================================
-Plug 'Shougo/neosnippet'
-Plug 'Shougo/neosnippet-snippets'
-let g:neosnippet#snippets_directory='~/.vim/neosnippets/'
-imap <C-e> <Plug>(neosnippet_expand_or_jump)
-smap <C-e> <Plug>(neosnippet_expand_or_jump)
-xmap <C-e> <Plug>(neosnippet_expand_target)
-
-" ==========================================================
-"  Tagbar Plugin
-" ==========================================================
-Plug 'preservim/tagbar'
-nmap <C-0> :TagbarToggle<CR>
-
-" ==========================================================
-"  fzf Plugin
-" ==========================================================
-Plug 'junegunn/fzf.vim' ", { 'on': ['FZF', 'Buffers', 'Marks'] }
-set rtp+=~/.fzf
-nnoremap <C-P> :Files<CR>
-nnoremap <C-F> :Ag<CR>
-
-" ==========================================================
-"  Deoplete Plugin
-" ==========================================================
-if has('nvim')
-    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-    Plug 'Shougo/deoplete.nvim'
-    Plug 'roxma/nvim-yarp'
-    Plug 'roxma/vim-hug-neovim-rpc'
-endif
-let g:deoplete#enable_at_startup = 1
-inoremap <expr> <C-Space> deoplete#manual_complete()
-
-" ==========================================================
-"  fern Plugin
-" ==========================================================
-Plug 'lambdalisue/fern.vim'
-Plug 'lambdalisue/fern-hijack.vim'
-Plug 'lambdalisue/fern-git-status.vim'
-Plug 'lambdalisue/glyph-palette.vim'
-Plug 'lambdalisue/nerdfont.vim'
-Plug 'lambdalisue/fern-renderer-nerdfont.vim'
-Plug 'yuki-yano/fern-preview.vim'
-" Disable netrw.
-let g:loaded_netrw  = 1
-let g:loaded_netrwPlugin = 1
-let g:loaded_netrwSettings = 1
-let g:loaded_netrwFileHandlers = 1
-let g:fern#default_hidden = 1
-let g:fern#renderer = "nerdfont"
-let g:fern#renderer#nerdfont#root_leading = " "
-let g:fern#renderer#nerdfont#leading = "   "
-let g:fern#renderer#nerdfont#padding = " "
-let g:fern#renderer#nerdfont#indent_markers = 1  " This thing disables the leading
-nnoremap <C-B> :Fern . -drawer -reveal=% -toggle -width=40<CR>
-function! FernInit() abort
-    nmap <buffer><expr>
-        \ <Plug>(fern-my-open-expand-collapse)
-        \ fern#smart#leaf(
-        \   "\<Plug>(fern-action-open:select)",
-        \   "\<Plug>(fern-action-expand)",
-        \   "\<Plug>(fern-action-collapse)",
-        \ )
-    nmap <buffer> <CR> <Plug>(fern-my-open-expand-collapse)
-    nmap <buffer> <2-LeftMouse> <Plug>(fern-my-open-expand-collapse)
-    nmap <buffer> n <Plug>(fern-action-new-path)
-    nmap <buffer> d <Plug>(fern-action-remove)
-    nmap <buffer> m <Plug>(fern-action-move)
-    nmap <buffer> M <Plug>(fern-action-rename)
-    nmap <buffer> r <Plug>(fern-action-reload)
-    nmap <buffer> b <Plug>(fern-action-open:split)
-    nmap <buffer> v <Plug>(fern-action-open:vsplit)
-    nmap <silent><buffer> p <Plug>(fern-action-preview:toggle)
-    nmap <buffer><nowait> < <Plug>(fern-action-leave)
-    nmap <buffer><nowait> > <Plug>(fern-action-enter)
-    nmap <buffer><silent> <C-H> :TmuxNavigateLeft<cr>
-    nmap <buffer><silent> <C-J> :TmuxNavigateDown<cr>
-    nmap <buffer><silent> <C-K> :TmuxNavigateUp<cr>
-    nmap <buffer><silent> <C-L> :TmuxNavigateRight<cr>
-    nmap <silent><buffer> p <Plug>(fern-action-preview:toggle)
-endfunction
-augroup FernGroup
-    autocmd!
-    autocmd FileType fern call glyph_palette#apply()
-    autocmd FileType fern call FernInit()
-    autocmd FileType fern setlocal nonumber
-    autocmd FileType fern setlocal norelativenumber
-    autocmd FileType fern setlocal numberwidth=1
-augroup END
-
-" ==========================================================
-"  vim-fugitive Plugin
-" ==========================================================
-Plug 'tpope/vim-fugitive'
-
-" ==========================================================
-"  vim-gitgutter Plugin
-" ==========================================================
-if has('nvim')
-    Plug 'lewis6991/gitsigns.nvim'
-    set rtp+=~/.config/nvim/lua/gitsigns.lua
-else
-    Plug 'airblade/vim-gitgutter'
-    let g:gitgutter_terminal_reports_focus=0
-    let g:gitgutter_max_signs=1000
-endif
-
-" ==========================================================
 "  Lightline
 " ==========================================================
 " git wrapper for vim
@@ -249,6 +83,183 @@ au! BufEnter *
 set laststatus=2
 
 " ==========================================================
+"  vim-tmux-navigator Plugin
+" ==========================================================
+Plug 'christoomey/vim-tmux-navigator'
+let g:tmux_navigator_no_mappings = 1
+let g:tmux_navigator_disable_when_zoomed = 1
+nnoremap <silent> <C-H> :TmuxNavigateLeft<cr>
+nnoremap <silent> <C-J> :TmuxNavigateDown<cr>
+nnoremap <silent> <C-K> :TmuxNavigateUp<cr>
+nnoremap <silent> <C-L> :TmuxNavigateRight<cr>
+
+" ==========================================================
+"  Ale Plugin
+" ==========================================================
+Plug 'dense-analysis/ale'
+let g:ale_sign_error = '✗'
+let g:ale_sign_warning = '!'
+let g:ale_set_highlights = 1
+let g:ale_lint_delay = 1000
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_enter = 0
+let g:ale_set_loclist = 0
+let g:ale_set_quickfix = 1
+let g:ale_echo_msg_error_str = 'E'
+let g:ale_echo_msg_warning_str = 'W'
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+
+" ==========================================================
+"  indentLine Plugin
+" ==========================================================
+if has('nvim')
+    Plug 'lukas-reineke/indent-blankline.nvim'
+    set rtp+=~/.config/nvim/lua/indent-blankline.lua
+else
+    Plug 'Yggdroot/indentLine'
+    let g:indentLine_showFirstIndentLevel = 0
+    let g:indentLine_char_list = ['|']
+endif
+
+" ==========================================================
+"  vim-multiple-cursors Plugin
+" ==========================================================
+Plug 'terryma/vim-multiple-cursors'
+let g:multi_cursor_use_default_mapping=1
+
+" ==========================================================
+"  vim-easymotion Plugin
+" ==========================================================
+Plug 'easymotion/vim-easymotion'
+
+" ==========================================================
+"  vim-surround Plugin
+" ==========================================================
+Plug 'tpope/vim-surround'
+
+" ==========================================================
+"  neosnippet Plugin
+" ==========================================================
+Plug 'Shougo/neosnippet'
+Plug 'Shougo/neosnippet-snippets'
+let g:neosnippet#snippets_directory='~/.vim/neosnippets/'
+imap <C-e> <Plug>(neosnippet_expand_or_jump)
+smap <C-e> <Plug>(neosnippet_expand_or_jump)
+xmap <C-e> <Plug>(neosnippet_expand_target)
+
+" ==========================================================
+"  Tagbar Plugin
+" ==========================================================
+Plug 'preservim/tagbar'
+nmap <leader>= :TagbarOpen f<CR>
+nmap <leader>+ :TagbarToggle<CR>
+
+" ==========================================================
+"  fzf Plugin
+" ==========================================================
+Plug 'junegunn/fzf.vim' ", { 'on': ['FZF', 'Buffers', 'Marks'] }
+set rtp+=~/.fzf
+nnoremap <C-P> :Files<CR>
+nnoremap <C-F> :Ag<CR>
+
+" ==========================================================
+"  Deoplete Plugin
+" ==========================================================
+if has('nvim')
+    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+    Plug 'Shougo/deoplete.nvim'
+    Plug 'roxma/nvim-yarp'
+    Plug 'roxma/vim-hug-neovim-rpc'
+endif
+let g:deoplete#enable_at_startup = 1
+inoremap <expr> <C-Space> deoplete#manual_complete()
+
+" ==========================================================
+"  echodoc Plugin
+" ==========================================================
+Plug 'Shougo/echodoc.vim'
+let g:echodoc#enable_at_startup = 1 
+let g:echodoc#type = "echo" 
+
+" ==========================================================
+"  fern Plugin
+" ==========================================================
+Plug 'lambdalisue/fern.vim'
+Plug 'lambdalisue/fern-hijack.vim'
+Plug 'lambdalisue/fern-git-status.vim'
+Plug 'lambdalisue/glyph-palette.vim'
+Plug 'lambdalisue/nerdfont.vim'
+Plug 'lambdalisue/fern-renderer-nerdfont.vim'
+Plug 'yuki-yano/fern-preview.vim'
+" Disable netrw.
+let g:loaded_netrw  = 0
+let g:loaded_netrwPlugin = 0
+let g:loaded_netrwSettings = 0
+let g:loaded_netrwFileHandlers = 0
+let g:fern#default_hidden = 1
+let g:fern#renderer = "nerdfont"
+let g:fern#renderer#nerdfont#root_leading = " "
+let g:fern#renderer#nerdfont#leading = "   "
+let g:fern#renderer#nerdfont#padding = " "
+let g:fern#renderer#nerdfont#indent_markers = 1  " This thing disables the leading
+nnoremap <C-B> :Fern . -drawer -reveal=% -toggle -width=40<CR>
+nnoremap <leader>_ :Fern . -drawer -reveal=% -toggle -width=40<CR>
+nnoremap <leader>- :Fern . -drawer -reveal=%<CR>
+function! FernInit() abort
+    nmap <buffer><expr>
+        \ <Plug>(fern-my-open-expand-collapse)
+        \ fern#smart#leaf(
+        \   "\<Plug>(fern-action-open:select)",
+        \   "\<Plug>(fern-action-expand)",
+        \   "\<Plug>(fern-action-collapse)",
+        \ )
+    nmap <buffer> <CR> <Plug>(fern-my-open-expand-collapse)
+    nmap <buffer> <2-LeftMouse> <Plug>(fern-my-open-expand-collapse)
+    nmap <buffer> n <Plug>(fern-action-new-path)
+    nmap <buffer> d <Plug>(fern-action-remove)
+    nmap <buffer> m <Plug>(fern-action-move)
+    nmap <buffer> M <Plug>(fern-action-rename)
+    nmap <buffer> r <Plug>(fern-action-reload)
+    nmap <buffer> b <Plug>(fern-action-open:split)
+    nmap <buffer> v <Plug>(fern-action-open:vsplit)
+    nmap <silent><buffer> p <Plug>(fern-action-preview:toggle)
+    nmap <buffer><nowait> < <Plug>(fern-action-leave)
+    nmap <buffer><nowait> > <Plug>(fern-action-enter)
+    nmap <buffer><silent> <C-H> :TmuxNavigateLeft<cr>
+    nmap <buffer><silent> <C-J> :TmuxNavigateDown<cr>
+    nmap <buffer><silent> <C-K> :TmuxNavigateUp<cr>
+    nmap <buffer><silent> <C-L> :TmuxNavigateRight<cr>
+    nmap <silent><buffer> p <Plug>(fern-action-preview:toggle)
+endfunction
+augroup FernGroup
+    autocmd!
+    autocmd FileType fern call glyph_palette#apply()
+    autocmd FileType fern call FernInit()
+    autocmd FileType fern setlocal nonumber
+    autocmd FileType fern setlocal norelativenumber
+    autocmd FileType fern setlocal numberwidth=1
+    autocmd FileType fern setlocal statusline=%#Normal#
+augroup END
+
+" ==========================================================
+"  vim-fugitive Plugin
+" ==========================================================
+Plug 'tpope/vim-fugitive'
+
+" ==========================================================
+"  vim-gitgutter Plugin
+" ==========================================================
+if has('nvim')
+    Plug 'lewis6991/gitsigns.nvim'
+    set rtp+=~/.config/nvim/lua/gitsigns.lua
+else
+    Plug 'airblade/vim-gitgutter'
+    let g:gitgutter_terminal_reports_focus=0
+    let g:gitgutter_max_signs=1000
+endif
+
+" ==========================================================
 "  vim-smoothie Plugin
 " ==========================================================
 Plug 'psliwka/vim-smoothie'
@@ -259,6 +270,11 @@ let g:smoothie_enabled = 1
 " ==========================================================
 Plug 'sheerun/vim-polyglot'
 let g:polyglot_disabled = ['vue', 'json']
+
+" ==========================================================
+"  vimspector
+" ==========================================================
+Plug 'puremourning/vimspector'
 
 " ==========================================================
 "  Python Plugins
@@ -397,7 +413,6 @@ set list
 " ==========================================================
 augroup AutoInit
     autocmd!
-    " autocmd VimEnter,TabNew * TagbarToggle<CR>TagbarToggle<CR>
 augroup END
 
 " ==========================================================
