@@ -18,4 +18,4 @@ call deoplete#custom#option({
     \ })
 call deoplete#custom#source('_',
     \'disabled_syntaxes', ['Comment']
-    \)
+    \ )

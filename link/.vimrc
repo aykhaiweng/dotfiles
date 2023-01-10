@@ -93,6 +93,11 @@ nnoremap <silent> <C-K> :TmuxNavigateUp<cr>
 nnoremap <silent> <C-L> :TmuxNavigateRight<cr>
 
 " ==========================================================
+"  vim-floaterm
+" ==========================================================
+Plug 'voldikss/vim-floaterm'
+
+" ==========================================================
 "  Ale Plugin
 " ==========================================================
 Plug 'dense-analysis/ale'
@@ -172,6 +177,8 @@ else
     Plug 'roxma/vim-hug-neovim-rpc'
 endif
 let g:deoplete#enable_at_startup = 1
+let g:deoplete#enable_typeinfo = 1
+let g:deoplete#show_docstring = 1
 inoremap <expr> <C-Space> deoplete#manual_complete()
 
 " ==========================================================
@@ -179,7 +186,9 @@ inoremap <expr> <C-Space> deoplete#manual_complete()
 " ==========================================================
 Plug 'Shougo/echodoc.vim'
 let g:echodoc#enable_at_startup = 1 
-let g:echodoc#type = "echo" 
+let g:echodoc#type = "popup" 
+highlight link EchoDocFloat Pmenu
+highlight link EchoDocPopup Pmenu
 
 " ==========================================================
 "  fern Plugin
@@ -202,8 +211,8 @@ let g:fern#renderer#nerdfont#root_leading = " "
 let g:fern#renderer#nerdfont#leading = "   "
 let g:fern#renderer#nerdfont#padding = " "
 let g:fern#renderer#nerdfont#indent_markers = 1  " This thing disables the leading
-nnoremap <C-B> :Fern . -drawer -reveal=% -toggle -width=40<CR>
-nnoremap <leader>_ :Fern . -drawer -reveal=% -toggle -width=40<CR>
+nnoremap <C-B> :Fern . -drawer -reveal=% -toggle -width=50<CR>
+nnoremap <leader>_ :Fern . -drawer -reveal=% -toggle -width=50<CR>
 nnoremap <leader>- :Fern . -drawer -reveal=%<CR>
 function! FernInit() abort
     nmap <buffer><expr>
@@ -220,7 +229,7 @@ function! FernInit() abort
     nmap <buffer> m <Plug>(fern-action-move)
     nmap <buffer> M <Plug>(fern-action-rename)
     nmap <buffer> r <Plug>(fern-action-reload)
-    nmap <buffer> b <Plug>(fern-action-open:split)
+    nmap <buffer> s <Plug>(fern-action-open:split)
     nmap <buffer> v <Plug>(fern-action-open:vsplit)
     nmap <silent><buffer> p <Plug>(fern-action-preview:toggle)
     nmap <buffer><nowait> < <Plug>(fern-action-leave)
@@ -229,7 +238,6 @@ function! FernInit() abort
     nmap <buffer><silent> <C-J> :TmuxNavigateDown<cr>
     nmap <buffer><silent> <C-K> :TmuxNavigateUp<cr>
     nmap <buffer><silent> <C-L> :TmuxNavigateRight<cr>
-    nmap <silent><buffer> p <Plug>(fern-action-preview:toggle)
 endfunction
 augroup FernGroup
     autocmd!
@@ -239,6 +247,7 @@ augroup FernGroup
     autocmd FileType fern setlocal norelativenumber
     autocmd FileType fern setlocal numberwidth=1
     autocmd FileType fern setlocal statusline=%#Normal#
+    autocmd FileType fern setlocal scl=no
 augroup END
 
 " ==========================================================
@@ -280,6 +289,7 @@ Plug 'puremourning/vimspector'
 "  - deoplete-jedi
 " ==========================================================
 Plug 'deoplete-plugins/deoplete-jedi', {'for': ['python']}
+Plug 'davidhalter/jedi', {'for': ['python']}
 
 " ==========================================================
 "  Plug End
