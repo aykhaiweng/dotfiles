@@ -5,8 +5,7 @@ is_ubuntu || return 1
 
 # Disable frontend for some installers
 export DEBIAN_FRONTEND=noninteractive
-export TZ=Asia/Kuala_Lumpur
-sudo apt-get -y install tzdata build-essential apt-transport-https software-properties-common unzip cmake make
+sudo apt-get -y install build-essential apt-transport-https software-properties-common unzip cmake make
 
 # Commands
 apt_ppa=()
@@ -18,7 +17,6 @@ apt_packages=(
     gettext
     gnupg-agent
     jq
-    lazygit
     libbz2-dev
     libc6-dev
     libffi-dev
@@ -74,7 +72,10 @@ sudo apt update
 
 # Install the apt packages
 e_arrow "Installing apt packages"
-sudo apt install -qy ${apt_packages[*]// /\s}
+formatted_packages=${apt_packages[*]// /\s}
+e_arrow "$formatted_packages"
+sudo apt install -qy $formatted_packages
+read userinput
 
 # Install pyenv
 if [[ -d "$HOME/.pyenv" ]]; then

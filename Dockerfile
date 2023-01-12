@@ -4,6 +4,7 @@ MAINTAINER Au Yeong Khai Weng <aykhaiweng@gmail.com>
 # OS updates and install
 RUN apt-get -qq update
 RUN apt-get install sudo apt-utils -qq -y
+RUN DEBIAN_FRONTEND=noninteractive TZ=Asia/Kuala_Lumpur apt-get -y install tzdata
 
 # Create test user and add to sudoers
 RUN useradd -m aykhaiweng
