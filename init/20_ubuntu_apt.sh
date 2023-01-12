@@ -68,15 +68,17 @@ apt_packages+=(docker.io)
 
 # Adding apt repositories
 e_arrow "Adding apt repositories"
-for entry in "${apt_ppa[@]}"; do
-    sudo add-apt-repository -y $entry
-done
+# for entry in "${apt_ppa[@]}"; do
+#     sudo add-apt-repository -y $entry
+# done
+sudo add-apt-repository ${apt_ppa[*]// /\s}
 
 # Install the apt packages
 e_arrow "Installing apt packages"
-for entry in "${apt_packages[@]}"; do
-    sudo apt install -qy $entry
-done
+# for entry in "${apt_packages[@]}"; do
+#     sudo apt install -qy $entry
+# done
+sudo apt install -qy ${apt_packages[*]// /\s}
 
 # Install pyenv
 if [[ -d "$HOME/.pyenv" ]]; then
