@@ -34,13 +34,13 @@ function init_do() {
 # Copy, link, init, etc.
 function do_stuff() {
     # Saving these as local variables for now
-    local source_folder=$1
+    local command=$1
     local target_folder=${2:-$HOME}
     local extra_find_args=$3
 
-    e_header "Doing $source_folder"
+    e_header "Doing $command"
 
-    # Replacing source_folder with the dotfiles related path
+    # Replacing command with the dotfiles related path
     dotfiles_relative_path=$DOTFILES/$1
 
     # Check if the path relative to the dotfiles exists before attempting anything
@@ -61,10 +61,10 @@ function do_stuff() {
                     mkdir -p "$backup_dir"
                     backup=1
                 fi
-                e_arrow "[$source_folder] $home_target Already exists. Creating a backup"
+                e_arrow "[$command] $home_target Already exists. Creating a backup"
                 cp -r "$home_target" "$backup_dir$target_file"
             fi
-            "${source_folder}_do" "$source_file" "$home_target"
+            "${command}_do" "$source_file" "$home_target"
         done
     fi
 }
