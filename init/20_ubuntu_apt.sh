@@ -6,20 +6,19 @@ is_ubuntu || return 1
 # Disable frontend for some installers
 export DEBIAN_FRONTEND=noninteractive
 export TZ=Asia/Kuala_Lumpur
-sudo apt-get -y install tzdata
+sudo apt-get -y install tzdata build-essential apt-transport-https software-properties-common unzip cmake make
 
 # Commands
 apt_ppa=()
 apt_packages=(
-    apt-transport-https
     bat
-    build-essential
     ca-certificates 
     certbot
-    cmake
     curl
+    gettext
     gnupg-agent
     jq
+    lazygit
     libbz2-dev
     libc6-dev
     libffi-dev
@@ -29,16 +28,14 @@ apt_packages=(
     libreadline-dev
     libsqlite3-dev
     libssl-dev
+    libtool-bin
     libxml2-dev
     libxmlsec1-dev
     llvm
-    make
     nodejs
     npm
     silversearcher-ag
-    software-properties-common
     tk-dev
-    wget
     wget
     xclip
     xz-utils
@@ -70,7 +67,9 @@ apt_packages+=(docker.io)
 
 # Adding apt repositories
 e_arrow "Adding apt repositories"
-sudo add-apt-repository ${apt_ppa[*]// /\s}
+for entry in "${apt_ppa[@]}"; do
+    sudo add-apt-repository -y $entry
+done
 sudo apt update
 
 # Install the apt packages
