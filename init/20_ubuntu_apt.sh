@@ -5,6 +5,8 @@ is_ubuntu || return 1
 
 # Disable frontend for some installers
 export DEBIAN_FRONTEND=noninteractive
+export TZ=Asia/Kuala_Lumpur
+sudo apt-get -y install tzdata
 
 # Commands
 apt_ppa=()
@@ -68,16 +70,11 @@ apt_packages+=(docker.io)
 
 # Adding apt repositories
 e_arrow "Adding apt repositories"
-# for entry in "${apt_ppa[@]}"; do
-#     sudo add-apt-repository -y $entry
-# done
 sudo add-apt-repository ${apt_ppa[*]// /\s}
+sudo apt update
 
 # Install the apt packages
 e_arrow "Installing apt packages"
-# for entry in "${apt_packages[@]}"; do
-#     sudo apt install -qy $entry
-# done
 sudo apt install -qy ${apt_packages[*]// /\s}
 
 # Install pyenv

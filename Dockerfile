@@ -18,4 +18,4 @@ RUN chown -R aykhaiweng:aykhaiweng /home/aykhaiweng
 USER aykhaiweng
 ENV HOME /home/aykhaiweng
 
-ENTRYPOINT ["/bin/bash", "/home/aykhaiweng/.dotfiles/bin/dotfiles"]
+CMD ["/bin/bash", "/home/aykhaiweng/.dotfiles/bin/dotfiles"]
