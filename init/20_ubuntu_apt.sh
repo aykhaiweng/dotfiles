@@ -75,12 +75,12 @@ e_arrow "Installing apt packages"
 formatted_packages=${apt_packages[*]// /\s}
 e_arrow "$formatted_packages"
 sudo apt install -qy $formatted_packages
-read userinput
 
 # Install pyenv
 if [[ -d "$HOME/.pyenv" ]]; then
     e_arrow "pyenv is already installed"
 else
-    e_success "Installing pyenv"
+    e_arrow "Installing pyenv..."
     curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+    e_success "Pyenv installed."
 fi

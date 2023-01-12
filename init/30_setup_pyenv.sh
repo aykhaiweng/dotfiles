@@ -14,8 +14,9 @@ PYTHON3_VER="3.11"
 if [[ $(pyenv versions | grep $PYTHON3_VER) ]]; then
     e_arrow "Python $PYTHON3_VER is already installed"
 else
-    e_success "Installing Python $PYTHON3_VER with pyenv..."
+    e_arrow "Installing Python $PYTHON3_VER with pyenv..."
     yes '' | pyenv install $PYTHON3_VER
     pyenv global $PYTHON3_VER
     pip install -U pip
+    e_success "Python $PYTHON3_VER installed."
 fi

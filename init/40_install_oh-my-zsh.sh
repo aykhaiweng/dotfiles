@@ -5,6 +5,7 @@ if [[ -d "$HOME/.oh-my-zsh/" ]]; then
 else
     e_arrow "Setting KEEP_ZSHRC=yes"
     export KEEP_ZSHRC=yes
-    e_success "Installing oh-my-zsh"
+    e_arrow "Installing oh-my-zsh..."
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    e_success "oh-my-zsh installed."
 fi

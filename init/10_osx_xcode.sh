@@ -6,6 +6,7 @@ is_osx || return 1
 if [[ -d "$('xcode-select' -print-path 2>/dev/null)" ]]; then
     e_arrow "XCode Command Line Tools is already installed"
 else
-    e_success "Installing XCode Command Line Tools"
+    e_arrow "Installing XCode Command Line Tools..."
     sudo xcode-select -switch /Library/Developer/CommandLineTools
+    e_success "XCode Command Line Tools installed."
 fi
