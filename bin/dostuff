@@ -61,8 +61,8 @@ function do_stuff() {
                     mkdir -p "$backup_dir"
                     backup=1
                 fi
-                e_arrow "[$command] $home_target Already exists. Creating a backup"
-                cp -r "$home_target" "$backup_dir$target_file"
+                e_arrow "[$command] $home_target Already exists. Creating a backup at $backup_dir$target_file"
+                mv "$home_target" "$backup_dir$target_file"
             fi
             "${command}_do" "$source_file" "$home_target"
         done
