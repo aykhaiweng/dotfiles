@@ -211,7 +211,7 @@ let g:fern#renderer#nerdfont#root_leading = " "
 let g:fern#renderer#nerdfont#leading = "   "
 let g:fern#renderer#nerdfont#padding = " "
 let g:fern#renderer#nerdfont#indent_markers = 1  " This thing disables the leading
-nnoremap <C-B> :Fern . -drawer -reveal=% -toggle -width=35<CR>
+nnoremap <C-B> :Fern . -drawer -reveal=% -toggle -width=40<CR>
 nnoremap <leader>_ :Fern . -drawer -reveal=% -toggle<CR>
 nnoremap <leader>- :Fern . -drawer -reveal=%<CR>
 function! FernInit() abort
