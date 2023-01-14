@@ -120,6 +120,11 @@ _G.packer_plugins = {
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/harpoon",
     url = "https://github.com/ThePrimeagen/harpoon"
   },
+  ["lazygit.nvim"] = {
+    loaded = true,
+    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/lazygit.nvim",
+    url = "https://github.com/kdheepak/lazygit.nvim"
+  },
   ["lsp-zero.nvim"] = {
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/lsp-zero.nvim",
@@ -171,10 +176,14 @@ _G.packer_plugins = {
     url = "https://github.com/nvim-lua/plenary.nvim"
   },
   ["telescope-media.nvim"] = {
-    config = { "\27LJ\2\nJ\0\0\3\0\4\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0'\2\3\0B\0\2\1K\0\1\0\nmedia\19load_extension\14telescope\frequire\0" },
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/telescope-media.nvim",
     url = "https://github.com/dharmx/telescope-media.nvim"
+  },
+  ["telescope-ui-select.nvim"] = {
+    loaded = true,
+    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/telescope-ui-select.nvim",
+    url = "https://github.com/nvim-telescope/telescope-ui-select.nvim"
   },
   ["telescope.nvim"] = {
     loaded = true,
@@ -203,10 +212,6 @@ time([[Defining packer_plugins]], false)
 time([[Config for gruvbox]], true)
 try_loadstring("\27LJ\2\n7\0\0\3\0\3\0\0056\0\0\0009\0\1\0'\2\2\0B\0\2\1K\0\1\0\24colorscheme gruvbox\bcmd\bvim\0", "config", "gruvbox")
 time([[Config for gruvbox]], false)
--- Config for: telescope-media.nvim
-time([[Config for telescope-media.nvim]], true)
-try_loadstring("\27LJ\2\nJ\0\0\3\0\4\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0'\2\3\0B\0\2\1K\0\1\0\nmedia\19load_extension\14telescope\frequire\0", "config", "telescope-media.nvim")
-time([[Config for telescope-media.nvim]], false)
 
 _G._packer.inside_compile = false
 if _G._packer.needs_bufread == true then

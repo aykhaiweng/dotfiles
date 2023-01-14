@@ -1,7 +1,7 @@
 vim.opt.guicursor = ""
 
 -- clipboard
-vim.opt.clipboard = "unnamed,unnamedplus"
+-- vim.opt.clipboard = "unnamed,unnamedplus"
 
 -- set line numbers
 vim.opt.nu = true

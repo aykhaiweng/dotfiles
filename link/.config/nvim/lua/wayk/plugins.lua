@@ -18,27 +18,6 @@ return require('packer').startup(function(use)
     -- Plugins go here
 
 
-    -- nvim-web-devicons
-    use('nvim-tree/nvim-web-devicons')
-
-    -- Telescope (fuzzyfinder) -- requires rg
-    use({
-        'nvim-telescope/telescope.nvim',
-        requires = { {'nvim-lua/plenary.nvim'} }
-    })
-
-    -- Telescope Media
-    use({
-        "dharmx/telescope-media.nvim",
-        config = function()
-            require("telescope").load_extension("media")
-        end,
-        requires = {
-            "nvim-lua/plenary.nvim",
-            "nvim-telescope/telescope.nvim",
-        }
-    })
-
     -- Gruvbox (colorscheme)
     use({
         'morhetz/gruvbox',
@@ -47,15 +26,33 @@ return require('packer').startup(function(use)
             vim.cmd('colorscheme gruvbox')
         end
     })
+    -- nvim-web-devicons
+    use('nvim-tree/nvim-web-devicons')
+
+    -- Telescope (fuzzyfinder) -- requires rg
+    use({
+        'nvim-telescope/telescope.nvim',
+        requires = { {'nvim-lua/plenary.nvim'} }
+    })
+    -- extension: telescope-media
+    use({
+        "dharmx/telescope-media.nvim",
+        requires = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope.nvim", }
+    })
+    -- extension: telescope-ui-select
+    use({
+        "nvim-telescope/telescope-ui-select.nvim",
+        requires = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope.nvim", }
+    })
 
     -- Treesitter (parser/syntax highlighting)
     use('nvim-treesitter/nvim-treesitter', { run = ':TSUpdate' })
+    -- Playground
     use('nvim-treesitter/playground')
 
     -- Harpoon (File explorer)
     use({
-        'ThePrimeagen/harpoon',
-        requires={ {'nvim-lua/plenary.nvim'} }
+        'ThePrimeagen/harpoon', requires={ 'nvim-lua/plenary.nvim' }
 
     })
 
@@ -65,6 +62,8 @@ return require('packer').startup(function(use)
 
     -- Fugitive (Git interface)
     use('tpope/vim-fugitive')
+    -- lazygit
+    use('kdheepak/lazygit.nvim')
 
     -- Language Server Protocol
     use({
