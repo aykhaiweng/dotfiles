@@ -59,11 +59,12 @@ return require('packer').startup(function(use)
     -- Undotree
     use('mbbill/undotree')
 
-
     -- Fugitive (Git interface)
     use('tpope/vim-fugitive')
     -- lazygit
     use('kdheepak/lazygit.nvim')
+    -- gitsigns
+    use('lewis6991/gitsigns.nvim')
 
     -- Language Server Protocol
     use({

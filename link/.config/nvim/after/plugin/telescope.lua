@@ -9,6 +9,13 @@ require('telescope').load_extension('lazygit')
 require('telescope').load_extension('ui-select')
 
 
+-- variables
+local default_file_ignore_patterns = {
+    ".git/*",
+    "node_modules/*"
+}
+
+
 -- setup
 require('telescope').setup({
     defaults = {
@@ -23,7 +30,7 @@ require('telescope').setup({
             '--column',
             '--smart-case',
         },
-        prompt_prefix = 🔍,
+        prompt_prefix = "   ",
         -- mappings
         mappings = {
             i = {
@@ -41,28 +48,28 @@ require('telescope').setup({
     },
     pickers = {
         find_files = {
-            theme = "ivy",
             hidden = true,
             smartcase = true,
-            file_ignore_patterns = { ".git/*", "node%_modules/" },
+            file_ignore_patterns = default_file_ignore_patterns,
             layout_config = {
-                cursor = { width = 1, height = 0.7 }
+                cursor = { width = 1, height = 0.7 },
+                prompt_position = "top"
             }
         },
         git_files = {
-            theme = "ivy",
             smartcase = true,
             layout_config = {
-                cursor = { width = 1, height = 0.7 }
+                cursor = { width = 1, height = 0.7 },
+                prompt_position = "top"
             }
         },
         grep_string = {
-            theme = "ivy",
             hidden = true,
             smartcase = true,
-            file_ignore_patterns = { ".git/*", "node%_modules/" },
+            file_ignore_patterns = default_file_ignore_patterns,
             layout_config = {
-                cursor = { width = 1, height = 0.7 }
+                cursor = { width = 1, height = 0.7 },
+                prompt_position = "top"
             }
         }
     },
@@ -86,3 +93,4 @@ vim.keymap.set('n', '<C-p>', builtin.git_files, {})
 vim.keymap.set('n', '<leader>ps', function()
     builtin.grep_string({ search = vim.fn.input("Grep > ") })
 end)
+
