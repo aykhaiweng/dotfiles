@@ -87,6 +87,9 @@ return require('packer').startup(function(use)
         }
     })
 
+    -- zenmode
+    use({"folke/zen-mode.nvim"})
+
     -- tmux-vim
     use({'christoomey/vim-tmux-navigator'})
 
