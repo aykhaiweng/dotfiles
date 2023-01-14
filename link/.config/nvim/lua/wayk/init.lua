@@ -1,3 +1,3 @@
 require('wayk.set')
 require('wayk.plugins')
-require('wayk.remap')
+require('wayk.remaps')
