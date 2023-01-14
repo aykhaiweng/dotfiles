@@ -1,7 +1,7 @@
 vim.g.mapleader = " "
 
 -- netrw
-vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+-- vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 
 -- tabs
 vim.keymap.set('n', '<leader>tj',  vim.cmd.tabfirst)
@@ -43,6 +43,8 @@ vim.keymap.set('n', '<leader>f', function()
     vim.lsp.buf.format()
 end)
 
-
 -- Imba substitute command
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+
+-- set breakpoints
+vim.keymap.set('n', '<leader>bp', vim.cmd.Break)

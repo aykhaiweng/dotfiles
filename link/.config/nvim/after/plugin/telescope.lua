@@ -1,13 +1,12 @@
-local builtin = require('telescope.builtin')
-local actions = require('telescope.actions')
-local themes = require('telescope.themes')
-
+local builtin = require("telescope.builtin")
+local actions = require("telescope.actions")
+local themes = require("telescope.themes")
 
 -- extensions
-require('telescope').load_extension('media')
-require('telescope').load_extension('lazygit')
-require('telescope').load_extension('ui-select')
-
+require("telescope").load_extension("media")
+require("telescope").load_extension("lazygit")
+require("telescope").load_extension("ui-select")
+require("telescope").load_extension("vimspector")
 
 -- variables
 local default_file_ignore_patterns = {
@@ -17,18 +16,18 @@ local default_file_ignore_patterns = {
 
 
 -- setup
-require('telescope').setup({
+require("telescope").setup({
     defaults = {
         -- rg
         vimgrep_arguments = {
-            'rg',
-            '--color=never',
-            '--no-heading',
-            '--hidden',
-            '--with-filename',
-            '--line-number',
-            '--column',
-            '--smart-case',
+            "rg",
+            "--color=never",
+            "--no-heading",
+            "--hidden",
+            "--with-filename",
+            "--line-number",
+            "--column",
+            "--smart-case",
         },
         prompt_prefix = "   ",
         -- mappings
@@ -79,18 +78,18 @@ require('telescope').setup({
             move = true, -- experimental GIF preview
             cache_path = "/tmp/tele.media.cache",
         },
-        ['ui-select'] = {
+        ["ui-select"] = {
             themes.get_dropdown({})
         }
     }
 })
 
 -- remaps
-vim.keymap.set('n', '<leader>pf', function()
+vim.keymap.set("n", "<leader>pf", function()
     builtin.find_files()
 end)
-vim.keymap.set('n', '<C-p>', builtin.git_files, {})
-vim.keymap.set('n', '<leader>ps', function()
+vim.keymap.set("n", "<C-p>", builtin.git_files, {})
+vim.keymap.set("n", "<leader>ps", function()
     builtin.grep_string({ search = vim.fn.input("Grep > ") })
 end)
-
+vim.keymap.set("n", "<leader>pvs", require("telescope").extensions.vimspector.configurations, {})

@@ -1,3 +1,4 @@
+-- uhhhh
 vim.opt.guicursor = ""
 
 -- clipboard
@@ -6,6 +7,12 @@ vim.opt.guicursor = ""
 -- set line numbers
 vim.opt.nu = true
 vim.opt.relativenumber = true
+
+-- tabline
+vim.opt.showtabline = 2
+-- Focus on the split window when opened
+vim.opt.splitright = true
+vim.opt.splitbelow = true
 
 -- show whitespaces, tabs and spaces
 vim.opt.listchars = "tab:--,trail:·,nbsp:~,extends:>,precedes:<,eol:¬"
@@ -43,3 +50,6 @@ vim.opt.isfname:append("@-@")
 
 -- updatetime
 vim.opt.updatetime = 50
+
+-- Python implementation
+vim.g.python3_host_prog = os.getenv("HOME") .. "/.pyenv/versions/neovim3/bin/python3"
