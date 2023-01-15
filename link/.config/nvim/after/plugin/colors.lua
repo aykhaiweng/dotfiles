@@ -16,21 +16,22 @@ require("gruvbox").setup({
     bold = true,
     italic = false,
     strikethrough = true,
-    invert_selection = true,
+    invert_selection = false,
     invert_signs = false,
     invert_tabline = false,
-    invert_intend_guides = true,
-    inverse = true, -- invert background for search, diffs, statuslines and errors
-    contrast = "hard", -- can be "hard", "soft" or empty string
+    invert_intend_guides = false,
+    inverse = false, -- invert background for search, diffs, statuslines and errors
+    contrast = "", -- can be "hard", "soft" or empty string
     palette_overrides = {},
     overrides = {},
     dim_inactive = false,
-    transparent_mode = false,
+    transparent_mode = true,
 })
 
 function ColorMyPencils(color)
     color = color or "gruvbox"
     vim.cmd.colorscheme(color)
+    vim.opt.background = "dark"
     -- Background Colors
     vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
     vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })

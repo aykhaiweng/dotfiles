@@ -19,24 +19,22 @@ return require("packer").startup(function(use)
 
 
     -- Gruvbox (colorscheme)
-    use({
-        "ellisonleao/gruvbox.nvim",
-        as = "gruvbox",
-        config = function()
-            vim.cmd("colorscheme gruvbox")
-        end
-    })
+    use({"ellisonleao/gruvbox.nvim", as = "gruvbox"})
     -- Devicons
     use("nvim-tree/nvim-web-devicons")
     -- Shows indents on the editor
-    use("lukas-reineke/indent-blankline.nvim")
+    -- use("lukas-reineke/indent-blankline.nvim")
     -- lualine
     use("nvim-lualine/lualine.nvim")
+    -- tabline
+    use("kdheepak/tabline.nvim")
+    -- incline -- floating statuslines
+    use("b0o/incline.nvim")
 
     -- nvim-tree (Filebrowser)
     use("nvim-tree/nvim-tree.lua")
     -- Telescope (fuzzyfinder) -- requires rg
-    use({"nvim-telescope/telescope.nvim", requires = { {"nvim-lua/plenary.nvim"} } })
+    use({"nvim-telescope/telescope.nvim", requires = {"nvim-lua/plenary.nvim"} })
     -- extension: telescope-media
     use({"dharmx/telescope-media.nvim", requires = { "nvim-lua/plenary.nvim" } })
     -- extension: telescope-ui-select
@@ -89,6 +87,18 @@ return require("packer").startup(function(use)
 
     -- tmux-vim
     use("christoomey/vim-tmux-navigator")
+
+    -- Impatient (improved loading for nvim by caching chunks
+    use("lewis6991/impatient.nvim")
+
+    -- persistence (Automatic session loading)
+    use({"folke/persistence.nvim",
+        event = "BufReadPre", -- this will only start session saving when an actual file was opened
+        module = "persistence",
+    })
+
+    -- Highlighting color codes in NVIM
+    use("norcalli/nvim-colorizer.lua")
 
 
     -- Automatically set up your configuration after cloning

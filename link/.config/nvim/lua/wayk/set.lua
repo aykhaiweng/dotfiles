@@ -10,6 +10,8 @@ vim.opt.relativenumber = true
 
 -- tabline
 vim.opt.showtabline = 2
+-- status
+vim.opt.laststatus = 3
 -- Focus on the split window when opened
 vim.opt.splitright = true
 vim.opt.splitbelow = true
