@@ -278,6 +278,14 @@ local ScrollBar = {
 -- LSP Stuff
 local LSPActive = {
     condition = conditions.lsp_attached,
+    on_click = {
+        callback = function()
+            vim.defer_fn(function()
+                vim.cmd.LspInfo()
+            end, 100)
+        end,
+        name = "heirline_LSP",
+    },
     update = { 'LspAttach', 'LspDetach' },
 
     -- Or complicate things a bit and get the servers names
@@ -434,6 +442,22 @@ local Diagnostics = {
 local Git = {
     condition = conditions.is_git_repo,
 
+    on_click = {
+        callback = function()
+            -- If you want to use Fugitive:
+            -- vim.cmd("G")
+
+            -- If you prefer Lazygit
+            -- use vim.defer_fn() if the callback requires
+            -- opening of a floating window
+            -- (this also applies to telescope)
+            vim.defer_fn(function()
+                vim.cmd.LazyGit()
+            end, 100)
+        end,
+        name = "heirline_git",
+    },
+
     init = function(self)
         self.status_dict = vim.b.gitsigns_status_dict
         self.has_changes = self.status_dict.added ~= 0 or self.status_dict.removed ~= 0 or self.status_dict.changed ~= 0
@@ -580,7 +604,7 @@ vim.api.nvim_create_autocmd("User", {
 })
 local WinBars = {
     fallthrough = false,
-    {   -- Hide the winbar for special buffers
+    { -- Hide the winbar for special buffers
         condition = function()
             return conditions.buffer_matches({
                 buftype = { "nofile", "prompt", "help", "quickfix" },
@@ -591,7 +615,7 @@ local WinBars = {
             vim.opt_local.winbar = nil
         end
     },
-    {   -- A special winbar for terminals
+    { -- A special winbar for terminals
         condition = function()
             return conditions.buffer_matches({ buftype = { "terminal" } })
         end,
@@ -601,7 +625,7 @@ local WinBars = {
             TerminalName,
         }),
     },
-    {   -- An inactive winbar for regular files
+    { -- An inactive winbar for regular files
         condition = function()
             return not conditions.is_active()
         end,
