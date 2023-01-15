@@ -36,7 +36,8 @@ return require("packer").startup(function(use)
             "nvim-lua/plenary.nvim",
             "nvim-tree/nvim-web-devicons",
             "MunifTanjim/nui.nvim",
-            "s1n7ax/nvim-window-picker"}
+            "s1n7ax/nvim-window-picker"
+        }
     }
 
     -- Telescope (fuzzyfinder) -- requires rg and fd
@@ -84,6 +85,10 @@ return require("packer").startup(function(use)
             { "rafamadriz/friendly-snippets" },
         }
     })
+    -- context inspection
+    use({"SmiteshP/nvim-navic", requires = { "neovim/nvim-lspconfig" } })
+    -- fidget for displaying LSP progress
+    use("j-hui/fidget.nvim")
 
     -- vimspector
     use("puremourning/vimspector")

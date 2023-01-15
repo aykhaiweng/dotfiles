@@ -23,3 +23,17 @@ require'nvim-treesitter.configs'.setup {
         additional_vim_regex_highlighting = false,
     },
 }
+
+
+-- Folding fun times
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldlevel = 9
+
+local OpenFolds = vim.api.nvim_create_augroup(
+    "OpenFolds", { clear = true }
+)
+vim.api.nvim_create_autocmd(
+    { "BufReadPost", "FileReadPost" },
+    { pattern = "*", command = "normal zR", group = OpenFolds }
+)

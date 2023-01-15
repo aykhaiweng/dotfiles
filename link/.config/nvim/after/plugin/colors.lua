@@ -1,5 +1,7 @@
 -- terminal colors
 vim.opt.termguicolors = true
+-- dark background
+vim.opt.background = "dark"
 
 -- gruvbox settings
 -- vim.g.gruvbox_italic = 1
@@ -16,7 +18,8 @@ vim.g.gruvbox_material_better_performance = 1
 vim.g.gruvbox_material_background = "medium"
 vim.g.gruvbox_material_foreground = "original"
 vim.g.gruvbox_material_enable_bold = 1
-vim.g.gruvbox_material_enable_italic = 0
+vim.g.gruvbox_material_enable_italic = 1
+vim.g.gruvbox_material_disable_italic_comment = 1
 vim.g.gruvbox_material_ui_contrast = "low"
 vim.g.gruvbox_material_current_word = "underline"
 -- vim.g.gruvbox_material_diagnostic_text_highlight = 1
@@ -24,9 +27,9 @@ vim.g.gruvbox_material_diagnostic_virtual_text = "colored"
 
 function ColorMyPencils(color)
     color = color or "gruvbox-material"
+    vim.cmd.colorscheme(color)
 
     -- Background Colors
-    vim.opt.background = "dark"
     vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
     vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 
@@ -47,8 +50,6 @@ function ColorMyPencils(color)
         { "WinLeave" },
         { pattern = "*", command = "set nocursorline", group = CursorLineGroup }
     )
-
-    vim.cmd.colorscheme(color)
 end
 
 ColorMyPencils()
