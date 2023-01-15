@@ -11,7 +11,6 @@ lsp.ensure_installed({
     'dockerls',
     'dotls',
     'bashls',
-    'jedi_language_server', -- Python
 })
 
 -- Fix Undefined global 'vim'
@@ -80,6 +79,12 @@ lsp.configure('pylsp', {
             configurationSources = { 'flake8' },
             plugins = {
                 pycodestyle = {
+                    enabled = false,
+                },
+                pyflakes = {
+                    enabled = false,
+                },
+                mccabe = {
                     enabled = false,
                 },
                 flake8 = {

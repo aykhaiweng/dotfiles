@@ -114,15 +114,20 @@ _G.packer_plugins = {
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/gitsigns.nvim",
     url = "https://github.com/lewis6991/gitsigns.nvim"
   },
-  gruvbox = {
+  ["gruvbox-material"] = {
     loaded = true,
-    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/gruvbox",
-    url = "https://github.com/ellisonleao/gruvbox.nvim"
+    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/gruvbox-material",
+    url = "https://github.com/sainnhe/gruvbox-material"
   },
   harpoon = {
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/harpoon",
     url = "https://github.com/ThePrimeagen/harpoon"
+  },
+  ["heirline.nvim"] = {
+    loaded = true,
+    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/heirline.nvim",
+    url = "https://github.com/rebelot/heirline.nvim"
   },
   ["impatient.nvim"] = {
     loaded = true,
@@ -144,11 +149,6 @@ _G.packer_plugins = {
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/lsp-zero.nvim",
     url = "https://github.com/VonHeikemen/lsp-zero.nvim"
   },
-  ["lualine.nvim"] = {
-    loaded = true,
-    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/lualine.nvim",
-    url = "https://github.com/nvim-lualine/lualine.nvim"
-  },
   ["mason-lspconfig.nvim"] = {
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/mason-lspconfig.nvim",
@@ -158,6 +158,16 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/mason.nvim",
     url = "https://github.com/williamboman/mason.nvim"
+  },
+  ["neo-tree.nvim"] = {
+    loaded = true,
+    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/neo-tree.nvim",
+    url = "https://github.com/nvim-neo-tree/neo-tree.nvim"
+  },
+  ["nui.nvim"] = {
+    loaded = true,
+    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/nui.nvim",
+    url = "https://github.com/MunifTanjim/nui.nvim"
   },
   ["nvim-cmp"] = {
     loaded = true,
@@ -174,11 +184,6 @@ _G.packer_plugins = {
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/nvim-lspconfig",
     url = "https://github.com/neovim/nvim-lspconfig"
   },
-  ["nvim-tree.lua"] = {
-    loaded = true,
-    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/nvim-tree.lua",
-    url = "https://github.com/nvim-tree/nvim-tree.lua"
-  },
   ["nvim-treesitter"] = {
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/nvim-treesitter",
@@ -188,6 +193,11 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/nvim-web-devicons",
     url = "https://github.com/nvim-tree/nvim-web-devicons"
+  },
+  ["nvim-window-picker"] = {
+    loaded = true,
+    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/nvim-window-picker",
+    url = "https://github.com/s1n7ax/nvim-window-picker"
   },
   ["packer.nvim"] = {
     loaded = true,
@@ -210,11 +220,6 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/plenary.nvim",
     url = "https://github.com/nvim-lua/plenary.nvim"
-  },
-  ["tabline.nvim"] = {
-    loaded = true,
-    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/tabline.nvim",
-    url = "https://github.com/kdheepak/tabline.nvim"
   },
   ["telescope-media.nvim"] = {
     loaded = true,
@@ -240,11 +245,6 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/undotree",
     url = "https://github.com/mbbill/undotree"
-  },
-  ["vim-floaterm"] = {
-    loaded = true,
-    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/vim-floaterm",
-    url = "https://github.com/voldikss/vim-floaterm"
   },
   ["vim-fugitive"] = {
     loaded = true,

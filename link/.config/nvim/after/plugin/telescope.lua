@@ -11,7 +11,8 @@ require("telescope").load_extension("vimspector")
 -- variables
 local default_file_ignore_patterns = {
     ".git/*",
-    "node_modules/*"
+    "node_modules/*",
+    "__pycache__/*"
 }
 
 
@@ -46,8 +47,9 @@ require("telescope").setup({
         }
     },
     pickers = {
-        find_files = {
+        fd = {
             theme = "ivy",
+            find_command = { "fd", "--type", "f", "--strip-cwd-prefix", "-uu", "--hidden"},
             hidden = true,
             smartcase = true,
             file_ignore_patterns = default_file_ignore_patterns,
@@ -85,11 +87,18 @@ require("telescope").setup({
 })
 
 -- remaps
-vim.keymap.set("n", "<leader>pf", function()
-    builtin.find_files()
-end)
+vim.keymap.set("n", "<leader>pf", builtin.fd, {})
 vim.keymap.set("n", "<C-p>", builtin.git_files, {})
 vim.keymap.set("n", "<leader>ps", function()
     builtin.grep_string({ search = vim.fn.input("Grep > ") })
 end)
+
 vim.keymap.set("n", "<leader>vs", require("telescope").extensions.vimspector.configurations, {})
+
+-- remaps for lsp
+vim.keymap.set("n", "<leader>plr", builtin.lsp_references, {})
+vim.keymap.set("n", "<leader>pls", builtin.lsp_workspace_symbols, {})
+vim.keymap.set("n", "<leader>pld", builtin.diagnostics, {})
+
+-- remaps for treesitter
+vim.keymap.set("n", "<leader>tsp", builtin.treesitter, {})
