@@ -1,11 +1,6 @@
 local conditions = require("heirline.conditions")
 local utils = require("heirline.utils")
 
-
--- vim options
-vim.cmd "set noshowmode"
-
-
 -- colors
 local function setup_colors()
     local gruvbox_config = vim.fn['gruvbox_material#get_configuration']()
@@ -489,6 +484,17 @@ local Git = {
     },
 }
 
+-- TerminalName
+local TerminalName = {
+    -- we could add a condition to check that buftype == 'terminal'
+    -- or we could do that later (see #conditional-statuslines below)
+    provider = function()
+        local tname, _ = vim.api.nvim_buf_get_name(0):gsub(".*:", "")
+        return " " .. tname
+    end,
+    hl = { fg = "blue", bold = true },
+}
+
 -- Help FileName
 local HelpFileName = {
     condition = function()
@@ -501,21 +507,8 @@ local HelpFileName = {
     hl = { fg = "blue" },
 }
 
--- Snippets
-local HelpFileName = {
-    condition = function()
-        return vim.bo.filetype == "help"
-    end,
-    provider = function()
-        local filename = vim.api.nvim_buf_get_name(0)
-        return vim.fn.fnamemodify(filename, ":t")
-    end,
-    hl = { fg = "blue" },
-}
 
-
--- Line setups
-
+-- Component setups
 ViMode = utils.surround({ "", "" }, "bright_bg", { ViMode })
 Git = utils.surround({ "", "" }, "bright_bg", { Git })
 FileNameBlock = utils.surround({ "", "" }, "bright_bg", { FileNameBlock })
@@ -525,6 +518,15 @@ LSPActive = utils.surround({ "", "" }, "bright_bg", { LSPActive })
 RulerAndScrollbar = utils.surround({ "", "" }, "bright_bg", { Ruler, Space, ScrollBar })
 FileFormatEncodingType = utils.surround({ "", "" }, "bright_bg", { FileFormat, FileEncoding, FileType })
 
+-- StatusLines
+local TerminalStatusLine = {
+    condition = function()
+        return conditions.buffer_matches({ buftype = { "terminal" } })
+    end,
+    -- hl = { bg = "dark_red" },
+    -- Quickly add a condition to the ViMode to only show it when buffer is active!
+    { condition = conditions.is_active, ViMode, Space }, FileType, Space, TerminalName, Align,
+}
 local DefaultStatusLine = {
     ViMode, Space, Git, Space, FileNameBlock, Space, Diagnostics, Space, Navic, Align,
     LSPActive, Space,
@@ -545,7 +547,6 @@ local SpecialStatusline = {
 }
 
 local StatusLines = {
-
     hl = function()
         if conditions.is_active() then
             return "StatusLine"
@@ -558,9 +559,127 @@ local StatusLines = {
     -- think of it as a switch case with breaks to stop fallthrough.
     fallthrough = false,
 
-    SpecialStatusline, InactiveStatusline, DefaultStatusLine,
+    SpecialStatusline, TerminalStatusLine, InactiveStatusline, DefaultStatusLine,
 }
 
-require("heirline").setup({
-    statusline = StatusLines
+
+-- WinBars
+vim.api.nvim_create_autocmd("User", {
+    pattern = 'HeirlineInitWinbar',
+    callback = function(args)
+        local buf = args.buf
+        local buftype = vim.tbl_contains(
+            { "prompt", "nofile", "help", "quickfix" },
+            vim.bo[buf].buftype
+        )
+        local filetype = vim.tbl_contains({ "gitcommit", "fugitive" }, vim.bo[buf].filetype)
+        if buftype or filetype then
+            vim.opt_local.winbar = nil
+        end
+    end,
 })
+local WinBars = {
+    fallthrough = false,
+    {   -- Hide the winbar for special buffers
+        condition = function()
+            return conditions.buffer_matches({
+                buftype = { "nofile", "prompt", "help", "quickfix" },
+                filetype = { "^git.*", "fugitive" },
+            })
+        end,
+        init = function()
+            vim.opt_local.winbar = nil
+        end
+    },
+    {   -- A special winbar for terminals
+        condition = function()
+            return conditions.buffer_matches({ buftype = { "terminal" } })
+        end,
+        utils.surround({ "", "" }, "bright_bg", {
+            FileType,
+            Space,
+            TerminalName,
+        }),
+    },
+    {   -- An inactive winbar for regular files
+        condition = function()
+            return not conditions.is_active()
+        end,
+        utils.surround({ "", "" }, "bright_bg", { hl = { fg = "gray", force = true }, FileNameBlock }),
+    },
+    -- A winbar for regular files
+    utils.surround({ "", "" }, "bright_bg", FileNameBlock, Space, Navic, { provider = "LOL" }),
+}
+
+
+-- Tabline
+local TabPage = {
+    provider = function(self)
+        print("Found a page")
+        return "%" .. self.tabnr .. "T " .. self.tabnr .. " %T"
+    end,
+    hl = function(self)
+        if not self.is_active then
+            return "TabLine"
+        else
+            return "TabLineSel"
+        end
+    end,
+}
+local TabpageClose = {
+    provider = "%999X  %X",
+    hl = "TabLine",
+}
+local TabPages = {
+    -- only show this component if there's 2 or more tabpages
+    condition = function()
+        return #vim.api.nvim_list_tabpages() >= 2
+    end,
+    utils.make_tablist(TabPage),
+    { provider = "%=" },
+    TabpageClose,
+}
+local TabLineOffset = {
+    condition = function(self)
+        local win = vim.api.nvim_tabpage_list_wins(0)[1]
+        local bufnr = vim.api.nvim_win_get_buf(win)
+        self.winid = win
+
+        if vim.bo[bufnr].filetype == "neo-tree" then
+            self.title = "neo-tree"
+            return true
+        end
+    end,
+
+    provider = function(self)
+        local title = self.title
+        local width = vim.api.nvim_win_get_width(self.winid)
+        local pad = math.ceil((width - #title) / 2)
+        return string.rep(" ", pad) .. title .. string.rep(" ", pad)
+    end,
+
+    hl = function(self)
+        if vim.api.nvim_get_current_win() == self.winid then
+            return "TablineSel"
+        else
+            return "Tabline"
+        end
+    end,
+}
+local TabLines = {
+    TabLineOffset, TabPages
+}
+
+
+require("heirline").setup({
+    statusline = StatusLines,
+    winbar = WinBars,
+    tabline = TabLines,
+})
+
+
+-- Vim Options
+vim.cmd "set noshowmode"
+vim.cmd "set noshowcmd"
+vim.o.showtabline = 2
+vim.cmd([[au FileType * if index(['wipe', 'delete'], &bufhidden) >= 0 | set nobuflisted | endif]])

@@ -25,7 +25,7 @@ return require("packer").startup(function(use)
     -- Devicons
     use("nvim-tree/nvim-web-devicons")
     -- incline -- floating statuslines
-    use("b0o/incline.nvim")
+    -- use("b0o/incline.nvim")
     -- Heirline
     use("rebelot/heirline.nvim")
     -- neotree
