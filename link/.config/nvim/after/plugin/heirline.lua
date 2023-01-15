@@ -1,6 +1,7 @@
 local conditions = require("heirline.conditions")
 local utils = require("heirline.utils")
 
+
 -- vim options
 vim.cmd "set noshowmode"
 
@@ -32,13 +33,14 @@ local function setup_colors()
         orange = cscolors.orange[1],
         purple = cscolors.purple[1],
         cyan = cscolors.aqua[1],
-        diag_warn = utils.get_highlight("DiagnosticWarn").fg,
-        diag_error = utils.get_highlight("DiagnosticError").fg,
-        diag_hint = utils.get_highlight("DiagnosticHint").fg,
-        diag_info = utils.get_highlight("DiagnosticInfo").fg,
-        git_del = utils.get_highlight("DiffDelete").fg,
+        yellow = cscolors.yellow[1],
+        diag_warn = utils.get_highlight("WarningFloat").fg,
+        diag_error = utils.get_highlight("ErrorFloat").fg,
+        diag_hint = utils.get_highlight("HintFloat").fg,
+        diag_info = utils.get_highlight("InfoFloat").fg,
+        git_del = utils.get_highlight("DiffRemoved").fg,
         git_add = utils.get_highlight("DiffAdded").fg,
-        git_change = utils.get_highlight("DiffChange").fg,
+        git_change = utils.get_highlight("DiffChanged").fg,
     }
     return colors
 end
@@ -177,20 +179,24 @@ local FileIcon = {
     end
 }
 local FileName = {
-    provider = function(self)
-        -- first, trim the pattern relative to the current directory. For other
-        -- options, see :h filename-modifers
-        local filename = vim.fn.fnamemodify(self.filename, ":.")
-        if filename == "" then return "[No Name]" end
-        -- now, if the filename would occupy more than 1/4th of the available
-        -- space, we trim the file path to its initials
-        -- See Flexible Components section below for dynamic truncation
-        if not conditions.width_percent_below(#filename, 0.50) then
-            filename = vim.fn.pathshorten(filename)
-        end
-        return filename
+    init = function(self)
+        self.lfilename = vim.fn.fnamemodify(self.filename, ":.")
+        if self.lfilename == "" then self.lfilename = "[No Name]" end
     end,
     hl = { fg = utils.get_highlight("Directory").fg },
+
+    flexible = 2,
+
+    {
+        provider = function(self)
+            return self.lfilename
+        end,
+    },
+    {
+        provider = function(self)
+            return vim.fn.pathshorten(self.lfilename)
+        end,
+    },
 }
 local FileFlags = {
     {
@@ -291,7 +297,6 @@ local LSPActive = {
 }
 
 local Navic = {
-    condition = require("nvim-navic").is_available,
     static = {
         -- create a type highlight map
         type_hl = {
@@ -383,13 +388,179 @@ local Navic = {
     hl = { fg = "gray" },
     update = 'CursorMoved'
 }
-print(require("nvim-navic").is_available())
+
+-- diagnostics
+local Diagnostics = {
+    condition = conditions.has_diagnostics,
+
+    static = {
+        error_icon = vim.fn.sign_getdefined("DiagnosticSignError")[1].text,
+        warn_icon = vim.fn.sign_getdefined("DiagnosticSignWarn")[1].text,
+        info_icon = vim.fn.sign_getdefined("DiagnosticSignInfo")[1].text,
+        hint_icon = vim.fn.sign_getdefined("DiagnosticSignHint")[1].text,
+    },
+
+    init = function(self)
+        self.errors = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.ERROR })
+        self.warnings = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.WARN })
+        self.hints = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.HINT })
+        self.info = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.INFO })
+    end,
+
+    update = { "DiagnosticChanged", "BufEnter" },
+
+    {
+        provider = function(self)
+            -- 0 is just another output, we can decide to print it or not!
+            return self.errors > 0 and (self.error_icon .. self.errors .. " ")
+        end,
+        hl = { fg = "diag_error" },
+    },
+    {
+        provider = function(self)
+            return self.warnings > 0 and (self.warn_icon .. self.warnings .. " ")
+        end,
+        hl = { fg = "diag_warn" },
+    },
+    {
+        provider = function(self)
+            return self.info > 0 and (self.info_icon .. self.info .. " ")
+        end,
+        hl = { fg = "diag_info" },
+    },
+    {
+        provider = function(self)
+            return self.hints > 0 and (self.hint_icon .. self.hints)
+        end,
+        hl = { fg = "diag_hint" },
+    },
+}
+
+local Git = {
+    condition = conditions.is_git_repo,
+
+    init = function(self)
+        self.status_dict = vim.b.gitsigns_status_dict
+        self.has_changes = self.status_dict.added ~= 0 or self.status_dict.removed ~= 0 or self.status_dict.changed ~= 0
+    end,
+
+    hl = { fg = "orange" },
+
+
+    { -- git branch name
+        provider = function(self)
+            return " " .. self.status_dict.head
+        end,
+        hl = { bold = true }
+    },
+    -- You could handle delimiters, icons and counts similar to Diagnostics
+    {
+        condition = function(self)
+            return self.has_changes
+        end,
+        provider = "("
+    },
+    {
+        provider = function(self)
+            local count = self.status_dict.added or 0
+            return count > 0 and ("+" .. count)
+        end,
+        hl = { fg = "git_add" },
+    },
+    {
+        provider = function(self)
+            local count = self.status_dict.removed or 0
+            return count > 0 and ("-" .. count)
+        end,
+        hl = { fg = "git_del" },
+    },
+    {
+        provider = function(self)
+            local count = self.status_dict.changed or 0
+            return count > 0 and ("~" .. count)
+        end,
+        hl = { fg = "git_change" },
+    },
+    {
+        condition = function(self)
+            return self.has_changes
+        end,
+        provider = ")",
+    },
+}
+
+-- Help FileName
+local HelpFileName = {
+    condition = function()
+        return vim.bo.filetype == "help"
+    end,
+    provider = function()
+        local filename = vim.api.nvim_buf_get_name(0)
+        return vim.fn.fnamemodify(filename, ":t")
+    end,
+    hl = { fg = "blue" },
+}
+
+-- Snippets
+local HelpFileName = {
+    condition = function()
+        return vim.bo.filetype == "help"
+    end,
+    provider = function()
+        local filename = vim.api.nvim_buf_get_name(0)
+        return vim.fn.fnamemodify(filename, ":t")
+    end,
+    hl = { fg = "blue" },
+}
+
+
+-- Line setups
+
+ViMode = utils.surround({ "", "" }, "bright_bg", { ViMode })
+Git = utils.surround({ "", "" }, "bright_bg", { Git })
+FileNameBlock = utils.surround({ "", "" }, "bright_bg", { FileNameBlock })
+Diagnostics = utils.surround({ "", "" }, "bright_bg", { Diagnostics })
+Navic = utils.surround({ "", "" }, "bright_bg", { Navic })
+LSPActive = utils.surround({ "", "" }, "bright_bg", { LSPActive })
+RulerAndScrollbar = utils.surround({ "", "" }, "bright_bg", { Ruler, Space, ScrollBar })
+FileFormatEncodingType = utils.surround({ "", "" }, "bright_bg", { FileFormat, FileEncoding, FileType })
+
+local DefaultStatusLine = {
+    ViMode, Space, Git, Space, FileNameBlock, Space, Diagnostics, Space, Navic, Align,
+    LSPActive, Space,
+    RulerAndScrollbar, Space, FileFormatEncodingType,
+}
+local InactiveStatusline = {
+    condition = conditions.is_not_active,
+    FileType, Space, FileName, Align,
+}
+local SpecialStatusline = {
+    condition = function()
+        return conditions.buffer_matches({
+            buftype = { "nofile", "prompt", "help", "quickfix", "neo-tree" },
+            filetype = { "^git.*", "fugitive" },
+        })
+    end,
+    FileType, Space, HelpFileName, Align
+}
+
+local StatusLines = {
+
+    hl = function()
+        if conditions.is_active() then
+            return "StatusLine"
+        else
+            return "StatusLineNC"
+        end
+    end,
+
+    -- the first statusline with no condition, or which condition returns true is used.
+    -- think of it as a switch case with breaks to stop fallthrough.
+    fallthrough = false,
+
+    SpecialStatusline, InactiveStatusline, DefaultStatusLine,
+}
 
 require("heirline").setup({
-    statusline = {
-        ViMode, Space, FileNameBlock, Align,
-        Navic, Align,
-        LSPActive, Space,
-        Ruler, Space, ScrollBar, Space, FileFormat, FileEncoding, FileType,
-    }
+    statusline = StatusLines
 })

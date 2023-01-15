@@ -100,7 +100,7 @@ return require("packer").startup(function(use)
     use("christoomey/vim-tmux-navigator")
 
     -- Impatient (improved loading for nvim by caching chunks
-    use("lewis6991/impatient.nvim")
+    -- use("lewis6991/impatient.nvim")
 
     -- persistence (Automatic session loading)
     use({ "folke/persistence.nvim",

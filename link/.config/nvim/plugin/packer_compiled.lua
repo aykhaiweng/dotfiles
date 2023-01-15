@@ -134,11 +134,6 @@ _G.packer_plugins = {
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/heirline.nvim",
     url = "https://github.com/rebelot/heirline.nvim"
   },
-  ["impatient.nvim"] = {
-    loaded = true,
-    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/impatient.nvim",
-    url = "https://github.com/lewis6991/impatient.nvim"
-  },
   ["incline.nvim"] = {
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/incline.nvim",

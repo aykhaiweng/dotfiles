@@ -46,10 +46,10 @@ lsp.setup_nvim_cmp({
 lsp.set_preferences({
     suggest_lsp_servers = false,
     sign_icons = {
-        error = 'E',
-        warn = 'W',
-        hint = 'H',
-        info = 'I'
+        error = vim.fn.sign_getdefined("DiagnosticSignError")[1].text,
+        warn = vim.fn.sign_getdefined("DiagnosticSignWarn")[1].text,
+        hint = vim.fn.sign_getdefined("DiagnosticSignHint")[1].text,
+        info = vim.fn.sign_getdefined("DiagnosticSignInfo")[1].text
     }
 })
 

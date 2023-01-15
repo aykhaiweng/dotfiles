@@ -25,13 +25,21 @@ vim.g.gruvbox_material_current_word = "underline"
 -- vim.g.gruvbox_material_diagnostic_text_highlight = 1
 vim.g.gruvbox_material_diagnostic_virtual_text = "colored"
 
+-- print(vim.api.nvim_get_hl_by_name("DiagnosticWarn", true).fg)
+
 function ColorMyPencils(color)
     color = color or "gruvbox-material"
     vim.cmd.colorscheme(color)
 
     -- Background Colors
-    vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+    -- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+    -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+
+    -- Diagnostic Icons
+    vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticsError" })
+    vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticsWarn" })
+    vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticsInfo" })
+    vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticsHint" })
 
     -- Cursor
     vim.api.nvim_set_hl(0, "Cursor", { reverse = true })

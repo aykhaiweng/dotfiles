@@ -41,6 +41,9 @@ vim.opt.undofile = true
 -- search hightlighting
 vim.opt.hlsearch = false
 vim.opt.incsearch = true
+-- search behaviour
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 
 -- terminal colors
 vim.opt.termguicolors = true
