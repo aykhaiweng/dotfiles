@@ -82,6 +82,9 @@ return require("packer").startup(function(use)
     -- vimspector
     use("puremourning/vimspector")
 
+    -- floating terminal
+    use("voldikss/vim-floaterm")
+
     -- zenmode
     use("folke/zen-mode.nvim")
 
