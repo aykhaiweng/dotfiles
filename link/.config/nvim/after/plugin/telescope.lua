@@ -52,14 +52,12 @@ require("telescope").setup({
             file_ignore_patterns = default_file_ignore_patterns,
             layout_config = {
                 cursor = { width = 1, height = 0.7 },
-                prompt_position = "top"
             }
         },
         git_files = {
             smartcase = true,
             layout_config = {
                 cursor = { width = 1, height = 0.7 },
-                prompt_position = "top"
             }
         },
         grep_string = {
@@ -68,7 +66,6 @@ require("telescope").setup({
             file_ignore_patterns = default_file_ignore_patterns,
             layout_config = {
                 cursor = { width = 1, height = 0.7 },
-                prompt_position = "top"
             }
         }
     },

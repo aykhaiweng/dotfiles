@@ -1,8 +1,8 @@
--- uhhhh
-vim.opt.guicursor = ""
+-- Python implementation
+vim.g.python3_host_prog = os.getenv("HOME") .. "/.pyenv/versions/neovim3/bin/python3"
 
--- clipboard
--- vim.opt.clipboard = "unnamed,unnamedplus"
+-- Stop my GUI terminal from rendering it's cursor over mine
+vim.opt.guicursor = ""
 
 -- set line numbers
 vim.opt.nu = true
@@ -50,6 +50,3 @@ vim.opt.isfname:append("@-@")
 
 -- updatetime
 vim.opt.updatetime = 50
-
--- Python implementation
-vim.g.python3_host_prog = os.getenv("HOME") .. "/.pyenv/versions/neovim3/bin/python3"

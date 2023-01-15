@@ -2,13 +2,31 @@
 vim.opt.termguicolors = true
 
 -- gruvbox settings
-vim.g.gruvbox_italic = 1
-vim.g.gruvbox_bold = 1
-vim.g.gruvbox_underline = 1
-vim.g.gruvbox_undercurl = 1
-vim.g.gruvbox_inverse = 1
-vim.g.gruvbox_contrast_dark = "hard"
-vim.g.gruvbox_improved_warnings = 1
+-- vim.g.gruvbox_italic = 1
+-- vim.g.gruvbox_bold = 1
+-- vim.g.gruvbox_underline = 1
+-- vim.g.gruvbox_undercurl = 1
+-- vim.g.gruvbox_inverse = 1
+-- vim.g.gruvbox_contrast_dark = "hard"
+-- vim.g.gruvbox_improved_warnings = 1
+-- vim.g.gruvbox_improved_strings = 0
+require("gruvbox").setup({
+    undercurl = true,
+    underline = true,
+    bold = true,
+    italic = false,
+    strikethrough = true,
+    invert_selection = true,
+    invert_signs = false,
+    invert_tabline = false,
+    invert_intend_guides = true,
+    inverse = true, -- invert background for search, diffs, statuslines and errors
+    contrast = "hard", -- can be "hard", "soft" or empty string
+    palette_overrides = {},
+    overrides = {},
+    dim_inactive = false,
+    transparent_mode = false,
+})
 
 function ColorMyPencils(color)
     color = color or "gruvbox"

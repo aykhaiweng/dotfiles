@@ -20,7 +20,7 @@ return require("packer").startup(function(use)
 
     -- Gruvbox (colorscheme)
     use({
-        "morhetz/gruvbox",
+        "ellisonleao/gruvbox.nvim",
         as = "gruvbox",
         config = function()
             vim.cmd("colorscheme gruvbox")
@@ -30,10 +30,11 @@ return require("packer").startup(function(use)
     use("nvim-tree/nvim-web-devicons")
     -- Shows indents on the editor
     use("lukas-reineke/indent-blankline.nvim")
+    -- lualine
+    use("nvim-lualine/lualine.nvim")
 
     -- nvim-tree (Filebrowser)
     use("nvim-tree/nvim-tree.lua")
-
     -- Telescope (fuzzyfinder) -- requires rg
     use({"nvim-telescope/telescope.nvim", requires = { {"nvim-lua/plenary.nvim"} } })
     -- extension: telescope-media
@@ -42,11 +43,6 @@ return require("packer").startup(function(use)
     use({"nvim-telescope/telescope-ui-select.nvim", requires = { "nvim-lua/plenary.nvim" } })
     -- extension: vimspector
     use({"nvim-telescope/telescope-vimspector.nvim", requires = { "puremourning/vimspector" } })
-
-    -- Treesitter (parser/syntax highlighting)
-    use("nvim-treesitter/nvim-treesitter", { run = ":TSUpdate" })
-    -- Playground
-    use("nvim-treesitter/playground")
     -- Harpoon (File explorer)
     use({"ThePrimeagen/harpoon", requires = { "nvim-lua/plenary.nvim" } })
     -- Undotree
@@ -59,6 +55,10 @@ return require("packer").startup(function(use)
     -- gitsigns
     use("lewis6991/gitsigns.nvim")
 
+    -- Treesitter (parser/syntax highlighting)
+    use("nvim-treesitter/nvim-treesitter", { run = ":TSUpdate" })
+    -- Playground
+    use("nvim-treesitter/playground")
     -- Language Server Protocol
     use({
         "VonHeikemen/lsp-zero.nvim",
