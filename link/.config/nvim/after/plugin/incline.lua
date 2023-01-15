@@ -6,7 +6,7 @@ require('incline').setup {
     hide = {
         cursorline = false,
         focused_win = false,
-        only_win = false
+        only_win = true
     },
     highlight = {
         groups = {
