@@ -33,7 +33,7 @@ return require("packer").startup(function(use)
 
     -- nvim-tree (Filebrowser)
     use("nvim-tree/nvim-tree.lua")
-    -- Telescope (fuzzyfinder) -- requires rg
+    -- Telescope (fuzzyfinder) -- requires rg and fd
     use({"nvim-telescope/telescope.nvim", requires = {"nvim-lua/plenary.nvim"} })
     -- extension: telescope-media
     use({"dharmx/telescope-media.nvim", requires = { "nvim-lua/plenary.nvim" } })

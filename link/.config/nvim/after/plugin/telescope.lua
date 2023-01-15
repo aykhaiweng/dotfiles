@@ -47,6 +47,7 @@ require("telescope").setup({
     },
     pickers = {
         find_files = {
+            theme = "ivy",
             hidden = true,
             smartcase = true,
             file_ignore_patterns = default_file_ignore_patterns,
@@ -55,12 +56,14 @@ require("telescope").setup({
             }
         },
         git_files = {
+            theme = "ivy",
             smartcase = true,
             layout_config = {
                 cursor = { width = 1, height = 0.7 },
             }
         },
         grep_string = {
+            theme = "ivy",
             hidden = true,
             smartcase = true,
             file_ignore_patterns = default_file_ignore_patterns,
