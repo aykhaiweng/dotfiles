@@ -21,7 +21,8 @@ return require("packer").startup(function(use)
     -- colorscheme
     -- use({"ellisonleao/gruvbox.nvim", as = "gruvbox"})
     -- use({"morhetz/gruvbox", as = "gruvbox"})
-    use("sainnhe/gruvbox-material")
+    -- use("sainnhe/gruvbox-material")
+    use { "catppuccin/nvim", as = "catppuccin" }
     -- Devicons
     use("nvim-tree/nvim-web-devicons")
     -- incline -- floating statuslines

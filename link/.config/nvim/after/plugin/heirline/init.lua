@@ -52,8 +52,11 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 
 
 -- trivial
+local DelimiterChar = { "", "" }
 local Align = { provider = "%=", hl = { bg = "bright_bg" } }
 local Space = { provider = " " }
+local LeftDelimiter = { provider = DelimiterChar[1] }
+local RightDelimiter = { provider = DelimiterChar[2] }
 
 
 -- vi-mode
@@ -596,7 +599,7 @@ vim.api.nvim_create_autocmd("User", {
             { "prompt", "nofile", "help", "quickfix" },
             vim.bo[buf].buftype
         )
-        local filetype = vim.tbl_contains({ "gitcommit", "fugitive" }, vim.bo[buf].filetype)
+        local filetype = vim.tbl_contains({ "gitcommit", "fugitive", "neo-tree" }, vim.bo[buf].filetype)
         if buftype or filetype then
             vim.opt_local.winbar = nil
         end
@@ -629,10 +632,11 @@ local WinBars = {
         condition = function()
             return not conditions.is_active()
         end,
-        utils.surround({ "", "" }, "bright_bg", { hl = { fg = "gray", force = true }, FileNameBlock }),
+        -- utils.surround({ "", "" }, "bright_bg", { hl = { fg = "gray", force = true }, FileNameBlock }),
+        { hl = { fg = "gray", force = true }, FileNameBlock }
     },
     -- A winbar for regular files
-    utils.surround({ "", "" }, "bright_bg", FileNameBlock, Space, Navic, { provider = "LOL" }),
+    utils.surround({ "", "" }, "bright_bg", FileNameBlock, Space),
 }
 
 

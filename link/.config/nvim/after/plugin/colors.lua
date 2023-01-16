@@ -18,7 +18,7 @@ vim.g.gruvbox_material_better_performance = 1
 vim.g.gruvbox_material_background = "medium"
 vim.g.gruvbox_material_foreground = "original"
 vim.g.gruvbox_material_enable_bold = 1
-vim.g.gruvbox_material_enable_italic = 1
+vim.g.gruvbox_material_enable_italic = 0
 vim.g.gruvbox_material_disable_italic_comment = 1
 vim.g.gruvbox_material_ui_contrast = "low"
 vim.g.gruvbox_material_current_word = "underline"
@@ -28,7 +28,7 @@ vim.g.gruvbox_material_diagnostic_virtual_text = "colored"
 -- print(vim.api.nvim_get_hl_by_name("DiagnosticWarn", true).fg)
 
 function ColorMyPencils(color)
-    color = color or "gruvbox-material"
+    color = color or "catppuccin"
     vim.cmd.colorscheme(color)
 
     -- Background Colors

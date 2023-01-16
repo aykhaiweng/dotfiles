@@ -79,6 +79,11 @@ _G.packer_plugins = {
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/LuaSnip",
     url = "https://github.com/L3MON4D3/LuaSnip"
   },
+  catppuccin = {
+    loaded = true,
+    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/catppuccin",
+    url = "https://github.com/catppuccin/nvim"
+  },
   ["cmp-buffer"] = {
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/cmp-buffer",
@@ -119,11 +124,6 @@ _G.packer_plugins = {
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/gitsigns.nvim",
     url = "https://github.com/lewis6991/gitsigns.nvim"
   },
-  ["gruvbox-material"] = {
-    loaded = true,
-    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/gruvbox-material",
-    url = "https://github.com/sainnhe/gruvbox-material"
-  },
   harpoon = {
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/harpoon",
@@ -133,11 +133,6 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/heirline.nvim",
     url = "https://github.com/rebelot/heirline.nvim"
-  },
-  ["incline.nvim"] = {
-    loaded = true,
-    path = "/Users/aykhaiweng/.local/share/nvim/site/pack/packer/start/incline.nvim",
-    url = "https://github.com/b0o/incline.nvim"
   },
   ["lazygit.nvim"] = {
     loaded = true,

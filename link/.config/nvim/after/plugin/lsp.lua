@@ -57,6 +57,14 @@ lsp.set_preferences({
 lsp.on_attach(function(client, bufnr)
     local opts = { buffer = bufnr, remap = false }
 
+    -- Attach Navic
+    -- TODO: Find a way to fix this
+    require("lspconfig").pylsp.setup({
+        on_attach = function(client, bufnr)
+            require("nvim-navic").attach(client, bufnr)
+        end
+    })
+
     vim.keymap.set("n", "gD", function() vim.lsp.buf.declaration() end, opts)
     vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
     vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)

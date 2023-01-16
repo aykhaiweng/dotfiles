@@ -241,6 +241,7 @@ neotree.setup({
     event_handlers = {
         event = "neo_tree_buffer_enter",
         handler = function (state)
+            print("LOL")
             -- Patch to make the background of neo-tree the same color as the editor
             vim.api.nvim_set_hl(0, "NeoTreeNormal", { link = "Normal" })
             vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { fg = "none", link = "Normal" })

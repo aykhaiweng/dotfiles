@@ -74,9 +74,15 @@ backup_dir="$DOTFILES/backups/$(date "+%Y_%m_%d-%H_%M_%S")/"
 backup=
 
 # Execute functions for each directory
-do_stuff copy $HOME
-do_stuff init $HOME '-name *.sh'
-do_stuff link $HOME
+if [ -z "$1" ] | [ "$1" == "copy" ]; then
+    do_stuff copy $HOME
+fi
+if [ -z "$1" ] | [ "$1" == "init" ]; then
+    do_stuff init $HOME '-name *.sh'
+fi
+if [ -z "$1" ] | [ "$1" == "link" ]; then
+    do_stuff link $HOME
+fi
 
 # Alert if backups were made.
 if [[ "$backup" ]]; then
