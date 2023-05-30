@@ -11,14 +11,15 @@ sudo -v
 # FIRST TIME SETUP THERE SHOULD BE NO DEPENDENCIES HERE
 ########################################################
 
-# Special use for Ubuntu only
-[[ "$(cat /etc/issue 2> /dev/null)" =~ Ubuntu ]] && sudo apt install -y -qq git curl
-
 # Logging stuff.
-function e_header()   { echo -e "\n\033[1m$@\033[0m"; }
+function e_header()   { echo -e "\n================================================\n$@\n------------------------------------------------"; }
 function e_success()  { echo -e " \033[1;32m✔\033[0m  $@"; }
 function e_error()    { echo -e " \033[1;31m✖\033[0m  $@"; }
 function e_arrow()    { echo -e " \033[1;34m➜\033[0m  $@"; }
+
+# Special use for Ubuntu only
+e_header "Downloading git and curl"
+[[ "$(cat /etc/issue 2> /dev/null)" =~ Ubuntu ]] && sudo apt install -y -qq git curl
 
 # If $DOTFILES doesn't exist, attempt to pull and update the git submodules
 if [[ ! -d "$DOTFILES/.git" ]]; then
@@ -62,15 +63,14 @@ mkdir -p "$DOTFILES/caches/init"
 # Create .config directory if the folder doesn't exist
 mkdir -p "$HOME/.config/"
 
+# Do the stuff
+e_header "Doing stuff"
 dostuff
 
 # All done!
-e_header "Setup complete"
-echo ""
-e_header "Things you might wanna run after this script is done:"
+e_header "Setup complete\nThings you might wanna run:"
 e_arrow "nvim +PlugUpdate"
 e_arrow "chsh"
-echo ""
 e_success "All done!"
 echo ""
 echo ""

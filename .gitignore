@@ -37,3 +37,6 @@ Brewfile.lock.json
 
 # Ignore any file with LOCAL in the name (good for per-machine vars/functions)
 *LOCAL*
+
+# Can't be bothered to properly link this :V
+kubectl

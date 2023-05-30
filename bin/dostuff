@@ -47,6 +47,8 @@ function do_stuff() {
     if [[ -d "$dotfiles_relative_path" ]]; then
         # Create a recursive file list of all the files
         local file_list=$(find $dotfiles_relative_path -type f $extra_find_args | sed 's/^\.\///g' | sort)
+        echo "Debugging filelist ($dotfiles_relative_path) ($extra_find_args)"
+        echo "${file_list}"
 
         for source_file in $file_list; do
             # Define the file_target without it's home or dotfiles prepend, this is needed for
@@ -64,6 +66,7 @@ function do_stuff() {
                 e_arrow "[$command] $home_target Already exists. Creating a backup at $backup_dir$target_file"
                 mv "$home_target" "$backup_dir$target_file"
             fi
+            echo "Debugging ${command_do} ${source_file} ${home_target}"
             "${command}_do" "$source_file" "$home_target"
         done
     fi
@@ -73,14 +76,18 @@ function do_stuff() {
 backup_dir="$DOTFILES/backups/$(date "+%Y_%m_%d-%H_%M_%S")/"
 backup=
 
+if [ -z "$1" ]; then
+    e_arrow "No argument supplied, running copy, init and link"
+fi
+
 # Execute functions for each directory
-if [ -z "$1" ] | [ "$1" == "copy" ]; then
+if [ -z "$1" ] || [ "$1" == "copy" ]; then
     do_stuff copy $HOME
 fi
-if [ -z "$1" ] | [ "$1" == "init" ]; then
-    do_stuff init $HOME '-name *.sh'
+if [ -z "$1" ] || [ "$1" == "init" ]; then
+    do_stuff init $HOME
 fi
-if [ -z "$1" ] | [ "$1" == "link" ]; then
+if [ -z "$1" ] || [ "$1" == "link" ]; then
     do_stuff link $HOME
 fi
 

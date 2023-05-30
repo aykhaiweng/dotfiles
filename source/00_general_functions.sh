@@ -20,7 +20,7 @@ export GPG_TTY=$(tty)
 [[ -d $HOME/.local/bin ]] && export PATH=$HOME/.local/bin:$PATH  # Add a .local/bin to the path if found
 
 # Logging stuff.
-function e_header()   { echo -e "\n\033[1m$@\033[0m"; }
+function e_header()   { echo -e "\n================================================\n$@\n------------------------------------------------"; }
 function e_success()  { echo -e " \033[1;32m✔\033[0m  $@"; }
 function e_error()    { echo -e " \033[1;31m✖\033[0m  $@"; }
 function e_arrow()    { echo -e " \033[1;34m➜\033[0m  $@"; }
