@@ -4,3 +4,4 @@ if [ -n "$ZSH_VERSION" ]; then
 else
    source ~/.bashrc
 fi
+. "$HOME/.cargo/env"
