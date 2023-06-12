@@ -40,3 +40,6 @@ Brewfile.lock.json
 
 # Can't be bothered to properly link this :V
 kubectl
+
+# Ignoring the nginx file that controls my server
+all-ports.conf
