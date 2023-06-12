@@ -42,4 +42,4 @@ Brewfile.lock.json
 kubectl
 
 # Ignoring the nginx file that controls my server
-all-ports.conf
+/extra/nginx/all-ports.conf
