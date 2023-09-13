@@ -26,7 +26,7 @@ if [[ ! -d "$DOTFILES/.git" ]]; then
     export KURA_FTS=1
     # Dotfiles directory doesn't exist? Clone it!
     e_header "Downloading dotfiles"
-    git clone --branch master --recursive git://github.com/aykhaiweng/.dotfiles.git $DOTFILES
+    git clone --branch master --recursive git://github.com/aykhaiweng/.dotfiles.git $DOTFILES --depth 1
     cd $DOTFILES
 elif [[ "$1" != "restart" ]]; then
     export KURA_FTS=0
@@ -64,6 +64,7 @@ mkdir -p "$DOTFILES/caches/init"
 mkdir -p "$HOME/.config/"
 
 # Do the stuff
+exec $SHELL
 e_header "Doing stuff"
 dostuff
 
