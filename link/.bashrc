@@ -17,4 +17,3 @@ src
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 # End
-. "$HOME/.cargo/env"

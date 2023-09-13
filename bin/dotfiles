@@ -68,6 +68,9 @@ exec $SHELL
 e_header "Doing stuff"
 dostuff
 
+# Initialize the general functions
+source $DOTFILES/source/00_general_functions.sh
+
 # All done!
 e_header "Setup complete\nThings you might wanna run:"
 e_arrow "nvim +PlugUpdate"
