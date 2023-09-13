@@ -22,7 +22,7 @@ e_header "Downloading git and curl"
 [[ "$(cat /etc/issue 2> /dev/null)" =~ Ubuntu ]] && sudo apt install -y -qq git curl
 
 # If $DOTFILES doesn't exist, attempt to pull and update the git submodules
-if [[ ! -d "$DOTFILES/.git" ]]; then
+if [[ ! -d "$DOTFILES" ]]; then
     export KURA_FTS=1
     # Dotfiles directory doesn't exist? Clone it!
     e_header "Downloading dotfiles"
