@@ -3,4 +3,6 @@ if [ -n "$ZSH_VERSION" ]; then
    source ~/.zshrc
 else
    source ~/.bashrc
-fieval "$(/bin/brew shellenv)"
+fi
+
+eval "$(/bin/brew shellenv)"
