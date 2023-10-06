@@ -27,3 +27,7 @@ export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 export LDFLAGS="-L/opt/homebrew/opt/node@14/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/node@14/include"
 export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
+
+if is_ubuntu; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
