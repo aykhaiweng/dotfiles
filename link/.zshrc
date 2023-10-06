@@ -31,3 +31,5 @@ export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
 if is_ubuntu; then
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
