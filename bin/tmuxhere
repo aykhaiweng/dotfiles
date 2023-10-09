@@ -8,7 +8,18 @@ fi
 
 cleaned_dirname=$(echo $(basename $this_dir) | sed "s/[\.]//g")
 if [[ $(tmux ls -F "#S" | grep $cleaned_dirname) ]]; then
-    echo "Session already exists"
+    # Do this if the session exists
+    if [ -z "$TMUX" ]; then
+        # Do this is out of tmux
+        tmux a -t $cleaned_dirname
+    else
+        tmux switch -t $cleaned_dirname
+    fi
 else
-    tmux new -s $cleaned_dirname -c $this_dir
+    if [ -z "$TMUX" ]; then
+        # Do this is out of tmux
+        tmux new -A -s $cleaned_dirname -c $this_dir
+    else
+        tmux new -A -s $cleaned_dirname -c $this_dir -d
+    fi
 fi
