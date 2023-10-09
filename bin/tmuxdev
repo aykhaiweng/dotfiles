@@ -18,3 +18,5 @@ else
     tmux new-session -d -s dotfiles -c ~/.dotfiles
     tmux new-window -c ~/.config/nvim/
 fi
+
+tmux a
