@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ "$1" ]]; then
-    this_dir=$1
+    this_dir="$(pwd)/$1"
 else
     this_dir=$(pwd)
 fi
@@ -20,6 +20,6 @@ else
         # Do this is out of tmux
         tmux new -A -s $cleaned_dirname -c $this_dir
     else
-        tmux new -A -s $cleaned_dirname -c $this_dir -d
+        tmux new -s $cleaned_dirname -d -c $this_dir
     fi
 fi
