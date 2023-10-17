@@ -35,3 +35,10 @@ defaults write com.apple.desktopservices DSDontWriteNetworkStores true
 
 # Remove mouse scaling
 defaults write .GlobalPreferences com.apple.mouse.scaling -1
+
+# speed up Launchpad show and hide animations
+defaults write com.apple.dock springboard-show-duration -float 0.1
+defaults write com.apple.dock springboard-hide-duration -float 0.1
+
+# speed up Launchpad page flip animation
+defaults write com.apple.dock springboard-page-duration -float 0.1
