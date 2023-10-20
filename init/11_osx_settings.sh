@@ -42,3 +42,6 @@ defaults write com.apple.dock springboard-hide-duration -float 0.1
 
 # speed up Launchpad page flip animation
 defaults write com.apple.dock springboard-page-duration -float 0.1
+
+# kill smooth swoosh animations
+defaults write com.apple.dock workspaces-swoosh-animation-off -bool YES
