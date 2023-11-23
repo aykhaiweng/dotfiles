@@ -47,8 +47,8 @@ function do_stuff() {
     if [[ -d "$dotfiles_relative_path" ]]; then
         # Create a recursive file list of all the files
         local file_list=$(find $dotfiles_relative_path -type f $extra_find_args | sed 's/^\.\///g' | sort)
-        echo "Debugging filelist ($dotfiles_relative_path) ($extra_find_args)"
-        echo "${file_list}"
+        # echo "Debugging filelist ($dotfiles_relative_path) ($extra_find_args)"
+        # echo "${file_list}"
 
         for source_file in $file_list; do
             # Define the file_target without it's home or dotfiles prepend, this is needed for
