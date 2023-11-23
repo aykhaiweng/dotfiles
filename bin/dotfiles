@@ -53,10 +53,6 @@ source $DOTFILES/source/00_general_functions.sh
 # Add binaries into the path
 [[ -d $DOTFILES/bin ]] && export PATH=$DOTFILES/bin:$PATH
 
-# Tweak file globbing.
-shopt -s dotglob
-shopt -s nullglob
-
 # Create caches dir and init subdir, if they don't already exist.
 mkdir -p "$DOTFILES/caches/init"
 
