@@ -3,7 +3,7 @@
 if [[ "$1" ]]; then
     this_dir="$(pwd)/$1"
 else
-    this_dir=$(pwd)
+    this_dir="$(pwd)"
 fi
 
 cleaned_dirname=$(echo $(basename $this_dir) | sed "s/[\.]//g")
@@ -11,15 +11,19 @@ if [[ $(tmux ls -F "#S" | grep $cleaned_dirname) ]]; then
     # Do this if the session exists
     if [ -z "$TMUX" ]; then
         # Do this is out of tmux
+        echo "Attaching to existing session"
         tmux a -t $cleaned_dirname
     else
+        echo "Switching to existing session"
         tmux switch -t $cleaned_dirname
     fi
 else
     if [ -z "$TMUX" ]; then
         # Do this is out of tmux
+        echo "Creating new session"
         tmux new -A -s $cleaned_dirname -c $this_dir
     else
+        echo "Creating new session (tmux)"
         tmux new -s $cleaned_dirname -d -c $this_dir
     fi
 fi
