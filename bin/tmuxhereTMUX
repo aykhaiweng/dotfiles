@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+
+# EXPERIMENTAL COMMAND FOR OPENING A VIM FOCUSED TERMINAL THAT CAN BE REOPENED
+
+if [[ "$1" ]]; then
+    this_dir="$(realpath $1)"
+else
+    this_dir="$(pwd)"
+fi
+
+echo "this_dir = $this_dir"
+
+cleaned_dirname=$(echo $(basename $this_dir) | sed "s/[\.]//g")
+cleaned_dirname+="TMUX"
+if [[ $(tmux ls -F "#S" | grep $cleaned_dirname) ]]; then
+    # Do this if the session exists
+    if [ -z "$TMUX" ]; then
+        # Do this is out of tmux
+        echo "Attaching to existing session \"$cleaned_dirname\""
+        tmux a -t $cleaned_dirname
+    else
+        echo "Switching to existing session \"$cleaned_dirname\""
+        tmux switch -t $cleaned_dirname
+    fi
+else
+    if [ -z "$TMUX" ]; then
+        # Do this is out of tmux
+        echo "Creating new session \"$cleaned_dirname\" at \"$this_dir\""
+        tmux new -A -s $cleaned_dirname -c $this_dir
+    else
+        echo "Creating new session (tmux) \"$cleaned_dirname\" at \"$this_dir\""
+        tmux new -s $cleaned_dirname -d -c $this_dir
+        tmux switch -t $cleaned_dirname
+    fi
+fi
