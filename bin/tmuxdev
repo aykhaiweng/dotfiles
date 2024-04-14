@@ -1,17 +1,5 @@
 #!/usr/bin/env bash
 
-if [[ $(tmux ls -F "#S" | grep "lazydocker") ]]; then
-    echo "Tmux Session already running: lazydocker"
-else
-    tmux new-session -d -s lazydocker "lazydocker"
-fi
-
-if [[ $(tmux ls -F "#S" | grep "htop") ]]; then
-    echo "Tmux Session already running: htop"
-else
-    tmux new-session -d -s htop "htop"
-fi
-
 if [[ $(tmux ls -F "#S" | grep "dotfiles") ]]; then
     echo "Tmux Session already running: dotfiles"
 else
