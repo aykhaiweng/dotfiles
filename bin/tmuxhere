@@ -8,7 +8,9 @@ fi
 
 echo "this_dir = $this_dir"
 
-cleaned_dirname=$(echo $(basename $this_dir) | sed "s/[\.]//g")
+# cleaned_dirname=$(echo $(basename $this_dir) | sed "s/[\.]//g")
+cleaned_dirname="${this_dir//\./DOT}"
+echo "cleaned_dirname = $cleaned_dirname"
 if [[ $(tmux ls -F "#S" | grep $cleaned_dirname) ]]; then
     # Do this if the session exists
     if [ -z "$TMUX" ]; then
