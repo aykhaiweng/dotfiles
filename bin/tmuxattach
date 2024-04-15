@@ -11,7 +11,7 @@ fi
 
 # Check if the window exists
 if ! tmux list-windows -t "$session_name" | grep -q "$window_name"; then
-    tmux new-window -t "$session_name": -n "$window_name"
+    tmux new-window -t "$session_name": -n "$window_name" "$start_command"
 fi
 
 # Attach to the session
