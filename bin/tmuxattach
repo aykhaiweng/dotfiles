@@ -15,4 +15,11 @@ if ! tmux list-windows -t "$session_name" | grep -q "$window_name"; then
 fi
 
 # Attach to the session
-tmux attach-session -t "$session_name:$window_name"
+echo $4
+if [ -n "$4" ]; then
+    echo "Attaching with arguments"
+    tmux attach-session -t "$session_name:$window_name" \; $4
+else
+    echo "Attaching without arguments"
+    tmux attach-session -t "$session_name:$window_name" \; source-file ~/.tmux.conf
+fi
