@@ -1,5 +1,9 @@
-# Where the magic happens.
+# --- Where the magic happens.
 export DOTFILES=~/.dotfiles
+
+# --- Build for NODE
+export LDFLAGS="-L/opt/homebrew/opt/node@14/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/node@14/include"
 
 # Source all files in "source"
 function src() {
@@ -12,28 +16,24 @@ function src() {
         done
     fi
 }
-
 src
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# The next line updates PATH for the Google Cloud SDK.
+# --- The next line updates PATH for the Google Cloud SDK.
 if [ -f '/root/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/root/Downloads/google-cloud-sdk/path.zsh.inc'; fi
 
-# The next line enables shell command completion for gcloud.
+# --- The next line enables shell command completion for gcloud.
 if [ -f '/root/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/root/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
 
-# JDK stuff
+# --- JDK stuff
 export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
-
-# Build stuff
-export LDFLAGS="-L/opt/homebrew/opt/node@14/lib"
-export CPPFLAGS="-I/opt/homebrew/opt/node@14/include"
 
 if is_ubuntu; then
     # Linuxbrew stuff
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
-# Shell stuff
+# --- Shell stuff
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# --- bat
+export BAT_THEME="Catppuccin Mocha"
