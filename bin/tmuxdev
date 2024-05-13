@@ -5,6 +5,13 @@ if [[ $(tmux ls -F "#S" | grep "dotfiles") ]]; then
 else
     tmux new-session -d -s dotfiles -c ~/.dotfiles \; rename-window "dotfiles"
     tmux new-window -c ~/.config/nvim/ \; rename-window "nvim-config"
+    if [ -d "/etc/nginx" ]; then
+        tmux new-window -c /etc/nginx/ \; rename-window "nginx"
+    fi
+    if [ -d "~/.ssh/" ]; then
+        tmux new-window -c ~/.ssh/ \; rename-window "ssh"
+    fi
 fi
+
 
 tmux a
