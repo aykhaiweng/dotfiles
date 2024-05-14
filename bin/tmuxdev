@@ -14,4 +14,4 @@ else
 fi
 
 
-tmux a
+tmux a -t dotfiles
