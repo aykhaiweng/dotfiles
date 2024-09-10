@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+session_name=$1
+window_name=$2
+start_command=$3
+
+# Cleaning the session and window names
+session_name="${session_name//./-DOT-}"
+window_name="${window_name//./-DOT-}"
+
+# Check if session exists, if not, create it
+if ! tmux has-session -t "$session_name" 2>/dev/null; then
+    tmux new-session -d -s "$session_name" "$start_command" \; rename-window "$window_name"
+fi
+
+# Check if the window exists
+if ! tmux list-windows -t "$session_name" | grep -q "$window_name"; then
+    tmux new-window -t "$session_name": -n "$window_name" "$start_command"
+fi
