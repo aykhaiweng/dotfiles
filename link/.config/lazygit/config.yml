@@ -1,0 +1,7 @@
+gui:
+  sidePanelWidth: 0.2 # gives you more space to show things side-by-side
+git:
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+    # pager: delta --dark --paging=never
