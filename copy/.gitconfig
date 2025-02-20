@@ -1,3 +1,22 @@
 [user]
-  name = Au Yeong Khai Weng
-  email = aykhaiweng@gmail.com
+    name = Au Yeong Khai Weng
+    email = aykhaiweng@gmail.com
+[core]
+	editor = nvim +star
+    pager = delta
+[interactive]
+    diffFilter = delta --color-only
+[delta]
+    navigate = true
+    line-numbers = true
+    dark = true
+[alias]
+	staash = stash --all
+[merge]
+    conflictstyle = diff3
+[init]
+	defaultBranch = main
+[push]
+	autoSetupRemote = true
+[pull]
+	rebase = true
