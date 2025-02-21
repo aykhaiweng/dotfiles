@@ -23,19 +23,19 @@ pyenv deactivate
 mkdir -p $DOTFILES/caches/vim
 
 # Installing vim-plug
-vim_plug_install_dir=$HOME/.vim/autoload/plug.vim
-if [[ ! -f $vim_plug_install_dir ]]; then
-    e_arrow "Installing vim-plug"
-    curl -fLo $vim_plug_install_dir --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-fi
+# vim_plug_install_dir=$HOME/.vim/autoload/plug.vim
+# if [[ ! -f $vim_plug_install_dir ]]; then
+#     e_arrow "Installing vim-plug"
+#     curl -fLo $vim_plug_install_dir --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+# fi
 
 # Installing packer for nvim
-nvim_packer_install_dir=$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim
-if [[ ! -f $nvim_packer_install_dir ]]; then
-    e_arrow "Installing packer.nvim"
-    git clone --depth 1 https://github.com/wbthomason/packer.nvim \
-    ~/.local/share/nvim/site/pack/packer/start/packer.nvim
-fi
+# nvim_packer_install_dir=$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim
+# if [[ ! -f $nvim_packer_install_dir ]]; then
+#     e_arrow "Installing packer.nvim"
+#     git clone --depth 1 https://github.com/wbthomason/packer.nvim \
+#     ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+# fi
 
 # Download nvim plugins.
 # if [[ "$(type -p nvim)" ]]; then
