@@ -1,48 +1,61 @@
 # Exit if Homebrew is not installed.
 [[ ! "$(type -P brew)" ]] && e_error "Brew casks need Homebrew to install." && return 1
 
+
+# Install Homebrew recipes.
+function brew_install_recipes() {
+    recipes=($(setdiff "${recipes[*]}" "$(brew list)"))
+    if (( ${#recipes[@]} > 0 )); then
+        e_header "Installing Homebrew recipes: ${recipes[*]}"
+        for recipe in "${recipes[@]}"; do
+            e_arrow "Installing recipe: ${recipe}"
+            brew install $recipe
+        done
+    fi
+}
+
 # Homebrew recipes
 recipes=(
-	bat
-	pkg-config
-	libx11
-	fd
-	fzf
-	eza
-	gitui
-	gitmux
-	git-delta
-	gnutls
-	gnupg
-	harfbuzz
-	htop
-	iperf
-	kubernetes-cli
-	lazydocker
-	lazygit
-	libffi
-	libpq
-	neovim
-	node
-	openjdk
-	openssl@3
-	p7zip
-	webp
-	qt@5
-	poppler-qt5
-	pyenv
-	pyenv-virtualenv
-	ripgrep
-	ruby
-	rust
-	sevenzip
-	the_silver_searcher
-	tmux
-	tree
-	vim
-	viu
-	wget
-	zsh
+  "bat"
+  "pkgconf"
+  "libx11"
+  "fd"
+  "fzf"
+  "eza"
+  "gitui"
+  "gitmux"
+  "git-delta"
+  "gnutls"
+  "gnupg"
+  "harfbuzz"
+  "htop"
+  "iperf"
+  "kubernetes-cli"
+  "lazydocker"
+  "lazygit"
+  "libffi"
+  "libpq"
+  "neovim"
+  "node"
+  "openjdk"
+  "openssl@3"
+  "p7zip"
+  "webp"
+  "qt@5"
+  "poppler-qt5"
+  "pyenv"
+  "pyenv-virtualenv"
+  "ripgrep"
+  "ruby"
+  "rust"
+  "sevenzip"
+  "the_silver_searcher"
+  "tmux"
+  "tree"
+  "vim"
+  "viu"
+  "wget"
+  "zsh"
 )
 
 brew_install_recipes
