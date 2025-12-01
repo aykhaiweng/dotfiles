@@ -56,6 +56,7 @@ recipes=(
   "viu"
   "wget"
   "zsh"
+  "zellij"
 )
 
 brew_install_recipes
