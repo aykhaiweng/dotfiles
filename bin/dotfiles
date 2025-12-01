@@ -258,7 +258,7 @@ function setdiff() {
 }
 
 # If this file was being sourced, exit now.
-[[ "$1" == "source" ]] && return
+[[ "$1" == "source" ]] && return 1
 
 
 ###########################################
