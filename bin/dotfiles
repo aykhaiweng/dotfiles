@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 [[ "$1" == "source" ]] || \
 
-echo 'Dotfiles - Khai @ aykhaiweng@gmail.com'
-
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then cat <<HELP
-
 Usage: $(basename "$0")
 HELP
 exit; fi
