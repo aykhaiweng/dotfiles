@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [[ $(tmux ls -F "#S" | grep "dotfiles") ]]; then
+    echo "Tmux Session already running: dotfiles"
+else
+    tmux new-session -d -s dotfiles -c ~/.dotfiles \; rename-window "dotfiles"
+    tmux new-window -c ~/.config/nvim/ \; rename-window "nvim-config"
+    if [ -d "~/.dotfiles/private/nginx" ]; then
+        tmux new-window -c ~/.dotfiles/private/nginx \; rename-window "nginx-config"
+    fi
+    if [ -d "~/.ssh/" ]; then
+        tmux new-window -c ~/.ssh/ \; rename-window "ssh"
+    fi
+fi
+
+
+tmux a -t dotfiles

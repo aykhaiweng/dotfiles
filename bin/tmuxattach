@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+session_name=$1
+window_name=$2
+start_command=$3
+
+# Cleaning the session and window names
+session_name="${session_name//./-DOT-}"
+window_name="${window_name//./-DOT-}"
+
+tmuxnew $session_name $window_name $start_command
+
+# Attach to the session
+echo $4
+if [ -n "$4" ]; then
+    echo "Attaching with arguments"
+    tmux attach-session -t "$session_name:$window_name" \; $4
+else
+    echo "Attaching without arguments"
+    tmux attach-session -t "$session_name:$window_name" \; source-file ~/.tmux.conf
+fi
