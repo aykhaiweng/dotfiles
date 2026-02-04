@@ -1,1 +1,5 @@
-promptToReturnFromSubprocess: false
+git:
+  commit:
+    confirmOnQuitPlaceholder: false
+gui:
+  skipNoStagedFilesAlert: true
