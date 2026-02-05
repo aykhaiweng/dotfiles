@@ -5,5 +5,5 @@ All the files in here are run according to sorting order upon running the `bin/d
 Run the script below:
 
 ```
-bash <(curl -sL https://raw.githubusercontent.com/aykhaiweng/dotfiles/main/bin/dotfiles)
+bash <(curl -sL https://raw.githubusercontent.com/aykhaiweng/dotfiles/refs/heads/main/bin/dotfiles)
 ```
