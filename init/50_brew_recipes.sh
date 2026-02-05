@@ -52,6 +52,7 @@ recipes=(
   "the_silver_searcher"
   "tmux"
   "tree"
+  "unzip"
   "vim"
   "viu"
   "wget"
