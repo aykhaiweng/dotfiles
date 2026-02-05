@@ -6,3 +6,5 @@ else
     e_success "Cloning nvim config to ~/.config/nvim/"
     git clone --depth 1 git@github.com:aykhaiweng/nvim-lua.git $HOME/.config/nvim
 fi
+
+return 1

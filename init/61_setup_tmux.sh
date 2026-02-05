@@ -15,3 +15,5 @@ else
 	e_success "Downloading tmux-gitbar"
 	git clone https://github.com/aurelien-rainone/tmux-gitbar.git $HOME/.tmux-gitbar
 fi
+
+return 1
