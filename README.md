@@ -5,5 +5,5 @@ All the files in here are run according to sorting order upon running the `bin/d
 Run the script below:
 
 ```
-bash <(curl -sL https://raw.githubusercontent.com/aykhaiweng/dotfiles/refs/heads/main/bin/dotfiles)
+bash <(curl -H "Cache-Control: no-cache, no-store" -sL https://raw.githubusercontent.com/aykhaiweng/dotfiles/refs/heads/main/bin/dotfiles)
 ```
