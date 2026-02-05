@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-# Setting up pyenv for the Terminal
+# Enable configuration options for Python
+is_osx && export PYTHON_CONFIGURE_OPTS="--enable-framework"
+is_ubuntu && export PYTHON_CONFIGURE_OPTS="--enable-shared"
+
+export LATEST_PYTHON3_VERSION=3.14.3
 
 if [[ -d "$HOME/.pyenv" ]]; then
     export PYENV_ROOT="$HOME/.pyenv"
