@@ -7,6 +7,9 @@ if [[ ! "$(type -P brew)" ]]; then
     bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 fi
 
+# Evaulate
+[[ ! "$(type -P brew)" ]] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
+
 # Exit if, for some reason, Homebrew is not installed.
 [[ ! "$(type -P brew)" ]] && e_error "Homebrew failed to install." && return 1
 

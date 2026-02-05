@@ -22,6 +22,7 @@ recipes=(
   "fd"
   "fzf"
   "eza"
+  "gcc"
   "gitui"
   "gitmux"
   "git-delta"
