@@ -2,7 +2,7 @@
 export ZSH="$HOME/.oh-my-zsh"
 
 # Theme
-ZSH_THEME="arrow"
+ZSH_THEME="af-magic"
 
 # Plugins
 plugins=(
