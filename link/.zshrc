@@ -10,6 +10,7 @@ plugins=(
 	branch
 	fzf
 	git
+    git-auto-fetch
 	docker
 	docker-compose
 	zsh-syntax-highlighting
