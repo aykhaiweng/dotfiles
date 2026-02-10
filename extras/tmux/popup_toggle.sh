@@ -18,5 +18,5 @@ if [ "#{session_name}" = "$SESSION_NAME" ]; then
     tmux detach-client
 else
     tmux popup -d "#{pane_current_path}" -xC -yC -w70% -h90% \
-        -E "tmuxattach $SESSION_NAME \"$TARGET_SESSION\" $COMMAND \"source-file $HOME/.tmux-popup.conf\""
+        -E "TMUX_RESURRECT_DEACTIVATE=1 tmuxattach $SESSION_NAME \"$TARGET_SESSION\" $COMMAND \"source-file $HOME/.tmux-popup.conf\""
 fi
