@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+ssh-keygen ed25519
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
