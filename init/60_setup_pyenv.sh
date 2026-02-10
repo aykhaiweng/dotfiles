@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source ../source/20_pyenv.sh
+
 if [[ $(pyenv versions | grep $LATEST_PYTHON3_VERSION) ]]; then
     e_arrow "Python $LATEST_PYTHON3_VERSION already installed."
 else
