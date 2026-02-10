@@ -25,5 +25,8 @@
 *LOCAL*
 .DS_Store
 
+# all-ports.conf
+extras/nginx/all-ports.conf
+
 # vim
 Session.vim
