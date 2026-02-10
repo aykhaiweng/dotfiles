@@ -1,0 +1,13 @@
+# vim:set ft=TOML
+
+[Unit]
+Description=ttyd Web Terminal
+After=network.target
+
+[Service]
+ExecStart=/home/linuxbrew/.linuxbrew/bin/ttyd --port 1337 --writable --index ~/.dotfiles/extras/ttyd/custom-index.html zsh
+Restart=always
+User=aykhaiweng
+
+[Install]
+WantedBy=multi-user.target
