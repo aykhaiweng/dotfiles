@@ -41,6 +41,7 @@ recipes=(
   "luarocks"
   "make"
   "neovim"
+  "nginx"
   "node"
   "openjdk"
   "openssl@3"
