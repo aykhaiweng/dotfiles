@@ -1,0 +1,74 @@
+# 1. Rename this to all-ports.conf
+# 2. `ln -s all-ports.conf /etc/nginx/sites-enabled/all-ports.conf`
+
+
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
+}
+
+# 1. Health Check Block (Responds to the Load Balancer's pings)
+server {
+    listen 80 default_server;
+    server_name _;
+
+    location / {
+        return 200 'healthy\n';
+        add_header Content-Type text/plain;
+    }
+}
+
+# 2. Default block for access to bench.wayk.dev
+server {
+    listen 80;
+    # Matches: 8080.bench.wayk.dev, 3000.bench.wayk.dev
+    server_name ~^bench\.wayk\.dev$;
+
+    location / {
+        # Security: Forward to localhost port
+        proxy_pass http://127.0.0.1:1337;
+
+        # --- CRITICAL FIXES ---
+        # 1. Force HTTP/1.1 (Required for WebSockets)
+        proxy_http_version 1.1;
+
+        # 2. WebSocket Headers
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        
+        # 3. Prevent ttyd from rejecting the connection due to hostname mismatch
+        # (Sets Origin to match the Host header exactly)
+        # proxy_set_header Origin $scheme://$host;
+        # LIE to ttyd
+        proxy_set_header Host "127.0.0.1";
+        proxy_set_header Origin "http://127.0.0.1";
+        # ----------------------
+
+        # 4. Long timeout to prevent disconnects when you stop typing
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+
+        # Standard Headers
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https; # Tell the app it's actually HTTPS
+    }
+}
+
+# 3. Dynamic Port Forwarding Block
+server {
+    listen 80;
+    # Matches: 8080.bench.wayk.dev, 3000.bench.wayk.dev
+    server_name ~^(?<port>\d+)\.bench\.wayk\.dev$;
+
+    location / {
+        # Security: Forward to localhost port
+        proxy_pass http://127.0.0.1:$port;
+
+        # Standard Headers
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https; # Tell the app it's actually HTTPS
+    }
+}
