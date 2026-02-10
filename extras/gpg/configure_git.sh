@@ -16,11 +16,4 @@ fi
 git config --global user.signingkey "$KEY_ID"
 git config --global commit.gpgsign true
 
-# 3. Handle GPG display issues on some systems (TTY)
-# This ensures the passphrase prompt (if any) appears correctly in the terminal
-if [[ "$OSTYPE" == "linux-gnu"* ]] || [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "export GPG_TTY=\$(tty)" >> ~/.bashrc
-    echo "export GPG_TTY=\$(tty)" >> ~/.zshrc
-fi
-
 echo "Git successfully configured to use GPG key: $KEY_ID"
