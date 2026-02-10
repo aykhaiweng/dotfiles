@@ -3,9 +3,18 @@
 # Configuration
 KEY_NAME="GitHub Key"
 KEY_EMAIL="aykhaiweng@gmail.com"
-PASSPHRASE="${GPG_PASSPHRASE:-}"
 KEY_TYPE="RSA"
 KEY_LENGTH=4096
+
+# Check if GPG_PASSPHRASE is set and not empty
+if [ -n "$GPG_PASSPHRASE" ]; then
+    PASSPHRASE_LINE="Passphrase: $GPG_PASSPHRASE"
+    PROTECTION_LINE=""
+else
+    # If no env var, use %no-protection to skip passphrase prompts entirely
+    PASSPHRASE_LINE=""
+    PROTECTION_LINE="%no-protection"
+fi
 
 # Create a batch file for non-interactive generation
 cat >gpg_batch <<EOF
@@ -17,7 +26,8 @@ cat >gpg_batch <<EOF
      Name-Real: $KEY_NAME
      Name-Email: $KEY_EMAIL
      Expire-Date: 0
-     Passphrase: "$PASSPHRASE"
+     $PASSPHRASE_LINE
+     $PROTECTION_LINE
      %commit
      %echo done
 EOF
