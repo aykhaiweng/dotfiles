@@ -22,10 +22,10 @@ brew cask info this-is-somewhat-annoying 2>/dev/null
 
 # Homebrew casks
 casks=(
-	"sublime-text"
+	# "sublime-text"
 	"google-cloud-sdk"
-    "font-symbols-only-nerd-font"
-    "font-iosevka-nerd-font"
+    # "font-symbols-only-nerd-font"
+    # "font-iosevka-nerd-font"
 )
 
 # Install Homebrew casks.
