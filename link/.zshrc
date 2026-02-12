@@ -19,12 +19,16 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
+# ==> Source [/home/linuxbrew/.linuxbrew/Caskroom/gcloud-cli/556.0.0/google-cloud-sdk/completion.zsh.inc] in your profile to enable shell command completion for gcloud.
+# ==> Source [/home/linuxbrew/.linuxbrew/Caskroom/gcloud-cli/556.0.0/google-cloud-sdk/path.zsh.inc]
+#  in your profile to add the Google Cloud SDK command line tools to your $PATH.
+
 # User completions
 # --- The next line updates PATH for the Google Cloud SDK.
-if [ -f '/root/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/root/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f '/home/linuxbrew/.linuxbrew/Caskroom/gcloud-cli/556.0.0/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/linuxbrew/.linuxbrew/Caskroom/gcloud-cli/556.0.0/google-cloud-sdk/completion.zsh.inc'; fi
 
 # --- The next line enables shell command completion for gcloud.
-if [ -f '/root/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/root/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+if [ -f '/home/linuxbrew/.linuxbrew/Caskroom/gcloud-cli/556.0.0/google-cloud-sdk/path.zsh.inc' ]; then . '/home/linuxbrew/.linuxbrew/Caskroom/gcloud-cli/556.0.0/google-cloud-sdk/path.zsh.inc'; fi
 
 export GPG_TTY=$(tty)
 
