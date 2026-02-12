@@ -21,6 +21,12 @@
 # Don't commit tmux resurrect state.
 /link/.tmux/resurrect
 
+# Don't commit the localrc
+/link/.userrc
+
+# ignore tmp folder
+/tmp/
+
 # Ignore any file with LOCAL in the name (good for per-machine vars/functions)
 *LOCAL*
 .DS_Store
