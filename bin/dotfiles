@@ -506,8 +506,16 @@ backup=
 
 # Execute code for each file in these subdirectories.
 do_stuff copy
+
+# Exit if only doing copy
+[[ "$1" == "copy" ]] && return 1
+
 do_stuff link
 do_stuff config
+
+# Exit if only doing link
+[[ "$1" == "link" ]] && return 1
+
 do_stuff init
 
 # Alert if backups were made.
