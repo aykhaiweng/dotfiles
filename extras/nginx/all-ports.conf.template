@@ -1,3 +1,4 @@
+# vim:set ft=nginx:
 # 1. Rename this to all-ports.conf
 # 2. `ln -s all-ports.conf /etc/nginx/sites-enabled/all-ports.conf`
 
@@ -18,11 +19,10 @@ server {
     }
 }
 
-# 2. Default block for access to bench.wayk.dev
+# 2. Default block for access to custom.domain.com
 server {
     listen 80;
-    # Matches: 8080.bench.wayk.dev, 3000.bench.wayk.dev
-    server_name ~^bench\.wayk\.dev$;
+    server_name custom.domain.com
 
     location / {
         # Security: Forward to localhost port
@@ -55,20 +55,47 @@ server {
     }
 }
 
+
 # 3. Dynamic Port Forwarding Block
 server {
     listen 80;
-    # Matches: 8080.bench.wayk.dev, 3000.bench.wayk.dev
-    server_name ~^(?<port>\d+)\.bench\.wayk\.dev$;
+    # Matches: 8080.custom.domain.com, 3000.custom.domain.com
+    server_name ~^(?<port>\d+)\.custom\.domain\.com$;
 
     location / {
-        # Security: Forward to localhost port
+        # Validates that $port is captured by the regex before proxying
         proxy_pass http://127.0.0.1:$port;
 
         # Standard Headers
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto https; # Tell the app it's actually HTTPS
+        proxy_set_header X-Forwarded-Proto https;
+    }
+}
+
+# 4. Dynamic port forwarding via path URI
+server {
+    listen 80;
+    server_name custom.domain.com;
+
+    # Captures the port from the first segment of the path
+    # Example: /3000/api/data -> captures '3000' and 'api/data'
+    location ~ ^/(?<port>\d+)(?<remaining_path>/.*|$) {
+
+        # Rewrites the URI to remove the port prefix before sending to backend
+        # Use 'break' to prevent Nginx from re-searching for a matching location
+        rewrite ^/\d+(/.*|$) $remaining_path break;
+
+        proxy_pass http://127.0.0.1:$port;
+
+        # Standard Headers
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # Custom App Header
+        proxy_set_header X-App-Auth $http_x_app_auth;
     }
 }
