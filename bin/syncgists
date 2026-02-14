@@ -14,54 +14,65 @@ fi
 
 touch "$MAP_FILE"
 
-# Helper for cross-platform MD5
 get_md5() {
     if command -v md5sum >/dev/null; then md5sum "$1" | awk '{print $1}'; else md5 -q "$1"; fi
 }
 
+# 1. PULL MISSING LOCAL FILES
+while IFS=: read -r filename gist_id; do
+    [ -z "$filename" ] && continue
+    if [ ! -f "$FOLDER/$filename" ]; then
+        if [ "$DRY_RUN" = true ]; then
+            echo "[DRY-RUN] Would PULL $filename from Gist $gist_id"
+        else
+            echo "Restoring $filename from Gist..."
+            gh gist view "$gist_id" -r -f "$filename" > "$FOLDER/$filename"
+        fi
+    fi
+done < "$MAP_FILE"
+
+# 2. SYNC EXISTING OR NEW LOCAL FILES
 for file in "$FOLDER"/*; do
     [ -f "$file" ] || continue
     filename=$(basename "$file")
+
+    # NEW: Prevent processing if file is empty
+    if [ ! -s "$file" ]; then
+        echo "Skipping $filename: File is empty."
+        continue
+    fi
+    
     gist_id=$(grep "^$filename:" "$MAP_FILE" | cut -d':' -f2 | tr -d '[:space:]')
     
     if [ -z "$gist_id" ]; then
         if [ "$DRY_RUN" = true ]; then
-            echo "[DRY-RUN] Would CREATE $filename"
+            echo "[DRY-RUN] Would CREATE Gist for $filename"
         else
-            echo "Creating $filename..."
+            echo "Creating Gist for $filename..."
             output=$(gh gist create "$file" --public=false)
             new_id=$(echo "$output" | grep -oE '[a-f0-9]{32}' | head -n 1 | tr -d '[:space:]')
-            echo "$filename:$new_id" >> "$MAP_FILE"
+            
+            if ! grep -q "^$filename:" "$MAP_FILE"; then
+                echo "$filename:$new_id" >> "$MAP_FILE"
+            fi
         fi
     else
-        # Fetch remote content and metadata
+        # Content-based Sync
         remote_content=$(gh gist view "$gist_id" -r -f "$filename")
-        remote_md5=$(echo "$remote_content" | awk 'NF' | get_md5 -) # Strip trailing newlines for comparison
+        remote_md5=$(echo "$remote_content" | awk 'NF' | get_md5 -)
         local_md5=$(get_md5 "$file")
 
-        if [ "$local_md5" = "$remote_md5" ]; then
-            echo "$filename: No content changes detected. Skipping."
-            continue
-        fi
+        if [ "$local_md5" != "$remote_md5" ]; then
+            remote_mod_raw=$(gh api "gists/$gist_id" --template '{{.updated_at}}')
+            remote_mod=$(date -d "$remote_mod_raw" +%s)
+            local_mod=$(stat -c %Y "$file")
 
-        # If different, fall back to timestamp logic
-        remote_mod_raw=$(gh api "gists/$gist_id" --template '{{.updated_at}}')
-        remote_mod=$(date -d "$remote_mod_raw" +%s)
-        local_mod=$(stat -c %Y "$file")
-
-        if [ "$local_mod" -gt "$remote_mod" ]; then
-            if [ "$DRY_RUN" = true ]; then
-                echo "[DRY-RUN] Would PUSH $filename (Content differs)"
+            if [ "$local_mod" -gt "$remote_mod" ]; then
+                [ "$DRY_RUN" = false ] && gh gist edit "$gist_id" -a "$file"
+                echo "Pushed $filename"
             else
-                echo "Pushing changes to $filename..."
-                gh gist edit "$gist_id" -a "$file"
-            fi
-        else
-            if [ "$DRY_RUN" = true ]; then
-                echo "[DRY-RUN] Would PULL $filename (Content differs)"
-            else
-                echo "Pulling changes for $filename..."
-                echo "$remote_content" > "$file"
+                [ "$DRY_RUN" = false ] && echo "$remote_content" > "$file"
+                echo "Pulled $filename"
             fi
         fi
     fi
