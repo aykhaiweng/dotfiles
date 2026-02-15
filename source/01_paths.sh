@@ -1,3 +1,5 @@
+#!/bin/bash
+
 paths=(
   /opt/homebrew/bin
   /opt/homebrew/sbin
