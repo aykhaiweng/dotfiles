@@ -8,7 +8,7 @@ fi
 export ZSH="$HOME/.oh-my-zsh"
 
 # Theme
-ZSH_THEME="custom01"
+ZSH_THEME="example"
 
 # Plugins
 plugins=(
