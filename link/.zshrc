@@ -8,19 +8,21 @@ fi
 export ZSH="$HOME/.oh-my-zsh"
 
 # Theme
-ZSH_THEME="af-magic"
+ZSH_THEME="custom01"
 
 # Plugins
 plugins=(
-  brew
   branch
+  brew
+  docker
+  docker-compose
   fzf
   git
   git-auto-fetch
-  docker
-  docker-compose
-  zsh-syntax-highlighting
+  pyenv
+  virtualenv
   zsh-autosuggestions
+  zsh-syntax-highlighting
 )
 
 source $ZSH/oh-my-zsh.sh
