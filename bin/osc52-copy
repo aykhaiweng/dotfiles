@@ -1,0 +1,8 @@
+# vim:set ft=sh:
+
+#!/usr/bin/env bash
+
+# Read from stdin, base64 encode, and wrap in OSC 52
+content=$(base64 | tr -d '\n')
+# The \ePtmux;\e prefix tells tmux to pass this string to the outer terminal
+printf "\033Ptmux;\033]52;c;%s\a\033\\" "$content"
