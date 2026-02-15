@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# DEPRECATED
+
 # Arguments
 SESSION_NAME="$1"
 COMMAND="$2"
