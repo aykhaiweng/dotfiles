@@ -1,0 +1,4 @@
+# vim:set ft=sh:
+#!/usr/bin/env bash
+
+printf "\033]52;c;$(printf 'Hello World' | base64)\a"
