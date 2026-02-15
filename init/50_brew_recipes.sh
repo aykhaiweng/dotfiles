@@ -56,6 +56,7 @@ recipes=(
   "tmux"
   "tree"
   "tree-sitter"
+  "tree-sitter-cli"
   "unzip"
   "vim"
   "wget"
