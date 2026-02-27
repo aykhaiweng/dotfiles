@@ -1,0 +1,16 @@
+services:
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=aykhaiweng@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+    networks:
+      - db-shared-network
+    ports:
+      - "6001:80"
+
+networks:
+  db-shared-network:
+    external: true
+  intranet:
+    external: true
