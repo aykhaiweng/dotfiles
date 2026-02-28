@@ -1,16 +1,36 @@
+volumes:
+  pgadmin-data:
+  portainer-data:
+
 services:
   pgadmin:
+    container_name: pgadmin
     image: dpage/pgadmin4
+    restart: always
     environment:
       - PGADMIN_DEFAULT_EMAIL=aykhaiweng@gmail.com
-      - PGADMIN_DEFAULT_PASSWORD=password
+      - PGADMIN_DEFAULT_PASSWORD=password  # REMEMBER TO CHANGE THIS ON FIRST LOGIN
+      - PGADMIN_DISABLE_POSTFIX=false
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
     networks:
       - db-shared-network
     ports:
       - "6001:80"
 
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:sts
+    restart: always
+    volumes:
+      - portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "6002:9000"  # This is the web ui
+      - "6003:8000"
+    command: --http-enabled
+
+
 networks:
   db-shared-network:
-    external: true
-  intranet:
     external: true
