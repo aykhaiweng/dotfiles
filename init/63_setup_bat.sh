@@ -1,10 +1,22 @@
 #!/usr/bin/env bash
 
-mkdir -p "$(bat --config-dir)/themes"
+if ! is_installed bat; then
+    e_error "bat is not installed, skipping theme setup."
+    return 1
+fi
 
-wget -N -P "$(bat --config-dir)/themes" https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Latte.tmTheme
-wget -N -P "$(bat --config-dir)/themes" https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Frappe.tmTheme
-wget -N -P "$(bat --config-dir)/themes" https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Macchiato.tmTheme
-wget -N -P "$(bat --config-dir)/themes" https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Mocha.tmTheme
+BAT_CONFIG_DIR=$(bat --config-dir)
+THEME_DIR="$BAT_CONFIG_DIR/themes"
 
-bat cache --build
+mkdir -p "$THEME_DIR"
+
+e_header "Downloading Catppuccin themes for bat"
+(
+    set -e
+    for theme in "Latte" "Frappe" "Macchiato" "Mocha"; do
+        wget -q -N -P "$THEME_DIR" "https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20${theme}.tmTheme"
+    done
+    bat cache --build --quiet
+) || { e_error "Failed to setup bat themes."; return 1; }
+
+e_success "bat themes configured."
