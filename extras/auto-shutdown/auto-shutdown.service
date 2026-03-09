@@ -1,0 +1,7 @@
+[Unit]
+Description=Check for system idle and power off
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/khai/.dotfiles/extras/auto-shutdown/auto-shutdown.sh
