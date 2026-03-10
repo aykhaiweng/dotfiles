@@ -1,7 +1,6 @@
 #!/bin/bash
 # Configuration
-IDLE_HOURS=1
-IDLE_SECONDS=$((IDLE_HOURS * 3600))
+IDLE_SECONDS=$((600))
 NOW=$(date +%s)
 
 # 1. Check Interactive TTY activity (mtime of pts devices)
