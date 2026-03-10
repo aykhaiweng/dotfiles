@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+# Source dotfiles bin for vars and functions
+if [[ ! "$DOTFILES" ]]; then
+    DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
+fi
+source "$DOTFILES/bin/dotfiles" "source"
+
+PRIVATE_DIR="$DOTFILES/private"
+GIST_ID_FILE="$PRIVATE_DIR/.gist_id"
+HOSTNAME_S=$(hostname -s)
+GIST_DESC="Dotfiles private: $HOSTNAME_S"
+
+# Ensure we're in the dotfiles root
+cd "$DOTFILES"
+
+# Check if gh is installed
+if ! command -v gh &> /dev/null; then
+    e_error "GitHub CLI (gh) is not installed. Install it first."
+    exit 1
+fi
+
+# Gather files in private/ (excluding .gist_id and .git-related if any)
+mapfile -t FILES < <(find private -maxdepth 1 -type f ! -name ".gist_id")
+
+if [[ ${#FILES[@]} -eq 0 ]]; then
+    e_arrow "No files to sync in $PRIVATE_DIR"
+    exit 0
+fi
+
+# Function to create a new gist
+create_gist() {
+    e_header "Creating new private gist for $HOSTNAME_S..."
+    # Create the gist with the first file and get its ID
+    GIST_URL=$(gh gist create "${FILES[@]}" --public=false --desc "$GIST_DESC")
+    if [[ $? -eq 0 ]]; then
+        GIST_ID=$(echo "$GIST_URL" | grep -oE '[a-f0-9]{32,}')
+        echo "$GIST_ID" > "$GIST_ID_FILE"
+        e_success "Created gist: $GIST_URL"
+    else
+        e_error "Failed to create gist."
+        exit 1
+    fi
+}
+
+# Function to update existing gist
+update_gist() {
+    local id=$1
+    e_header "Updating existing gist ($id)..."
+    
+    # gh gist edit doesn't support bulk updates easily with local file content
+    # unless we use some trickery or loop. 
+    # Let's try to update each file.
+    for file in "${FILES[@]}"; do
+        filename=$(basename "$file")
+        e_arrow "Syncing $filename..."
+        # This will update if exists, or we might need --add if it's new.
+        # We'll try to add/update it.
+        # Note: gh gist edit <id> --add <filename> works for new files.
+        # For existing ones, we can pipe content.
+        cat "$file" | gh gist edit "$id" -f "$filename" - > /dev/null
+        if [[ $? -ne 0 ]]; then
+            # If it failed, maybe it's a new file?
+            e_arrow "File $filename might be new, trying to add..."
+            gh gist edit "$id" --add "$file" > /dev/null
+        fi
+    done
+    e_success "Sync complete."
+}
+
+if [[ ! -f "$GIST_ID_FILE" ]]; then
+    create_gist
+else
+    GIST_ID=$(cat "$GIST_ID_FILE" | tr -d '[:space:]')
+    if [[ -z "$GIST_ID" ]]; then
+        create_gist
+    else
+        update_gist "$GIST_ID"
+    fi
+fi
