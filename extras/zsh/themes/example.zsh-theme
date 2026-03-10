@@ -33,8 +33,8 @@ local venv_prompt='$(virtualenv_prompt_info)'
 ZSH_THEME_RVM_PROMPT_OPTIONS="i v g"
 
 
-PROMPT="${FG[237]}\${(l.\$(afmagic_dashes)..-.)}%{$reset_color%}"
-PROMPT+="${user_host}${current_dir}${rvm_ruby}${git_branch}${venv_prompt}
+# PROMPT="${FG[237]}\${(l.\$(afmagic_dashes)..-.)}%{$reset_color%}"
+PROMPT="${user_host}${current_dir}${rvm_ruby}${git_branch}${venv_prompt}
  %B${user_symbol}%b "
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[yellow]%}‹"

@@ -4,11 +4,11 @@
 if [[ -d "$HOME/.oh-my-zsh/" ]]; then
     e_arrow "oh-my-zsh is already installed"
 else
-    e_arrow "Setting KEEP_ZSHRC=yes"
-    export KEEP_ZSHRC=yes
-    e_arrow "Installing oh-my-zsh..."
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-    e_success "oh-my-zsh installed."
+    e_header "Installing oh-my-zsh..."
+    (
+        set -e
+        export KEEP_ZSHRC=yes
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    ) || { e_error "oh-my-zsh installation failed."; return 1; }
+    e_success "oh-my-zsh installed successfully."
 fi
-
-return 1

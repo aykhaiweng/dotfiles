@@ -1,0 +1,42 @@
+{
+  "general": {
+    "sessionRetention": {
+      "enabled": true,
+      "maxAge": "30d",
+      "warningAcknowledged": true
+    },
+    "vimMode": true,
+    "preferredEditor": "neovim",
+    "enableNotifications": true
+  },
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    },
+    "enableConseca": false
+  },
+  "experimental": {
+    "useOSC52Copy": true,
+    "useOSC52Paste": true
+  },
+  "ui": {
+    "dynamicWindowTitle": true,
+    "hideTips": false,
+    "showShortcutsHint": false,
+    "hideBanner": false,
+    "hideContextSummary": false,
+    "showMemoryUsage": true,
+    "showCitations": true,
+    "showModelInfoInChat": true,
+    "useAlternateBuffer": true,
+    "incrementalRendering": true
+  },
+  "model": {
+    "name": "auto-gemini-3"
+  },
+  "ide": {
+    "hasSeenNudge": true,
+    "enabled": true
+  },
+  "timeout": 60000
+}

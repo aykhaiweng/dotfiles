@@ -4,12 +4,20 @@
 
 # Install Homebrew recipes.
 function brew_install_recipes() {
-    recipes=($(setdiff "${recipes[*]}" "$(brew list)"))
-    if (( ${#recipes[@]} > 0 )); then
-        e_header "Installing Homebrew recipes: ${recipes[*]}"
-        for recipe in "${recipes[@]}"; do
-            e_arrow "Installing recipe: ${recipe}"
-            brew install $recipe
+    local recipes=("$@")
+    local installed_recipes
+    installed_recipes=$(brew list --formula)
+    local filtered_recipes=()
+    for recipe in "${recipes[@]}"; do
+        if ! echo "$installed_recipes" | grep -qxF "$recipe"; then
+            filtered_recipes+=("$recipe")
+        fi
+    done
+
+    if (( ${#filtered_recipes[@]} > 0 )); then
+        e_header "Installing Homebrew recipes: ${filtered_recipes[*]}"
+        for recipe in "${filtered_recipes[@]}"; do
+            brew install "$recipe"
         done
     fi
 }
@@ -17,6 +25,7 @@ function brew_install_recipes() {
 # Homebrew recipes
 recipes=(
   "bat"
+  "coreutils"
   "eza"
   "fd"
   "fzf"
