@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+# Source dotfiles bin for vars and functions
+if [[ ! "$DOTFILES" ]]; then
+    DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
+fi
+
+# Source bin/dotfiles in source-only mode to get logging functions and variables
+source "$DOTFILES/bin/dotfiles" "source"
+
+PRIVATE_DIR="$DOTFILES/private"
+PRIVATE_USERRC="$PRIVATE_DIR/.userrc"
+HOME_USERRC="$HOME/.userrc"
+
+# Ensure private directory exists
+if [[ ! -d "$PRIVATE_DIR" ]]; then
+    e_header "Creating private directory at $PRIVATE_DIR"
+    mkdir -p "$PRIVATE_DIR"
+fi
+
+# Logic:
+# 1. If ~/.userrc exists and is NOT a symlink, move it to private/.userrc
+# 2. If private/.userrc doesn't exist, touch it.
+# 3. If ~/.userrc exists and is a symlink, check if it points to private/.userrc.
+
+if [[ -e "$HOME_USERRC" || -L "$HOME_USERRC" ]]; then
+    if [[ -L "$HOME_USERRC" ]]; then
+        # It's a symlink.
+        current_target=$(readlink "$HOME_USERRC")
+        if [[ "$current_target" == "$PRIVATE_USERRC" ]]; then
+            e_success "~/.userrc is already linked to $PRIVATE_USERRC"
+            exit 0
+        else
+            e_arrow "~/.userrc is a symlink pointing elsewhere: $current_target"
+            # Removing the old symlink to make way for the new one
+            rm "$HOME_USERRC"
+        fi
+    else
+        # It's a regular file or directory.
+        e_header "Moving existing ~/.userrc to $PRIVATE_USERRC"
+        if [[ -e "$PRIVATE_USERRC" ]]; then
+            e_error "$PRIVATE_USERRC already exists! Backing up ~/.userrc instead?"
+            backup_file="$HOME_USERRC.bak.$(date +%Y%m%d%H%M%S)"
+            mv "$HOME_USERRC" "$backup_file"
+            e_arrow "Moved ~/.userrc to $backup_file"
+        else
+            mv "$HOME_USERRC" "$PRIVATE_USERRC"
+            e_success "Moved ~/.userrc to $PRIVATE_USERRC"
+        fi
+    fi
+fi
+
+# Ensure the private file exists
+if [[ ! -e "$PRIVATE_USERRC" ]]; then
+    e_header "Creating empty .userrc at $PRIVATE_USERRC"
+    touch "$PRIVATE_USERRC"
+fi
+
+# Link it
+e_header "Linking $PRIVATE_USERRC to $HOME_USERRC"
+ln -sf "$PRIVATE_USERRC" "$HOME_USERRC"
+e_success "Done."
