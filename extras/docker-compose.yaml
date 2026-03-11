@@ -39,7 +39,7 @@ services:
       - PGID=1004
     restart: unless-stopped
     volumes:
-      - /mnt/disks/code2/:/srv/code2/
+      - ~/Projects/:/srv/Projects/
       - filebrowser-data:/database/
     ports:
       - "6004:80"
