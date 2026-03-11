@@ -382,6 +382,23 @@ function do_stuff() {
     else
       dest="$HOME/$base"
     fi
+
+    # Ensure parent directory is a real directory (unroll if symlinked to dotfiles)
+    local dest_dir="$(dirname "$dest")"
+    if [[ -L "$dest_dir" ]]; then
+      local target_abs=$(realpath "$dest_dir")
+      if [[ "$target_abs" == "$DOTFILES"* ]]; then
+        local rel_dir="${rel_path%/*}"
+        e_arrow "Converting symlinked directory ~/$rel_dir to real directory."
+        backup=1
+        [[ -e "$backup_dir" ]] || mkdir -p "$backup_dir"
+        mkdir -p "$(dirname "$backup_dir/$rel_dir")"
+        mv "$dest_dir" "$backup_dir/$rel_dir"
+        mkdir -p "$dest_dir"
+      fi
+    fi
+    mkdir -p "$dest_dir"
+
     # Run _test function only if declared.
     if [[ $(declare -f "${subdir}_test") ]]; then
       # If _test function returns a string, skip file and print that message.
@@ -390,22 +407,6 @@ function do_stuff() {
         e_error "Skipping ~/$base, $skip."
         continue
       fi
-
-      # Ensure parent directory is a real directory (unroll if symlinked to dotfiles)
-      local dest_dir="$(dirname "$dest")"
-      if [[ -L "$dest_dir" ]]; then
-        local target=$(readlink "$dest_dir")
-        if [[ "$target" == *"$DOTFILES"* ]]; then
-          local rel_dir="${rel_path%/*}"
-          e_arrow "Converting symlinked directory ~/$rel_dir to real directory."
-          backup=1
-          [[ -e "$backup_dir" ]] || mkdir -p "$backup_dir"
-          mkdir -p "$(dirname "$backup_dir/$rel_dir")"
-          mv "$dest_dir" "$backup_dir/$rel_dir"
-          mkdir -p "$dest_dir"
-        fi
-      fi
-      mkdir -p "$dest_dir"
 
       # Destination file already exists. Back it up!
       if [[ -e "$dest" || -L "$dest" ]]; then
