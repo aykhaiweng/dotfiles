@@ -1,9 +1,5 @@
 #!/bin/bash
 
-if [ -f ~/.bashrc ]; then
-  source ~/.bashrc
-fi
-
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -26,5 +22,9 @@ plugins=(
 )
 
 source $ZSH/oh-my-zsh.sh
+
+if [ -f ~/.bashrc ]; then
+  source ~/.bashrc
+fi
 
 export GPG_TTY=$(tty)
