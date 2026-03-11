@@ -360,7 +360,9 @@ function do_stuff() {
   local files=()
   
   if [[ $(declare -f "${subdir}_files") ]]; then
-    mapfile -d '' files < <("${subdir}_files")
+    while IFS= read -r -d '' line; do
+      files+=("$line")
+    done < <("${subdir}_files")
   else
     files=("$DOTFILES/$subdir"/*)
   fi

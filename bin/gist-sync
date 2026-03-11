@@ -21,7 +21,10 @@ if ! command -v gh &> /dev/null; then
 fi
 
 # Gather files in private/ (excluding .gist_id and .git-related if any)
-mapfile -t FILES < <(find private -maxdepth 1 -type f ! -name ".gist_id")
+FILES=()
+while IFS= read -r line; do
+    FILES+=("$line")
+done < <(find private -maxdepth 1 -type f ! -name ".gist_id")
 
 if [[ ${#FILES[@]} -eq 0 ]]; then
     e_arrow "No files to sync in $PRIVATE_DIR"
