@@ -1,5 +1,36 @@
 #!/usr/bin/env bash
 
-sudo apt update && sudo apt upgrade
-brew update && brew upgrade
-nvim --headless "+Lazy! sync" +qa
+# Source dotfiles to get helper functions
+source "$(dirname "$0")/dotfiles" source
+
+# Update sudo (Ubuntu only)
+if is_ubuntu; then
+  e_header "Updating system packages..."
+  sudo apt-get update && sudo apt-get upgrade -y
+fi
+
+# Update brew
+if is_installed brew; then
+  e_header "Updating Homebrew..."
+  brew update && brew upgrade
+fi
+
+# Update nvim plugins
+if is_installed nvim; then
+  e_header "Updating Neovim plugins..."
+  nvim --headless "+Lazy! sync" +qa
+fi
+
+# Pull dotfiles
+e_header "Pulling dotfiles..."
+git -C "$DOTFILES" pull
+
+# Pull the nvim configuration
+if [[ -d "$HOME/.config/nvim/.git" ]]; then
+  e_header "Pulling Neovim configuration..."
+  git -C "$HOME/.config/nvim" pull
+fi
+
+# Run dotfiles
+e_header "Running dotfiles..."
+"$DOTFILES/bin/dotfiles"
