@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ -f ~/.bashrc ]; then
+  source ~/.bashrc
+fi
+
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
