@@ -7,11 +7,11 @@ based on the provided diff. Follow the Conventional Commits specification:
 [optional body]
 
 Rules:
+- Always segregate big changes into multiple commits that have separate dependencies
 - Use the imperative, present tense ("change", not "changed").
 - Limit the first line to 50 characters.
 - If the change is complex, add a bulleted list in the body.
 
-Generate a commit message for the following changes:
-
+Help me run `git commit` for the following changes:
 !{git diff --cached}
 """
