@@ -1,0 +1,17 @@
+description = "Generate a conventional commit message from staged changes"
+prompt = """
+You are an expert developer. Your task is to write a concise Git commit message 
+based on the provided diff. Follow the Conventional Commits specification:
+<type>(<scope>): <description>
+
+[optional body]
+
+Rules:
+- Use the imperative, present tense ("change", not "changed").
+- Limit the first line to 50 characters.
+- If the change is complex, add a bulleted list in the body.
+
+Generate a commit message for the following changes:
+
+!{git diff --cached}
+"""
