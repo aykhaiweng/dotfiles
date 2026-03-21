@@ -275,8 +275,8 @@ trap cleanup EXIT
 init_file=$DOTFILES/caches/init/selected
 function init_files() {
   local i f dirname oses os opt remove
-  dirname="$(dirname "$1")"
-  f=("$@")
+  dirname="$DOTFILES/init"
+  f=("$dirname"/*)
   menu_options=(); menu_selects=()
   for i in "${!f[@]}"; do menu_options[i]="$(basename "${f[i]}")"; done
   if [[ -e "$init_file" ]]; then
@@ -298,7 +298,7 @@ function init_files() {
   rm "$init_file" 2>/dev/null
   for i in "${!menu_selects[@]}"; do
     echo "${menu_selects[i]}" >> "$init_file"
-    echo "$dirname/${menu_selects[i]}"
+    printf "%s\0" "$dirname/${menu_selects[i]}"
   done
 }
 function init_do() {
