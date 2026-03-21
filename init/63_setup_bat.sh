@@ -16,7 +16,7 @@ e_header "Downloading Catppuccin themes for bat"
     for theme in "Latte" "Frappe" "Macchiato" "Mocha"; do
         wget -q -N -P "$THEME_DIR" "https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20${theme}.tmTheme"
     done
-    bat cache --build --quiet
+    bat cache --build
 ) || { e_error "Failed to setup bat themes."; return 1; }
 
 e_success "bat themes configured."
