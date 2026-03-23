@@ -12,7 +12,18 @@
     }
   },
   "ui": {
-    "useAlternateBuffer": true
+    "useAlternateBuffer": true,
+    "footer": {
+      "showLabels": true,
+      "items": [
+        "workspace",
+        "git-branch",
+        "model-name",
+        "quota",
+        "context-used",
+        "token-count"
+      ]
+    }
   },
   "ide": {
     "hasSeenNudge": true,
