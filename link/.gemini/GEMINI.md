@@ -40,3 +40,6 @@
 - Model mutations can happen on the Serializer but never the Views.
 - Common filters should be written in the QuerySet.
 - Always create basic admin views when starting a new app.
+
+## Gemini Added Memories
+- The user wants a Google Cloud price summary included with all architectural recommendations or infrastructure changes.
