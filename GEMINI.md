@@ -41,13 +41,14 @@ This is a sophisticated, modular dotfiles management system. It decouples config
 - `init/50_brew_recipes.sh`: The source of truth for installed CLI tools.
 
 ## Summary (2026-03-22)
-- **Context**: Restored `init/` script execution in `bin/dotfiles` and fixed validation errors in custom Gemini CLI commands.
+- **Context**: Restored `init/` script execution in `bin/dotfiles`, fixed validation errors in custom Gemini CLI commands, and refined git commit prompt rules.
 - **Decisions**: 
     - Updated `init_files` in `bin/dotfiles` to be a generator that prints null-terminated absolute paths (`printf "%s\0"`).
     - Removed unsupported `--quiet` flag from `bat cache --build` in `init/63_setup_bat.sh`.
     - Flattened the TOML schema for `git/commit.toml` and `tasks.toml` to follow the CLI's requirements.
     - Used `!{...}` shell injection in command prompts to handle dynamic values like `git diff` and the current date.
-- **Architecture**: Reinforced the generator-based file processing pattern in the core dotfiles script.
+    - Refined `git/commit.toml` rules to strictly enforce segregation of large changes and modernized phrasing to "Help me run `git commit`".
+- **Architecture**: Reinforced the generator-based file processing pattern in the core dotfiles script and improved custom command ergonomics.
 - **Todo**: 
     - Push local commits.
     - Audit other `init/` scripts for outdated tool flags.
