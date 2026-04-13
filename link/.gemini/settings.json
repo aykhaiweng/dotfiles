@@ -4,7 +4,8 @@
       "enabled": true,
       "maxAge": "30d",
       "warningAcknowledged": true
-    }
+    },
+    "enableNotifications": true
   },
   "security": {
     "auth": {
@@ -23,7 +24,13 @@
         "context-used",
         "token-count"
       ]
-    }
+    },
+    "escapePastedAtSymbols": true,
+    "hideBanner": true,
+    "showCitations": true,
+    "showModelInfoInChat": true,
+    "showStatusInTitle": true,
+    "inlineThinkingMode": "full"
   },
   "ide": {
     "hasSeenNudge": true,
