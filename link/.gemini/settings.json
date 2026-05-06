@@ -35,5 +35,11 @@
   "ide": {
     "hasSeenNudge": true,
     "enabled": true
+  },
+  "mcpServers": {
+    "medusa": {
+      "url": "https://docs.medusajs.com/mcp"
+    }
   }
 }
+
