@@ -32,3 +32,9 @@ if [ -f ~/.bashrc ]; then
 fi
 
 export GPG_TTY=$(tty)
+
+# Refresh VSCODE_IPC_HOOK_CLI from tmux env on each prompt so /ide works after VS Code reconnects
+function _tmux_refresh_vscode_ipc() {
+  [[ -n "$TMUX" ]] && eval "$(tmux show-environment -s 2>/dev/null | grep ^VSCODE_IPC_HOOK_CLI)" 2>/dev/null || true
+}
+precmd_functions+=(_tmux_refresh_vscode_ipc)
