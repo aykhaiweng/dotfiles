@@ -1,11 +1,11 @@
 #!/bin/bash
 
-if [ -f ~/.bashrc ]; then
-  source ~/.bashrc
-fi
-
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
+
+if [ -f ~/.sharedrc ]; then
+  source ~/.sharedrc
+fi
 
 # Theme
 ZSH_THEME="example"
@@ -27,8 +27,8 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-if [ -f ~/.bashrc ]; then
-  source ~/.bashrc
+if [ -f ~/.sharedrc ]; then
+  source ~/.sharedrc
 fi
 
 export GPG_TTY=$(tty)

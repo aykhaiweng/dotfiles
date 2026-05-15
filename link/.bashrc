@@ -1,21 +1,9 @@
-# Where the magic happens.
-export DOTFILES=~/.dotfiles
+# Instantly hand over the session to Homebrew's Zsh
+if [ -x /home/linuxbrew/.linuxbrew/bin/zsh ]; then
+    export SHELL=/home/linuxbrew/.linuxbrew/bin/zsh
+    exec /home/linuxbrew/.linuxbrew/bin/zsh -l
+fi
 
-# Source all files in "source"
-function src() {
-  local file
-  if [[ "$1" ]]; then
-    source "$DOTFILES/source/$1.sh"
-  else
-    for file in $DOTFILES/source/*; do
-      source "$file"
-    done
-  fi
-}
-
-# Run dotfiles script, then source.
-function dotfiles() {
-  $DOTFILES/bin/dotfiles "$@" && src
-}
-
-src
+if [ -f ~/.sharedrc ]; then
+  source ~/.sharedrc
+fi
