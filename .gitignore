@@ -40,3 +40,6 @@ extras/nginx/all-ports.conf
 
 # zsh plugins
 extras/zsh/plugins
+
+# claude
+.claude/settings.local.json
