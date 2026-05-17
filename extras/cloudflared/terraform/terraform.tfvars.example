@@ -1,0 +1,4 @@
+account_id     = "REPLACE_ME"
+app_name       = "my-tunnel"
+domain_uri     = "*.example.com"
+allowed_emails = ["you@example.com"]
