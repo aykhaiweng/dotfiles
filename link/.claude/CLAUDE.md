@@ -22,3 +22,9 @@ How I classify new guidance:
 Every entry includes a **Why:** line so the rationale survives for future re-evaluation.
 
 @memory/MEMORY.md
+
+## Host-local context
+
+If `~/.claude/local.md` exists on this machine, it describes environment-specific facts (network, hosting, reachability). Treat it as ground truth for this host.
+
+@local.md

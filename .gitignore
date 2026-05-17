@@ -43,3 +43,4 @@ extras/zsh/plugins
 
 # claude
 .claude/settings.local.json
+/link/.claude/local.md
