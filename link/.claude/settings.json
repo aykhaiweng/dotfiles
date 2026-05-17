@@ -3,7 +3,6 @@
     "allow": [
       "Bash(claude mcp *)",
       "Bash(timeout 15 docker run -i --rm hashicorp/terraform-mcp-server)",
-      "Bash(echo \"---exit: $?---\")",
       "Bash(jq '\\(.projects[\"/mnt/code/ffg\"].mcpServers.terraform.args\\) = [\"run\",\"-i\",\"--rm\",\"hashicorp/terraform-mcp-server\"] | \\(.projects[\"/mnt/code/ffg\"].mcpServers.github.headers.Authorization\\) = \"Bearer ${GITHUB_TOKEN}\"' ~/.claude.json)",
       "Bash(mv ~/.claude.json.tmp ~/.claude.json)",
       "Bash(python3 -m json.tool)",
@@ -18,16 +17,13 @@
       "Bash(pnpm list *)",
       "Bash(git -C /mnt/code/ffg status)",
       "Bash(git -C /mnt/code/ffg diff --stat)",
-      "Bash(git *)",
       "mcp__context7__resolve-library-id",
       "mcp__context7__query-docs",
       "Bash(npx degit *)",
       "Bash(npx tsc *)",
-      "Bash(echo \"Exit: $?\")",
       "WebFetch(domain:developers.xendit.co)",
       "WebFetch(domain:docs.xendit.co)",
-      "Bash(docker compose *)",
-      "Bash(grep -v \"^$\")"
+      "Bash(docker compose *)"
     ],
     "defaultMode": "default"
   },
