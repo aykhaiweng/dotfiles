@@ -25,6 +25,32 @@ resource "cloudflare_zero_trust_access_application" "dev_bench" {
   }]
 }
 
+# Cloudflare evaluates Access apps by path specificity, so this app wins over
+# the parent for the listed paths and lets requests through without auth.
+resource "cloudflare_zero_trust_access_application" "bypass" {
+  count = length(var.bypass_paths) > 0 ? 1 : 0
+
+  account_id        = var.account_id
+  name              = "${var.app_name} (bypass)"
+  type              = "self_hosted"
+  session_duration  = var.session_duration
+  skip_interstitial = true
+
+  destinations = [
+    for path in var.bypass_paths : {
+      type = "public"
+      uri  = "${var.domain_uri}${path}"
+    }
+  ]
+
+  policies = [{
+    name       = "Bypass auth"
+    decision   = "bypass"
+    precedence = 1
+    include    = [{ everyone = {} }]
+  }]
+}
+
 output "application_id" {
   value = cloudflare_zero_trust_access_application.dev_bench.id
 }

@@ -23,3 +23,14 @@ variable "session_duration" {
   type        = string
   default     = "24h"
 }
+
+variable "bypass_paths" {
+  description = <<-EOT
+    Path patterns (relative to domain_uri) that skip Access entirely. Useful for
+    webhook endpoints that can't do interactive auth. Each entry is appended to
+    domain_uri to form a destination URI (e.g. "/webhooks/*").
+    Leave empty to create no bypass app.
+  EOT
+  type        = list(string)
+  default     = []
+}
