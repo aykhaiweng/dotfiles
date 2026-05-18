@@ -87,6 +87,20 @@
     ],
     "defaultMode": "default"
   },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/session-start.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
     "medusa-dev@medusa": true,
     "ralph-loop@claude-plugins-official": true
