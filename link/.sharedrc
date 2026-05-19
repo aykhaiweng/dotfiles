@@ -9,8 +9,8 @@ function src() {
   if [[ "$1" ]]; then
     source "$DOTFILES/source/$1.sh"
   else
-    for file in $DOTFILES/source/*; do
-      source "$file"
+    for file in "$DOTFILES/source/"[0-9]*_*.sh; do
+      [[ -r "$file" ]] && source "$file"
     done
   fi
 }

@@ -6,10 +6,10 @@ case $- in
       *) return;;
 esac
 
-# Instantly hand over the session to Homebrew's Zsh
-if [ -x /home/linuxbrew/.linuxbrew/bin/zsh ]; then
-    export SHELL=/home/linuxbrew/.linuxbrew/bin/zsh
-    exec /home/linuxbrew/.linuxbrew/bin/zsh -l
+# Instantly hand over the session to Zsh if available
+if [[ $- == *i* ]] && command -v zsh >/dev/null 2>&1; then
+    export SHELL=$(command -v zsh)
+    exec "$SHELL" -l
 fi
 
 if [ -f ~/.sharedrc ]; then
