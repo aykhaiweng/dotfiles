@@ -83,7 +83,17 @@
       "Bash(gcloud artifacts repositories describe *)",
       "Bash(gcloud artifacts docker images list *)",
       "Bash(gcloud builds list *)",
-      "Bash(gcloud builds describe *)"
+      "Bash(gcloud builds describe *)",
+      "Bash(docker --version)",
+      "Bash(git submodule *)",
+      "Bash(corepack --version)",
+      "Bash(brew list *)",
+      "Bash(env)",
+      "Read(//home/khai_ouch_my/.config/**)",
+      "Read(//home/khai_ouch_my/**)",
+      "Bash(./scripts/bootstrap.sh *)",
+      "Bash(curl -s -o /dev/null -w \"store:%{http_code}\\\\n\" http://127.0.0.1:8000/)",
+      "Bash(curl -s -o /dev/null -w \"backend:%{http_code}\\\\n\" http://127.0.0.1:9000/health)"
     ],
     "defaultMode": "default"
   },
@@ -100,6 +110,9 @@
         ]
       }
     ]
+  },
+  "worktree": {
+    "baseRef": "fresh"
   },
   "enabledPlugins": {
     "medusa-dev@medusa": true,
