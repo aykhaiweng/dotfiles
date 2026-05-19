@@ -2,6 +2,7 @@
 name: terraform-planner
 description: Use proactively before any `terraform apply`, or when the user asks to review a terraform diff, plan a change, or check provider/module versions. Runs fmt + validate + plan, summarizes the diff, and flags provider/module version drift via the terraform registry.
 tools: Read, Bash, Grep, Glob, mcp__terraform__get_latest_provider_version, mcp__terraform__get_latest_module_version, mcp__terraform__get_provider_details, mcp__terraform__get_module_details, mcp__terraform__search_modules, mcp__terraform__search_providers
+model: sonnet
 color: purple
 ---
 

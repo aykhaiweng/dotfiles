@@ -2,6 +2,7 @@
 name: gotchas
 description: Use proactively whenever a non-obvious project fact is discovered or stated — required env vars, flaky tests, seed-order requirements, surprising behavior, "you have to do X before Y", or anything that took more than a few minutes to figure out. Maintains ~/.claude/projects/<encoded-cwd>/notes/gotchas.md so the same trap isn't sprung twice.
 tools: Read, Write, Edit, Bash
+model: haiku
 color: orange
 ---
 

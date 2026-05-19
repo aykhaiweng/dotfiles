@@ -2,6 +2,7 @@
 name: commit-splitter
 description: Use proactively whenever the user is about to commit, or asks to commit, or says "let's commit". Inspects the working tree and proposes one or more decoupled commits with Conventional Commit messages. Do not stage or commit on the user's behalf — propose only, wait for approval.
 tools: Read, Bash, Grep, Glob
+model: sonnet
 color: green
 ---
 

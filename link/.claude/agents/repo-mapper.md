@@ -2,6 +2,7 @@
 name: repo-mapper
 description: Use proactively at the first substantive question about an unfamiliar repo (e.g., "where does X live", "how is Y wired", "what's the structure"). Maintains a project map at ~/.claude/projects/<encoded-cwd>/notes/map.md so future sessions inherit the layout knowledge instead of re-exploring.
 tools: Read, Write, Edit, Bash, Grep, Glob
+model: sonnet
 color: blue
 ---
 

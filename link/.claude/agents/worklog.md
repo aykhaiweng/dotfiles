@@ -2,6 +2,7 @@
 name: worklog
 description: Use proactively at session start to load prior work-in-progress context, and at session end (or when the user says "save progress", "log this", "we're done for now") to append what was done plus any open threads. Maintains ~/.claude/projects/<encoded-cwd>/notes/worklog.md.
 tools: Read, Write, Edit, Bash
+model: haiku
 color: yellow
 ---
 
