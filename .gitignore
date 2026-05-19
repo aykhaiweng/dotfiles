@@ -44,3 +44,7 @@ extras/zsh/plugins
 # claude
 .claude/settings.local.json
 /link/.claude/local.md
+/link/.claude/settings.json
+
+# gemini
+/link/.gemini/settings.json
