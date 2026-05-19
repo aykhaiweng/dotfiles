@@ -7,6 +7,6 @@ Format: `- [Title](file.md) — one-line hook`. Add new files alongside this one
 - [Laws](laws.md) — hard rules: no push, no DB mutation, decoupled commits, ask on vague scope, DRY.
 
 ## Preferences (mutable)
-<!-- add topical preference files here -->
+- [Self-improvement](feedback_self_improve.md) — actively flag tooling/subagent/hook/dotfile improvements as I work.
 
 @laws.md
