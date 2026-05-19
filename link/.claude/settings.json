@@ -95,7 +95,7 @@
       "Bash(curl -s -o /dev/null -w \"store:%{http_code}\\\\n\" http://127.0.0.1:8000/)",
       "Bash(curl -s -o /dev/null -w \"backend:%{http_code}\\\\n\" http://127.0.0.1:9000/health)"
     ],
-    "defaultMode": "default"
+    "defaultMode": "auto"
   },
   "hooks": {
     "SessionStart": [
@@ -126,11 +126,13 @@
       }
     }
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "medium",
   "advisorModel": "opus",
+  "autoUpdatesChannel": "stable",
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
-  "verbose": true,
+  "editorMode": "vim",
+  "verbose": false,
   "preferredNotifChannel": "terminal_bell",
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
