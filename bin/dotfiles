@@ -86,6 +86,24 @@ function path_remove() {
   echo "$path"
 }
 
+# Prepend a directory to $PATH if it exists and isn't already there
+function path_prepend() {
+  for arg in "$@"; do
+    if [[ -d "$arg" && ! ":$PATH:" == *":$arg:"* ]]; then
+      export PATH="$arg:$PATH"
+    fi
+  done
+}
+
+# Append a directory to $PATH if it exists and isn't already there
+function path_append() {
+  for arg in "$@"; do
+    if [[ -d "$arg" && ! ":$PATH:" == *":$arg:"* ]]; then
+      export PATH="$PATH:$arg"
+    fi
+  done
+}
+
 # Display a fancy multi-select menu.
 # Inspired by http://serverfault.com/a/298312
 function prompt_menu() {
