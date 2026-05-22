@@ -32,4 +32,4 @@ When a task matches one of these, read the corresponding file in `~/.claude/agen
 - Development workloads are on the cloud; only the Terminal is local.
 - Prefers config in pure bash scripts.
 - Lives in Malaysia (UTC+8).
-- Include a Google Cloud price summary with all architectural recommendations.
+- Include a Google Cloud price summary with all architectural recommendations, providing estimates in both USD and MYR.
