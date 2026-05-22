@@ -18,7 +18,7 @@ kegs=(
 brew_tap_kegs
 
 # Hack to show the first-run brew-cask password prompt immediately.
-brew cask info this-is-somewhat-annoying 2>/dev/null
+brew info --cask this-is-somewhat-annoying 2>/dev/null
 
 # Homebrew casks
 casks=(
@@ -29,7 +29,7 @@ casks=(
 )
 
 # Install Homebrew casks.
-casks=($(setdiff "${casks[*]}" "$(brew cask list 2>/dev/null)"))
+casks=($(setdiff "${casks[*]}" "$(brew list --cask 2>/dev/null)"))
 if (( ${#casks[@]} > 0 )); then
   e_header "Installing Homebrew casks: ${casks[*]}"
   for cask in "${casks[@]}"; do
