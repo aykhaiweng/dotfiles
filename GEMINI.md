@@ -40,6 +40,19 @@ This is a sophisticated, modular dotfiles management system. It decouples config
 - `link/.bashrc`: The shell entry point that sources everything in `source/`.
 - `init/50_brew_recipes.sh`: The source of truth for installed CLI tools.
 
+## Summary (2026-05-22)
+- **Context**: Audited `init/` scripts for outdated tool flags and committed pending changes for Tmux and Gemini instructions.
+- **Decisions**: 
+    - Modernized Homebrew installation URL and update command in `init/12_osx_brew.sh`.
+    - Modernized `brew cask` commands to `brew list --cask` and `brew info --cask` in `init/51_brew_casks.sh`.
+    - Implemented a `client-attached` hook in `extras/tmux/theme.conf` to automatically hide status and pane borders when attaching from VS Code.
+    - Disabled session persistence plugins (`continuum`, `resurrect`) in `link/.tmux.conf`.
+    - Updated `link/.gemini/GEMINI.md` to require Google Cloud price summaries in both USD and MYR.
+- **Architecture**: Improved tmux environment responsiveness to the client's terminal program.
+- **Todo**: 
+    - Push local commits.
+    - Monitor shell startup performance with new tmux hooks.
+
 ## Summary (2026-03-22)
 - **Context**: Restored `init/` script execution in `bin/dotfiles`, fixed validation errors in custom Gemini CLI commands, and refined git commit prompt rules.
 - **Decisions**: 
