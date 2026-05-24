@@ -1,0 +1,13 @@
+{
+  "altScreenMode": "always",
+  "permissions": {
+    "allow": [
+      "command(ls)",
+      "command(cat)",
+      "command(find)"
+    ]
+  },
+  "trustedWorkspaces": [
+    "/Users/aykhaiweng/.dotfiles"
+  ]
+}

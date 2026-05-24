@@ -15,3 +15,7 @@ fi
 if [ -f ~/.sharedrc ]; then
   source ~/.sharedrc
 fi
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/aykhaiweng/.local/bin:$PATH"

@@ -33,10 +33,16 @@ fi
 
 export GPG_TTY=$(tty)
 
-# Refresh VSCODE_IPC_HOOK_CLI from tmux env on each prompt so /ide works after VS Code reconnects
+# Refresh VSCODE_IPC_HOOK_CLI and TERM_PROGRAM from tmux env on each prompt.
+# Needed because tmux 3.4+ injects TERM_PROGRAM=tmux into all panes, breaking Gemini /ide.
 function _tmux_refresh_vscode_ipc() {
-  if [[ -n "$TMUX" && -z "$VSCODE_IPC_HOOK_CLI" ]]; then
-    eval "$(tmux show-environment -s 2>/dev/null | grep ^VSCODE_IPC_HOOK_CLI)" 2>/dev/null || true
+  if [[ -n "$TMUX" ]]; then
+    [[ -z "$VSCODE_IPC_HOOK_CLI" ]] && eval "$(tmux show-environment -s 2>/dev/null | grep ^VSCODE_IPC_HOOK_CLI)" 2>/dev/null || true
+    [[ "$TERM_PROGRAM" != "vscode" && "$(tmux show-environment TERM_PROGRAM 2>/dev/null)" == "TERM_PROGRAM=vscode" ]] && export TERM_PROGRAM=vscode
   fi
 }
 precmd_functions+=(_tmux_refresh_vscode_ipc)
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/aykhaiweng/.local/bin:$PATH"
