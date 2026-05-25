@@ -48,3 +48,6 @@ extras/zsh/plugins
 
 # gemini
 /link/.gemini/settings.json
+
+# antigravity
+.antigravitycli/
