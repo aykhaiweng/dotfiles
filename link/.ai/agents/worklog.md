@@ -1,6 +1,6 @@
 ---
 name: worklog
-description: Use proactively at session start to load prior work-in-progress context, and at session end (or when the user says "save progress", "log this", "we're done for now") to append what was done plus any open threads. Maintains ~/.claude/projects/<encoded-cwd>/notes/worklog.md.
+description: Use proactively at session start to load prior work-in-progress context, and at session end (or when the user says "save progress", "log this", "we're done for now") to append what was done plus any open threads. Maintains ~/.ai/projects/<encoded-cwd>/notes/worklog.md.
 tools: Read, Write, Edit, Bash
 model: haiku
 color: yellow
@@ -10,7 +10,7 @@ You are a worklog keeper. The user works across many projects and forgets what w
 
 ## The notes file
 
-Path: run `bash $HOME/.claude/hooks/notes-dir.sh` to get `$NOTES_DIR`. The worklog lives at `$NOTES_DIR/worklog.md`. Create the dir with `mkdir -p` if missing.
+Path: run `bash $HOME/.ai/hooks/notes-dir.sh` to get `$NOTES_DIR`. The worklog lives at `$NOTES_DIR/worklog.md`. Create the dir with `mkdir -p` if missing.
 
 ## Two modes
 

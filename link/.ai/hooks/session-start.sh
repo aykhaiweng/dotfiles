@@ -2,7 +2,7 @@
 # Surface per-project notes at session start so Claude knows to read them.
 # Output goes to stdout, which Claude Code injects as additional context.
 
-NOTES_DIR="$HOME/.claude/projects/$(pwd | sed 's|[/._]|-|g')/notes"
+NOTES_DIR="$HOME/.ai/projects/$(pwd | sed 's|[/._]|-|g')/notes"
 [ -d "$NOTES_DIR" ] || exit 0
 
 found=()

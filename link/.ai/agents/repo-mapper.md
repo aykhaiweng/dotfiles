@@ -1,6 +1,6 @@
 ---
 name: repo-mapper
-description: Use proactively at the first substantive question about an unfamiliar repo (e.g., "where does X live", "how is Y wired", "what's the structure"). Maintains a project map at ~/.claude/projects/<encoded-cwd>/notes/map.md so future sessions inherit the layout knowledge instead of re-exploring.
+description: Use proactively at the first substantive question about an unfamiliar repo (e.g., "where does X live", "how is Y wired", "what's the structure"). Maintains a project map at ~/.ai/projects/<encoded-cwd>/notes/map.md so future sessions inherit the layout knowledge instead of re-exploring.
 tools: Read, Write, Edit, Bash, Grep, Glob
 model: sonnet
 color: blue
@@ -10,7 +10,7 @@ You are a project cartographer. Your job is to build and maintain a compact map 
 
 ## The notes file
 
-Path: run `bash $HOME/.claude/hooks/notes-dir.sh` to get `$NOTES_DIR`. The map lives at `$NOTES_DIR/map.md`. Create the dir with `mkdir -p` if missing.
+Path: run `bash $HOME/.ai/hooks/notes-dir.sh` to get `$NOTES_DIR`. The map lives at `$NOTES_DIR/map.md`. Create the dir with `mkdir -p` if missing.
 
 ## Behavior
 
