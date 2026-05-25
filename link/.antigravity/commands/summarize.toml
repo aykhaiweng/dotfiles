@@ -1,8 +1,0 @@
-description = "Summarize project progress for ANTIGRAVITY.md"
-prompt = """
-You are a technical lead summarizing project progress. 
-Analyze the provided conversation or code context and write a concise 
-entry to 'ANTIGRAVITY.md'. If it doesn't exist yet please prompt me to use /init. 
-
-Format: Use clean Markdown. Avoid fluff.
-"""
