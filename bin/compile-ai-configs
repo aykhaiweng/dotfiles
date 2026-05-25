@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# Compiles modular tool-agnostic AI configurations in ~/.dotfiles/ai/
+# into tool-specific target files under ~/.dotfiles/link/.
+
+# Exit on any error
+set -e
+
+# Resolve paths relative to this script
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(dirname "$BIN_DIR")"
+
+AI_SOURCE_DIR="$DOTFILES_DIR/ai"
+LINK_DIR="$DOTFILES_DIR/link"
+
+# Ensure target directories exist
+mkdir -p "$LINK_DIR/.ai/memory"
+mkdir -p "$LINK_DIR/.claude"
+mkdir -p "$LINK_DIR/.gemini"
+mkdir -p "$LINK_DIR/.antigravity"
+
+echo "🔨 Compiling tool-agnostic AI configurations..."
+
+# 1. Compile link/.ai/memory/laws.md
+cat << 'EOF' > "$LINK_DIR/.ai/memory/laws.md"
+---
+name: laws
+description: Immutable hard rules. Do not modify or override without explicit user permission.
+metadata:
+  type: feedback
+  tier: law
+---
+
+# Laws
+
+These are immutable. If a request contradicts one, stop and ask before acting.
+
+## Rules
+
+EOF
+cat "$AI_SOURCE_DIR/laws.md" >> "$LINK_DIR/.ai/memory/laws.md"
+echo "  - Generated link/.ai/memory/laws.md"
+
+# 2. Compile link/.claude/CLAUDE.md
+cat << 'EOF' > "$LINK_DIR/.claude/CLAUDE.md"
+# Claude — Global
+
+EOF
+cat "$AI_SOURCE_DIR/persona.md" >> "$LINK_DIR/.claude/CLAUDE.md"
+echo "" >> "$LINK_DIR/.claude/CLAUDE.md"
+cat "$AI_SOURCE_DIR/memory_policy_claude.md" >> "$LINK_DIR/.claude/CLAUDE.md"
+echo "  - Generated link/.claude/CLAUDE.md"
+
+# 3. Compile link/.gemini/GEMINI.md
+cat << 'EOF' > "$LINK_DIR/.gemini/GEMINI.md"
+# Gemini — Mirroring Claude Global
+
+EOF
+cat "$AI_SOURCE_DIR/persona.md" >> "$LINK_DIR/.gemini/GEMINI.md"
+echo "" >> "$LINK_DIR/.gemini/GEMINI.md"
+cat "$AI_SOURCE_DIR/memory_policy_antigravity.md" >> "$LINK_DIR/.gemini/GEMINI.md"
+echo "" >> "$LINK_DIR/.gemini/GEMINI.md"
+cat "$AI_SOURCE_DIR/agents.md" >> "$LINK_DIR/.gemini/GEMINI.md"
+echo "" >> "$LINK_DIR/.gemini/GEMINI.md"
+echo "## Laws (Mirroring Claude)" >> "$LINK_DIR/.gemini/GEMINI.md"
+cat "$AI_SOURCE_DIR/laws.md" >> "$LINK_DIR/.gemini/GEMINI.md"
+echo "" >> "$LINK_DIR/.gemini/GEMINI.md"
+cat "$AI_SOURCE_DIR/cto_context.md" >> "$LINK_DIR/.gemini/GEMINI.md"
+echo "  - Generated link/.gemini/GEMINI.md"
+
+# 4. Compile link/.antigravity/ANTIGRAVITY.md
+cat << 'EOF' > "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
+# Antigravity — Global
+
+EOF
+cat "$AI_SOURCE_DIR/persona.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
+echo "" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
+cat "$AI_SOURCE_DIR/memory_policy_antigravity.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
+echo "" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
+cat "$AI_SOURCE_DIR/agents.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
+echo "" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
+echo "## Laws (Mirroring Claude)" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
+cat "$AI_SOURCE_DIR/laws.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
+echo "" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
+cat "$AI_SOURCE_DIR/cto_context.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
+echo "  - Generated link/.antigravity/ANTIGRAVITY.md"
+
+echo "✨ AI configurations compiled successfully!"
