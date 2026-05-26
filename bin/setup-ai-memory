@@ -27,21 +27,19 @@ else
   echo "Memory repo already present at $REPO_DIR"
 fi
 
-# 2. Launchd agent (macOS only).
-if [[ "$(uname)" != "Darwin" ]]; then
-  echo "setup-ai-memory: not macOS, skipping launchd setup"
-  exit 0
-fi
+# 2. OS-specific auto-sync agent.
+OS="$(uname)"
 
-if ! command -v fswatch >/dev/null 2>&1; then
-  echo "setup-ai-memory: fswatch not installed — run 'brew install fswatch' or re-run dotfiles init" >&2
-  exit 1
-fi
+if [[ "$OS" == "Darwin" ]]; then
+  if ! command -v fswatch >/dev/null 2>&1; then
+    echo "setup-ai-memory: fswatch not installed — run 'brew install fswatch' or re-run dotfiles init" >&2
+    exit 1
+  fi
 
-FSWATCH_BIN="$(command -v fswatch)"
+  FSWATCH_BIN="$(command -v fswatch)"
 
-mkdir -p "$(dirname "$PLIST")"
-cat > "$PLIST" <<PLIST
+  mkdir -p "$(dirname "$PLIST")"
+  cat > "$PLIST" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -77,7 +75,58 @@ cat > "$PLIST" <<PLIST
 </plist>
 PLIST
 
-launchctl unload "$PLIST" 2>/dev/null || true
-launchctl load -w "$PLIST"
-echo "Loaded launchd agent ${LABEL}"
-echo "Logs: /tmp/ai-memory-sync.{log,err}"
+  launchctl unload "$PLIST" 2>/dev/null || true
+  launchctl load -w "$PLIST"
+  echo "Loaded launchd agent ${LABEL}"
+  echo "Logs: /tmp/ai-memory-sync.{log,err}"
+
+elif [[ "$OS" == "Linux" ]]; then
+  if ! command -v systemctl >/dev/null 2>&1; then
+    echo "setup-ai-memory: systemctl not found — only systemd-based distros supported on Linux" >&2
+    exit 1
+  fi
+
+  UNIT_DIR="$HOME/.config/systemd/user"
+  mkdir -p "$UNIT_DIR"
+
+  cat > "$UNIT_DIR/ai-memory-sync.service" <<UNIT
+[Unit]
+Description=Sync ~/.ai/memory to its remote (one-shot, debounced)
+
+[Service]
+Type=oneshot
+# Coalesce a burst of writes (editor save = multiple inotify events) into one sync.
+ExecStartPre=/bin/sleep 5
+ExecStart=${SYNC_BIN}
+UNIT
+
+  cat > "$UNIT_DIR/ai-memory-sync.path" <<UNIT
+[Unit]
+Description=Watch ~/.ai/memory for changes
+
+[Path]
+PathModified=%h/.ai/memory
+# Recursive watch by default for PathModified on directories.
+
+[Install]
+WantedBy=default.target
+UNIT
+
+  systemctl --user daemon-reload
+  systemctl --user enable --now ai-memory-sync.path
+  echo "Enabled systemd path unit ai-memory-sync.path"
+
+  # User-level units stop when the user logs out unless linger is enabled.
+  if ! loginctl show-user "$USER" 2>/dev/null | grep -q "Linger=yes"; then
+    echo
+    echo "NOTE: To keep auto-sync running when you're logged out, enable linger:"
+    echo "  sudo loginctl enable-linger \$USER"
+  fi
+
+  echo "Logs: journalctl --user -u ai-memory-sync.service -f"
+
+else
+  echo "setup-ai-memory: unsupported OS '$OS' — auto-sync agent not installed" >&2
+  echo "Memory repo is cloned and bin/ai-memory-sync works manually."
+  exit 0
+fi
