@@ -11,8 +11,12 @@ set -euo pipefail
 REPO_URL="${AI_MEMORY_REPO:-git@github.com:aykhaiweng/ai-memory.git}"
 REPO_DIR="$HOME/.ai"
 LABEL="com.aykhaiweng.ai-memory-sync"
+TICK_LABEL="com.aykhaiweng.ai-memory-tick"
 PLIST="$HOME/Library/LaunchAgents/${LABEL}.plist"
+TICK_PLIST="$HOME/Library/LaunchAgents/${TICK_LABEL}.plist"
 SYNC_BIN="$HOME/.dotfiles/bin/ai-memory-sync"
+# Seconds between periodic pulls (catches remote pushes when nothing local changes).
+TICK_INTERVAL="${AI_MEMORY_TICK_INTERVAL:-60}"
 
 # 1. Initialize repo if missing.
 # Can't use plain `git clone` because ~/.ai/ may already have agents/ + hooks/
@@ -81,7 +85,47 @@ PLIST
   launchctl unload "$PLIST" 2>/dev/null || true
   launchctl load -w "$PLIST"
   echo "Loaded launchd agent ${LABEL}"
-  echo "Logs: /tmp/ai-memory-sync.{log,err}"
+
+  # Periodic tick agent — runs the sync script every $TICK_INTERVAL seconds
+  # so remote pushes are pulled even when nothing changes locally.
+  cat > "$TICK_PLIST" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>${TICK_LABEL}</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>${SYNC_BIN}</string>
+  </array>
+
+  <key>StartInterval</key>
+  <integer>${TICK_INTERVAL}</integer>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/ai-memory-tick.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/ai-memory-tick.err</string>
+</dict>
+</plist>
+PLIST
+
+  launchctl unload "$TICK_PLIST" 2>/dev/null || true
+  launchctl load -w "$TICK_PLIST"
+  echo "Loaded launchd agent ${TICK_LABEL} (interval ${TICK_INTERVAL}s)"
+  echo "Logs: /tmp/ai-memory-{sync,tick}.{log,err}"
 
 elif [[ "$OS" == "Linux" ]]; then
   if ! command -v systemctl >/dev/null 2>&1; then
@@ -115,9 +159,24 @@ PathModified=%h/.ai/projects
 WantedBy=default.target
 UNIT
 
+  # Periodic tick — pulls remote changes when nothing local changes.
+  cat > "$UNIT_DIR/ai-memory-sync.timer" <<UNIT
+[Unit]
+Description=Periodic pull+push for ~/.ai/
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=${TICK_INTERVAL}s
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+UNIT
+
   systemctl --user daemon-reload
   systemctl --user enable --now ai-memory-sync.path
-  echo "Enabled systemd path unit ai-memory-sync.path"
+  systemctl --user enable --now ai-memory-sync.timer
+  echo "Enabled systemd path + timer (interval ${TICK_INTERVAL}s)"
 
   # User-level units stop when the user logs out unless linger is enabled.
   if ! loginctl show-user "$USER" 2>/dev/null | grep -q "Linger=yes"; then
