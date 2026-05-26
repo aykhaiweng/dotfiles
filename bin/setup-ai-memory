@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# Bootstrap ~/.ai/memory on a new machine:
+#   1. Clone the memory repo if missing
+#   2. Generate and load the launchd auto-sync agent (macOS only)
+#
+# Idempotent — safe to run repeatedly.
+
+set -euo pipefail
+
+REPO_URL="${AI_MEMORY_REPO:-git@github.com:aykhaiweng/ai-memory.git}"
+REPO_DIR="$HOME/.ai/memory"
+LABEL="com.aykhaiweng.ai-memory-sync"
+PLIST="$HOME/Library/LaunchAgents/${LABEL}.plist"
+SYNC_BIN="$HOME/.dotfiles/bin/ai-memory-sync"
+
+# 1. Clone if missing.
+if [[ ! -d "$REPO_DIR/.git" ]]; then
+  mkdir -p "$(dirname "$REPO_DIR")"
+  if [[ -d "$REPO_DIR" ]] && [[ -n "$(ls -A "$REPO_DIR" 2>/dev/null)" ]]; then
+    echo "setup-ai-memory: $REPO_DIR exists and is non-empty but not a git repo — refusing to clobber" >&2
+    exit 1
+  fi
+  rmdir "$REPO_DIR" 2>/dev/null || true
+  git clone "$REPO_URL" "$REPO_DIR"
+  echo "Cloned $REPO_URL → $REPO_DIR"
+else
+  echo "Memory repo already present at $REPO_DIR"
+fi
+
+# 2. Launchd agent (macOS only).
+if [[ "$(uname)" != "Darwin" ]]; then
+  echo "setup-ai-memory: not macOS, skipping launchd setup"
+  exit 0
+fi
+
+if ! command -v fswatch >/dev/null 2>&1; then
+  echo "setup-ai-memory: fswatch not installed — run 'brew install fswatch' or re-run dotfiles init" >&2
+  exit 1
+fi
+
+FSWATCH_BIN="$(command -v fswatch)"
+
+mkdir -p "$(dirname "$PLIST")"
+cat > "$PLIST" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>${LABEL}</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>-c</string>
+    <string>${FSWATCH_BIN} -o --latency 30 -e '\.git' "\$HOME/.ai/memory" | while read -r _; do "${SYNC_BIN}"; done</string>
+  </array>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/ai-memory-sync.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/ai-memory-sync.err</string>
+</dict>
+</plist>
+PLIST
+
+launchctl unload "$PLIST" 2>/dev/null || true
+launchctl load -w "$PLIST"
+echo "Loaded launchd agent ${LABEL}"
+echo "Logs: /tmp/ai-memory-sync.{log,err}"

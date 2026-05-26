@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Auto-sync ~/.ai/memory with its remote.
+#
+# Invoked by the launchd agent (com.user.ai-memory-sync) whenever fswatch
+# detects a change. fswatch already debounces with --latency, so this script
+# does a single pull → commit → push cycle and exits.
+#
+# Safe to run manually: `ai-memory-sync`.
+
+set -uo pipefail
+
+REPO="$HOME/.ai/memory"
+[[ -d "$REPO/.git" ]] || { echo "ai-memory-sync: $REPO is not a git repo" >&2; exit 1; }
+cd "$REPO" || exit 1
+
+# Quiet pull so machines stay in sync. --autostash keeps any uncommitted local
+# tweaks; --rebase keeps history linear.
+git pull --rebase --autostash origin main >/dev/null 2>&1 || true
+
+# Bail if nothing changed locally.
+[[ -z "$(git status --porcelain)" ]] && exit 0
+
+git add -A
+git commit -m "memory: auto-sync $(date -u +%FT%TZ) from $(hostname -s)" >/dev/null
+git push origin main >/dev/null 2>&1 || {
+  echo "ai-memory-sync: push failed (will retry on next change)" >&2
+  exit 1
+}

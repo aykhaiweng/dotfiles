@@ -30,6 +30,7 @@ recipes=(
   "coreutils"
   "eza"
   "fd"
+  "fswatch"
   "fzf"
   "gcc"
   "git-delta"
