@@ -46,6 +46,9 @@ extras/zsh/plugins
 /link/.claude/local.md
 /link/.claude/settings.json
 
+# ai memory — managed as its own repo at ~/.ai/memory (see bin/setup-ai-memory)
+/link/.ai/memory/
+
 # gemini
 /link/.gemini/settings.json
 
