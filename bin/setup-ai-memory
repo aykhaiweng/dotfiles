@@ -1,30 +1,33 @@
 #!/usr/bin/env bash
-# Bootstrap ~/.ai/memory on a new machine:
-#   1. Clone the memory repo if missing
-#   2. Generate and load the launchd auto-sync agent (macOS only)
+# Bootstrap ~/.ai/ on a new machine:
+#   1. Initialize the shared AI repo at ~/.ai/ if missing (memory + project notes)
+#   2. Generate and load the auto-sync agent (launchd on macOS, systemd on Linux)
 #
-# Idempotent — safe to run repeatedly.
+# Idempotent — safe to run repeatedly. Coexists with the dotfiles linker that
+# manages ~/.ai/agents/ and ~/.ai/hooks/ — those are gitignored in this repo.
 
 set -euo pipefail
 
 REPO_URL="${AI_MEMORY_REPO:-git@github.com:aykhaiweng/ai-memory.git}"
-REPO_DIR="$HOME/.ai/memory"
+REPO_DIR="$HOME/.ai"
 LABEL="com.aykhaiweng.ai-memory-sync"
 PLIST="$HOME/Library/LaunchAgents/${LABEL}.plist"
 SYNC_BIN="$HOME/.dotfiles/bin/ai-memory-sync"
 
-# 1. Clone if missing.
+# 1. Initialize repo if missing.
+# Can't use plain `git clone` because ~/.ai/ may already have agents/ + hooks/
+# symlinks from the dotfiles linker. Instead: init + fetch + reset.
 if [[ ! -d "$REPO_DIR/.git" ]]; then
-  mkdir -p "$(dirname "$REPO_DIR")"
-  if [[ -d "$REPO_DIR" ]] && [[ -n "$(ls -A "$REPO_DIR" 2>/dev/null)" ]]; then
-    echo "setup-ai-memory: $REPO_DIR exists and is non-empty but not a git repo — refusing to clobber" >&2
-    exit 1
-  fi
-  rmdir "$REPO_DIR" 2>/dev/null || true
-  git clone "$REPO_URL" "$REPO_DIR"
-  echo "Cloned $REPO_URL → $REPO_DIR"
+  mkdir -p "$REPO_DIR"
+  cd "$REPO_DIR"
+  git init -b main >/dev/null
+  git remote add origin "$REPO_URL"
+  git fetch --quiet origin main
+  git reset --hard origin/main
+  git branch --set-upstream-to=origin/main main >/dev/null
+  echo "Bootstrapped $REPO_DIR from $REPO_URL"
 else
-  echo "Memory repo already present at $REPO_DIR"
+  echo "Repo already initialized at $REPO_DIR"
 fi
 
 # 2. OS-specific auto-sync agent.
@@ -51,7 +54,7 @@ if [[ "$OS" == "Darwin" ]]; then
   <array>
     <string>/bin/bash</string>
     <string>-c</string>
-    <string>${FSWATCH_BIN} -o --latency 30 -e '\.git' "\$HOME/.ai/memory" | while read -r _; do "${SYNC_BIN}"; done</string>
+    <string>${FSWATCH_BIN} -o --latency 30 -e '\.git' "\$HOME/.ai/memory" "\$HOME/.ai/projects" | while read -r _; do "${SYNC_BIN}"; done</string>
   </array>
 
   <key>RunAtLoad</key>
@@ -91,7 +94,7 @@ elif [[ "$OS" == "Linux" ]]; then
 
   cat > "$UNIT_DIR/ai-memory-sync.service" <<UNIT
 [Unit]
-Description=Sync ~/.ai/memory to its remote (one-shot, debounced)
+Description=Sync ~/.ai/ to its remote (one-shot, debounced)
 
 [Service]
 Type=oneshot
@@ -102,11 +105,11 @@ UNIT
 
   cat > "$UNIT_DIR/ai-memory-sync.path" <<UNIT
 [Unit]
-Description=Watch ~/.ai/memory for changes
+Description=Watch ~/.ai/memory and ~/.ai/projects for changes
 
 [Path]
 PathModified=%h/.ai/memory
-# Recursive watch by default for PathModified on directories.
+PathModified=%h/.ai/projects
 
 [Install]
 WantedBy=default.target
@@ -127,6 +130,6 @@ UNIT
 
 else
   echo "setup-ai-memory: unsupported OS '$OS' — auto-sync agent not installed" >&2
-  echo "Memory repo is cloned and bin/ai-memory-sync works manually."
+  echo "Repo is initialized and bin/ai-memory-sync works manually."
   exit 0
 fi

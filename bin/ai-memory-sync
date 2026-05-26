@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
-# Auto-sync ~/.ai/memory with its remote.
+# Auto-sync ~/.ai/ (memory + per-project notes) with its remote.
 #
-# Invoked by the launchd agent (com.user.ai-memory-sync) whenever fswatch
-# detects a change. fswatch already debounces with --latency, so this script
-# does a single pull → commit → push cycle and exits.
+# Invoked by the launchd / systemd agent whenever a watched path changes.
+# The watcher already debounces; this script does a single pull → commit →
+# push cycle and exits. Gitignored content (session transcripts, dotfiles-
+# managed agents/hooks) is filtered by the repo's own .gitignore.
 #
 # Safe to run manually: `ai-memory-sync`.
 
 set -uo pipefail
 
-REPO="$HOME/.ai/memory"
+REPO="$HOME/.ai"
 [[ -d "$REPO/.git" ]] || { echo "ai-memory-sync: $REPO is not a git repo" >&2; exit 1; }
 cd "$REPO" || exit 1
 
@@ -21,7 +22,7 @@ git pull --rebase --autostash origin main >/dev/null 2>&1 || true
 [[ -z "$(git status --porcelain)" ]] && exit 0
 
 git add -A
-git commit -m "memory: auto-sync $(date -u +%FT%TZ) from $(hostname -s)" >/dev/null
+git commit -m "sync: auto-sync $(date -u +%FT%TZ) from $(hostname -s)" >/dev/null
 git push origin main >/dev/null 2>&1 || {
   echo "ai-memory-sync: push failed (will retry on next change)" >&2
   exit 1
