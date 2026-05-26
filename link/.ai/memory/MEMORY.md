@@ -13,5 +13,6 @@ Format: `- [Title](file.md) — one-line hook`. Add new files alongside this one
 ## Preferences (mutable)
 
 - [Self-improvement](feedback_self_improve.md) — actively flag tooling/subagent/hook/dotfile improvements as I work.
+- [Ouch! Infrastructure Preferences](ouch_infra.md) — never recommend gcloud commands, always use terraform.
 
 @laws.md
