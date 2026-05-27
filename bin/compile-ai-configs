@@ -48,7 +48,7 @@ echo "" >> "$LINK_DIR/.gemini/GEMINI.md"
 echo "## Laws (Mirroring Claude)" >> "$LINK_DIR/.gemini/GEMINI.md"
 cat "$AI_SOURCE_DIR/laws.md" >> "$LINK_DIR/.gemini/GEMINI.md"
 echo "" >> "$LINK_DIR/.gemini/GEMINI.md"
-cat "$AI_SOURCE_DIR/cto_context.md" >> "$LINK_DIR/.gemini/GEMINI.md"
+cat "$AI_SOURCE_DIR/user_context.md" >> "$LINK_DIR/.gemini/GEMINI.md"
 echo "  - Generated link/.gemini/GEMINI.md"
 
 # 3. Compile link/.antigravity/ANTIGRAVITY.md
@@ -65,7 +65,7 @@ echo "" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
 echo "## Laws (Mirroring Claude)" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
 cat "$AI_SOURCE_DIR/laws.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
 echo "" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
-cat "$AI_SOURCE_DIR/cto_context.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
+cat "$AI_SOURCE_DIR/user_context.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
 echo "  - Generated link/.antigravity/ANTIGRAVITY.md"
 
 echo "✨ AI configurations compiled successfully!"
