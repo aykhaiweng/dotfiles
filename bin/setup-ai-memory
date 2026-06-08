@@ -103,6 +103,11 @@ ExecStartPre=/bin/sleep 5
 ExecStart=${SYNC_BIN}
 UNIT
 
+  # systemd PathModified is NOT recursive: it only fires for direct children of
+  # the watched dir. Memory files live flat in ~/.ai/memory/*.md, so the path
+  # unit catches those instantly. Project notes live two levels down
+  # (~/.ai/projects/<enc>/notes/*.md) and would never trigger it — so a timer
+  # below acts as the recursive catch-all (and a safety net for missed events).
   cat > "$UNIT_DIR/ai-memory-sync.path" <<UNIT
 [Unit]
 Description=Watch ~/.ai/memory and ~/.ai/projects for changes
@@ -115,9 +120,23 @@ PathModified=%h/.ai/projects
 WantedBy=default.target
 UNIT
 
+  cat > "$UNIT_DIR/ai-memory-sync.timer" <<UNIT
+[Unit]
+Description=Periodic recursive catch-all for ~/.ai/ sync (nested project notes)
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=3min
+# Don't pile up runs if the machine was asleep.
+Persistent=false
+
+[Install]
+WantedBy=timers.target
+UNIT
+
   systemctl --user daemon-reload
-  systemctl --user enable --now ai-memory-sync.path
-  echo "Enabled systemd path unit ai-memory-sync.path"
+  systemctl --user enable --now ai-memory-sync.path ai-memory-sync.timer
+  echo "Enabled systemd units ai-memory-sync.path (instant memory) + .timer (recursive catch-all)"
 
   # User-level units stop when the user logs out unless linger is enabled.
   if ! loginctl show-user "$USER" 2>/dev/null | grep -q "Linger=yes"; then
