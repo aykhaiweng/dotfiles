@@ -23,7 +23,7 @@ with the dotfiles-managed `agents/` and `hooks/` symlinks) and installs a
 filesystem-watcher that auto-commits + pushes on every change:
 
 - **macOS**: launchd agent at `~/Library/LaunchAgents/com.aykhaiweng.ai-memory-sync.plist`, using `fswatch` (apt: from the brew recipes list).
-- **Linux**: systemd user units at `~/.config/systemd/user/ai-memory-sync.{path,service}`. To keep it running while logged out: `sudo loginctl enable-linger $USER`.
+- **Linux**: systemd user units at `~/.config/systemd/user/ai-memory-sync.{path,service,timer}`. The path unit fires instantly on flat-file memory changes; the timer (3-min cadence) is a recursive catch-all for nested project notes, since systemd `PathModified` does not watch subdirectories. To keep it running while logged out: `sudo loginctl enable-linger $USER`.
 
 Tracked: `memory/*.md`, `projects/*/notes/**`, `projects/*/memory/**`.
 Ignored: Claude Code session transcripts (`projects/*/*.jsonl`), UUID-named
