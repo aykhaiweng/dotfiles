@@ -32,6 +32,8 @@ EOF
 cat "$AI_SOURCE_DIR/persona.md" >> "$LINK_DIR/.claude/CLAUDE.md"
 echo "" >> "$LINK_DIR/.claude/CLAUDE.md"
 cat "$AI_SOURCE_DIR/memory_policy_claude.md" >> "$LINK_DIR/.claude/CLAUDE.md"
+echo "" >> "$LINK_DIR/.claude/CLAUDE.md"
+cat "$AI_SOURCE_DIR/agents.md" >> "$LINK_DIR/.claude/CLAUDE.md"
 echo "  - Generated link/.claude/CLAUDE.md"
 
 # 2. Compile link/.gemini/GEMINI.md
