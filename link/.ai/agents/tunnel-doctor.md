@@ -32,7 +32,7 @@ Don't dump raw output. Report:
 
 - **Which step failed**, with the one piece of evidence that proves it (the HTTP code, the log line, the missing port).
 - **The fix**, concretely (command to run, file to edit, service to restart).
-- If the chain is healthy and the user still sees failure, ask what they're observing — the symptom may be browser cache, DNS, or an actual app bug, not the tunnel.
+- If every step checks out but the user still reports failure, say so explicitly in the report and list the non-tunnel suspects to check next: browser cache, stale DNS, or a bug in the app itself.
 
 ## Hard rules
 
