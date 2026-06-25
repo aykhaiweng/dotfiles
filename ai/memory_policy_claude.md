@@ -24,7 +24,7 @@ How I classify new guidance:
 Every entry includes a **Why:** line so the rationale survives for future
 re-evaluation.
 
-@memory/MEMORY.md
+@~/.ai/memory/MEMORY.md
 
 ## Host-local context
 
