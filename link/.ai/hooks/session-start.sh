@@ -10,12 +10,23 @@ for f in worklog.md map.md gotchas.md; do
   [ -s "$NOTES_DIR/$f" ] && found+=("$f")
 done
 
-[ ${#found[@]} -eq 0 ] && exit 0
+# In-repo project log (source of truth for what's built / pending). Surface it
+# alongside the ~/.ai notes so the session-start reminder matches CLAUDE.md.
+progress_readme=""
+[ -s "docs/progress/README.md" ] && progress_readme="docs/progress/README.md"
 
-echo "📓 Project notes exist at $NOTES_DIR:"
-for f in "${found[@]}"; do
-  lines=$(wc -l < "$NOTES_DIR/$f")
-  echo "  - $f ($lines lines)"
-done
-echo ""
-echo "Read these before substantive work. Use the matching agent (repo-mapper, worklog, gotchas) to query or update."
+[ ${#found[@]} -eq 0 ] && [ -z "$progress_readme" ] && exit 0
+
+if [ -n "$progress_readme" ]; then
+  echo "📓 In-repo project log: $progress_readme — read its Pending / Next Up before substantive work."
+fi
+
+if [ ${#found[@]} -gt 0 ]; then
+  echo "📓 Project notes exist at $NOTES_DIR:"
+  for f in "${found[@]}"; do
+    lines=$(wc -l < "$NOTES_DIR/$f")
+    echo "  - $f ($lines lines)"
+  done
+  echo ""
+  echo "Read these before substantive work. Use the matching agent (repo-mapper, worklog, gotchas) to query or update."
+fi
