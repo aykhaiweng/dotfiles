@@ -66,7 +66,7 @@ refresh_laws_cache
 # Claude reads MEMORY.md + host-local dynamically via @-imports, so it inlines
 # neither laws nor the memory index — it @-imports them fresh each session.
 render "$LINK/.claude/CLAUDE.md" "# Claude — Global" \
-  persona memory_policy @memory orchestration @local agents user_context
+  persona principles memory_policy @memory orchestration @local agents user_context
 
 # Tools without @-import support get laws + user context inlined. Same payload
 # as Claude otherwise — one shared block list keeps them from drifting.
@@ -76,7 +76,7 @@ for entry in \
   ".qwen/QWEN.md|# Qwen — Global"; do
   IFS='|' read -r path title <<< "$entry"
   render "$LINK/$path" "$title" \
-    persona memory_policy orchestration agents laws user_context
+    persona principles memory_policy orchestration agents laws user_context
 done
 
 echo "✨ AI configurations compiled successfully!"
