@@ -1,73 +1,82 @@
 #!/usr/bin/env bash
-# Compiles modular tool-agnostic AI configurations in ~/.dotfiles/ai/
+# Compiles modular, tool-agnostic AI config fragments in ~/.dotfiles/ai/
 # into tool-specific target files under ~/.dotfiles/link/.
+#
+# Each tool is one render() call listing an ordered set of blocks. A block is
+# either a fragment name (a file in ai/) or a special directive:
+#   @memory  -> Claude @-import of ~/.ai/memory/MEMORY.md (dynamic, runtime)
+#   @local   -> Claude @-import of the host-local file (dynamic, runtime)
+#   laws     -> inline copy of the laws, for tools that don't do @-imports
+# Add a tool by appending one render() call — no copy-paste blocks.
 
-# Exit on any error
-set -e
+set -euo pipefail
 
-# Resolve paths relative to this script
 BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$(dirname "$BIN_DIR")"
-
-AI_SOURCE_DIR="$DOTFILES_DIR/ai"
-LINK_DIR="$DOTFILES_DIR/link"
-
-# Ensure target directories exist
-mkdir -p "$LINK_DIR/.claude"
-mkdir -p "$LINK_DIR/.gemini"
-mkdir -p "$LINK_DIR/.antigravity"
+AI="$DOTFILES_DIR/ai"
+LINK="$DOTFILES_DIR/link"
+AI_MEMORY="${HOME}/.ai/memory"
 
 echo "🔨 Compiling tool-agnostic AI configurations..."
 
-# Note: ~/.ai/memory/laws.md is no longer compiled here — it lives in the
-# auto-synced ai-memory repo (~/.ai/, see bin/setup-ai-memory). The dotfiles
-# fragment $AI_SOURCE_DIR/laws.md is still used below to embed inline copies
-# into CLAUDE.md / GEMINI.md / ANTIGRAVITY.md.
+# --- Laws: single source of truth -------------------------------------------
+# ~/.ai/memory/laws.md is canonical — it's what Claude reads at runtime via the
+# @MEMORY.md -> @laws.md chain, and it lives in the auto-synced ai-memory repo.
+# That repo has a filesystem watcher that auto-commits AND PUSHES on change, so
+# this compiler must NEVER write into it (that would trip the "never push" law).
+# Instead we derive the committed bootstrap cache ai/laws.md FROM it (rules only,
+# frontmatter/wrapper stripped) so fresh machines and the inline copies below
+# stay in lockstep without hand-syncing. All writes land inside dotfiles only.
+refresh_laws_cache() {
+  [[ -f "$AI_MEMORY/laws.md" ]] || return 0
+  local tmp; tmp="$(mktemp)"
+  # Keep everything after the "## Rules" heading, then drop leading blank lines.
+  awk 'found { print } /^## Rules/ { found = 1 }' "$AI_MEMORY/laws.md" \
+    | sed '/./,$!d' > "$tmp"
+  if [[ -s "$tmp" ]] && ! cmp -s "$tmp" "$AI/laws.md"; then
+    cp "$tmp" "$AI/laws.md"
+    echo "  - Refreshed ai/laws.md from ~/.ai/memory/laws.md"
+  fi
+  rm -f "$tmp"
+}
 
-# 1. Compile link/.claude/CLAUDE.md
-cat << 'EOF' > "$LINK_DIR/.claude/CLAUDE.md"
-# Claude — Global
+# render <outfile> <title> <block>...
+render() {
+  local out="$1" title="$2"; shift 2
+  {
+    printf '%s\n\n' "$title"
+    local first=1 blk
+    for blk in "$@"; do
+      [[ $first -eq 1 ]] || printf '\n'
+      first=0
+      case "$blk" in
+        laws)    printf '## Laws (Mirroring Claude)\n'; cat "$AI/laws.md" ;;
+        @memory) printf '@~/.ai/memory/MEMORY.md\n' ;;
+        @local)  printf '@local.md\n' ;;
+        *)       cat "$AI/$blk.md" ;;
+      esac
+    done
+  } > "$out"
+  echo "  - Generated ${out#"$DOTFILES_DIR"/}"
+}
 
-EOF
-cat "$AI_SOURCE_DIR/persona.md" >> "$LINK_DIR/.claude/CLAUDE.md"
-echo "" >> "$LINK_DIR/.claude/CLAUDE.md"
-cat "$AI_SOURCE_DIR/memory_policy_claude.md" >> "$LINK_DIR/.claude/CLAUDE.md"
-echo "" >> "$LINK_DIR/.claude/CLAUDE.md"
-cat "$AI_SOURCE_DIR/agents.md" >> "$LINK_DIR/.claude/CLAUDE.md"
-echo "  - Generated link/.claude/CLAUDE.md"
+mkdir -p "$LINK/.claude" "$LINK/.gemini" "$LINK/.antigravity" "$LINK/.qwen"
+refresh_laws_cache
 
-# 2. Compile link/.gemini/GEMINI.md
-cat << 'EOF' > "$LINK_DIR/.gemini/GEMINI.md"
-# Gemini — Mirroring Claude Global
+# Claude reads MEMORY.md + host-local dynamically via @-imports, so it inlines
+# neither laws nor the memory index — it @-imports them fresh each session.
+render "$LINK/.claude/CLAUDE.md" "# Claude — Global" \
+  persona memory_policy @memory orchestration @local agents user_context
 
-EOF
-cat "$AI_SOURCE_DIR/persona.md" >> "$LINK_DIR/.gemini/GEMINI.md"
-echo "" >> "$LINK_DIR/.gemini/GEMINI.md"
-cat "$AI_SOURCE_DIR/memory_policy_antigravity.md" >> "$LINK_DIR/.gemini/GEMINI.md"
-echo "" >> "$LINK_DIR/.gemini/GEMINI.md"
-cat "$AI_SOURCE_DIR/agents.md" >> "$LINK_DIR/.gemini/GEMINI.md"
-echo "" >> "$LINK_DIR/.gemini/GEMINI.md"
-echo "## Laws (Mirroring Claude)" >> "$LINK_DIR/.gemini/GEMINI.md"
-cat "$AI_SOURCE_DIR/laws.md" >> "$LINK_DIR/.gemini/GEMINI.md"
-echo "" >> "$LINK_DIR/.gemini/GEMINI.md"
-cat "$AI_SOURCE_DIR/user_context.md" >> "$LINK_DIR/.gemini/GEMINI.md"
-echo "  - Generated link/.gemini/GEMINI.md"
-
-# 3. Compile link/.antigravity/ANTIGRAVITY.md
-cat << 'EOF' > "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
-# Antigravity — Global
-
-EOF
-cat "$AI_SOURCE_DIR/persona.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
-echo "" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
-cat "$AI_SOURCE_DIR/memory_policy_antigravity.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
-echo "" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
-cat "$AI_SOURCE_DIR/agents.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
-echo "" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
-echo "## Laws (Mirroring Claude)" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
-cat "$AI_SOURCE_DIR/laws.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
-echo "" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
-cat "$AI_SOURCE_DIR/user_context.md" >> "$LINK_DIR/.antigravity/ANTIGRAVITY.md"
-echo "  - Generated link/.antigravity/ANTIGRAVITY.md"
+# Tools without @-import support get laws + user context inlined. Same payload
+# as Claude otherwise — one shared block list keeps them from drifting.
+for entry in \
+  ".gemini/GEMINI.md|# Gemini — Mirroring Claude Global" \
+  ".antigravity/ANTIGRAVITY.md|# Antigravity — Global" \
+  ".qwen/QWEN.md|# Qwen — Global"; do
+  IFS='|' read -r path title <<< "$entry"
+  render "$LINK/$path" "$title" \
+    persona memory_policy orchestration agents laws user_context
+done
 
 echo "✨ AI configurations compiled successfully!"
