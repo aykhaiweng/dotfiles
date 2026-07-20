@@ -40,10 +40,15 @@ Manual sync (safe to run anytime): `bin/ai-memory-sync`.
 Logs: `/tmp/ai-memory-sync.{log,err}` (macOS) or
 `journalctl --user -u ai-memory-sync.service` (Linux).
 
-Gotcha: `ai/laws.md` (source fragment) and `~/.ai/memory/laws.md` (synced)
-both exist by design — the fragment seeds the inline `## Laws` sections in
-`CLAUDE.md`/`GEMINI.md`/`ANTIGRAVITY.md` via `bin/compile-ai-configs`. Update
-both if you ever change the rules.
+### Laws: single source
+
+`~/.ai/memory/laws.md` (in the auto-synced ai-memory repo) is canonical — it's
+what Claude reads at runtime via the `@MEMORY.md → @laws.md` chain. Edit the
+rules there. `bin/compile-ai-configs` derives the committed bootstrap cache
+`ai/laws.md` from it (rules only) and inlines that into the `## Laws` sections of
+`GEMINI.md`/`ANTIGRAVITY.md`/`QWEN.md`. The compiler only ever writes inside the
+dotfiles tree — never into `~/.ai/` — so it can't trip the ai-memory watcher's
+auto-push. No hand-syncing; run the compiler after editing laws.
 
 ## Known Issues
 ### Google Axion running Ubuntu 24.04 LTS
