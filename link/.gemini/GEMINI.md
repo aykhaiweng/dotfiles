@@ -130,5 +130,4 @@ When a task matches one of these, read the corresponding file in
 
 - Development workloads are on the cloud; only the Terminal is local.
 - Prefers config in pure bash scripts.
-- Lives in Malaysia (UTC+8).
-  providing estimates in both USD and MYR.
+- Lives in Malaysia (UTC+8); give cost estimates in both USD and MYR.
