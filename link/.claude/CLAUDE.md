@@ -83,20 +83,10 @@ spec'd coding tasks, one for rote multi-file sweeps); only skip them for
 trivial edits or pure text substitution, where a spec round trip costs more
 than the fix.
 
-When a task matches one of these, read the corresponding file in
-`~/.ai/agents/` and follow its instructions:
-
-- **commit-splitter**: Use when proposing or performing commits. Propose
-  decoupled commits with Conventional Commit messages.
-- **gotchas**: Use when discovering or asked about non-obvious project facts.
-- **implementer**: Use for any coding task that has a complete spec. Not for
-  design decisions or rote multi-file pattern sweeps.
-- **mechanic**: Use for rote multi-file sweeps that apply a known pattern with
-  judgment-free local adaptation. Not for pure text substitution or design.
-- **repo-mapper**: Use for codebase analysis and maintaining `map.md`.
-- **terraform-planner**: Use before any Terraform operations.
-- **tunnel-doctor**: Use for triaging service reachability or routing issues.
-- **worklog**: Use at session start/end to manage work-in-progress context.
+Dispatch them with the Agent tool — Claude Code loads their definitions from
+`~/.claude/agents/` and already lists every name and trigger in context, so the
+roster is not repeated here. Tools without agent dispatch read `agents.md`
+instead, which carries the full roster for hand-reading from `~/.ai/agents/`.
 
 <!-- markdownlint-disable MD041 -->
 

@@ -64,9 +64,12 @@ mkdir -p "$LINK/.claude" "$LINK/.gemini" "$LINK/.antigravity" "$LINK/.qwen"
 refresh_laws_cache
 
 # Claude reads MEMORY.md + host-local dynamically via @-imports, so it inlines
-# neither laws nor the memory index — it @-imports them fresh each session.
+# neither laws nor the memory index — it @-imports them fresh each session. It
+# also gets agents_claude instead of agents: Claude Code injects the agent
+# roster (names + triggers) into every session by itself, so repeating it here
+# would be resident dead weight. Tools without agent dispatch keep `agents`.
 render "$LINK/.claude/CLAUDE.md" "# Claude — Global" \
-  persona principles memory_policy @memory orchestration @local agents user_context
+  persona principles memory_policy @memory orchestration @local agents_claude user_context
 
 # Tools without @-import support get laws + user context inlined. Same payload
 # as Claude otherwise — one shared block list keeps them from drifting.
