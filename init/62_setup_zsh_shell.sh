@@ -26,5 +26,5 @@ else
     e_success "Shell changed to $ZSH_PATH"
 fi
 
-return 1
+return 0
 
