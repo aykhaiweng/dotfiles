@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Shim: the namine server from the checked-out repo. Needs DATABASE_URL (dev default: postgres://namine:namine@127.0.0.1:5433/namine).
+exec node "${NAMINE_REPO:-$HOME/Projects/namine-dev/namine}/packages/server/dist/bin/namine-server.js" "$@"

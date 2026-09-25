@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Shim: the namine CLI from the checked-out repo (hooks and MCP registered by `namine setup` call plain `namine`).
+exec node "${NAMINE_REPO:-$HOME/Projects/namine-dev/namine}/packages/cli/dist/bin/namine.js" "$@"
