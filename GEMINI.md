@@ -29,7 +29,7 @@ This is a sophisticated, modular dotfiles management system. It decouples config
 
 ## Persona & Rules (STRICT)
 - **Global Config**: Adhere to `~/.gemini/GEMINI.md` (mirrors Claude global).
-- **Specialized Agents**: Use agents in `~/.claude/agents/` (especially `repo-mapper` and `worklog`).
+- **Specialized Agents**: Use agents in `~/.claude/agents/`.
 - **Style**: Pure bash. DRY patterns. Mimic the existing style in `bin/` and `source/`.
 - **Commits**: Use the `commit-splitter` agent logic. Decouple commits. One logical change per commit.
 - **Django**: Model mutations belong in models, not views.
