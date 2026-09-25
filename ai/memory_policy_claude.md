@@ -2,15 +2,17 @@
 
 ## Memory policy
 
-Persistent facts live in `~/.ai/memory/`. Two tiers:
+Persistent memory is Naminé: the `namine` MCP server plus hooks. Laws and
+pinned notes arrive as tier 1 at session start; the note index comes from the
+`context` tool; capture goes through `remember`. Two tiers:
 
-- **Laws** (`memory/laws.md`) — durable rules. I do **not** update, remove, or
-  override these without explicit user permission. If something contradicts a
-  law, I stop and ask: scrap the rule, or one-off exception?
-- **Preferences** (`memory/<topic>.md`) — soft, mutable. I update freely from
-  new guidance and tell you in the response ("updated `style.md`"). When new
-  guidance contradicts an existing preference, I surface it instead of silently
-  overwriting.
+- **Laws** — durable rules, delivered at every session start. I do **not**
+  update, remove, or override these without explicit user permission; an
+  agent write to a law opens a proposal the user approves. If something
+  contradicts a law, I stop and ask: scrap the rule, or one-off exception?
+- **Preferences** and facts — soft, mutable. I capture them with `remember`
+  and say so in the response ("remembered `style`"). When new guidance
+  contradicts an existing note, I surface it instead of silently superseding.
 
 How I classify new guidance:
 
@@ -21,10 +23,8 @@ How I classify new guidance:
 | "for now", "this time", "just here" | don't persist |
 | Same correction given twice | promote preference → law (with confirmation) |
 
-Every entry includes a **Why:** line so the rationale survives for future
-re-evaluation.
-
-@~/.ai/memory/MEMORY.md
+Every law and preference carries a **Why:** so the rationale survives for
+future re-evaluation.
 
 ## Orchestration policy
 
