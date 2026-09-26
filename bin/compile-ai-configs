@@ -4,7 +4,6 @@
 #
 # Each tool is one render() call listing an ordered set of blocks. A block is
 # either a fragment name (a file in ai/) or a special directive:
-#   @local   -> Claude @-import of the host-local file (dynamic, runtime)
 #   laws     -> inline copy of the laws, for tools that don't do @-imports
 # Add a tool by appending one render() call — no copy-paste blocks.
 
@@ -50,7 +49,6 @@ render() {
       first=0
       case "$blk" in
         laws)    printf '## Laws (Mirroring Claude)\n'; cat "$AI/laws.md" ;;
-        @local)  printf '@local.md\n' ;;
         *)       cat "$AI/$blk.md" ;;
       esac
     done
@@ -61,11 +59,9 @@ render() {
 mkdir -p "$LINK/.claude" "$LINK/.gemini" "$LINK/.antigravity" "$LINK/.qwen"
 refresh_laws_cache
 
-# Claude gets persona, memory policy, orchestration (with the agent roster)
-# and ADR conventions from Naminé tier 1, so it only carries the Naminé
-# pointer plus what Naminé doesn't serve, and @-imports host-local context.
-render "$LINK/.claude/CLAUDE.md" "# Claude — Global" \
-  namine principles host_context @local user_context
+# Claude gets everything from Naminé (tier 1 at session start), so its file is
+# only the pointer to it.
+render "$LINK/.claude/CLAUDE.md" "# Claude — Global" namine
 
 # Tools without @-import support get laws + user context inlined. Same payload
 # as Claude otherwise — one shared block list keeps them from drifting.
