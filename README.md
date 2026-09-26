@@ -10,44 +10,16 @@ bash <(curl -H "Cache-Control: no-cache, no-store" -sL https://raw.githubusercon
 
 ## AI Memory
 
-Persistent AI state (global memory + per-project agent notes) lives in its own
-private repo at `~/.ai/`, kept in sync across machines by a background agent —
-not in dotfiles. After the dotfiles install runs, bootstrap it:
+Persistent AI memory (laws, persona, preferences, per-project notes) lives in
+Naminé (`~/Projects/namine-dev/namine`), not in dotfiles. `bin/namine` shims
+its CLI; `namine setup --tool claude-code` registers the hooks and MCP server.
 
-```
-bin/setup-ai-memory
-```
-
-That clones `git@github.com:aykhaiweng/ai-memory.git` into `~/.ai/` (coexisting
-with the dotfiles-managed `agents/` and `hooks/` symlinks) and installs a
-filesystem-watcher that auto-commits + pushes on every change:
-
-- **macOS**: two launchd agents at `~/Library/LaunchAgents/`:
-  - `com.aykhaiweng.ai-memory-sync.plist` — `fswatch` watcher, instant push on local change
-  - `com.aykhaiweng.ai-memory-tick.plist` — periodic timer (every 60s by default) that pulls remote changes
-- **Linux**: systemd user units at `~/.config/systemd/user/`:
-  - `ai-memory-sync.{path,service}` — inotify watcher + sync service
-  - `ai-memory-sync.timer` — periodic trigger of the same service; also the recursive catch-all for nested project notes, since systemd `PathModified` does not watch subdirectories
-  - Keep running while logged out: `sudo loginctl enable-linger $USER`.
-
-Override the tick interval with `AI_MEMORY_TICK_INTERVAL=30 bin/setup-ai-memory`.
-
-Tracked: `memory/*.md`, `projects/*/notes/**`, `projects/*/memory/**`.
-Ignored: Claude Code session transcripts (`projects/*/*.jsonl`), UUID-named
-session state dirs, and the dotfiles-managed `agents/` + `hooks/` subdirs.
-
-Manual sync (safe to run anytime): `bin/ai-memory-sync`.
-Logs: `/tmp/ai-memory-sync.{log,err}` (macOS) or
-`journalctl --user -u ai-memory-sync.service` (Linux).
-
-### Laws: single source
-
-`~/.ai/memory/laws.md` (in the auto-synced ai-memory repo) is canonical for
-the non-Claude tools; Claude gets laws from Naminé tier 1. Edit the rules there. `bin/compile-ai-configs` derives the committed bootstrap cache
-`ai/laws.md` from it (rules only) and inlines that into the `## Laws` sections of
-`GEMINI.md`/`ANTIGRAVITY.md`/`QWEN.md`. The compiler only ever writes inside the
-dotfiles tree — never into `~/.ai/` — so it can't trip the ai-memory watcher's
-auto-push. No hand-syncing; run the compiler after editing laws.
+`bin/compile-ai-configs` generates the per-tool configs from the `ai/`
+fragments. `CLAUDE.md` is only a pointer to Naminé. Gemini, Antigravity and
+Qwen can't reach Naminé yet, so they get the fragments inlined, with the laws
+from `ai/laws.md` — a committed cache the compiler refreshes from Naminé's
+global law notes whenever the `namine` CLI can reach its server. Edit laws in
+Naminé, then run the compiler.
 
 ## Known Issues
 ### Google Axion running Ubuntu 24.04 LTS
