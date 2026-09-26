@@ -20,4 +20,3 @@ When a task matches one of these, read the corresponding file in
 - **mechanic**: Use for rote multi-file sweeps that apply a known pattern with
   judgment-free local adaptation. Not for pure text substitution or design.
 - **terraform-planner**: Use before any Terraform operations.
-- **tunnel-doctor**: Use for triaging service reachability or routing issues.

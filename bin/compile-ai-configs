@@ -77,7 +77,7 @@ for entry in \
   ".qwen/QWEN.md|# Qwen — Global"; do
   IFS='|' read -r path title <<< "$entry"
   render "$LINK/$path" "$title" \
-    persona principles memory_policy orchestration host_context agents adr laws user_context
+    persona principles memory_policy orchestration agents adr laws user_context
 done
 
 echo "✨ AI configurations compiled successfully!"

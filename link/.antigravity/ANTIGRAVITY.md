@@ -57,13 +57,6 @@ are a compiled snapshot of it; there is no memory store to write to here.
 
 <!-- markdownlint-disable MD041 -->
 
-## Host-local context
-
-If `~/.ai/local.md` exists on this machine, it describes environment-specific
-facts (network, hosting, reachability). Treat it as ground truth for this host.
-
-<!-- markdownlint-disable MD041 -->
-
 ## Specialized Agents
 
 Lean toward delegating: invoke these proactively the moment a task fits —
@@ -84,7 +77,6 @@ When a task matches one of these, read the corresponding file in
 - **mechanic**: Use for rote multi-file sweeps that apply a known pattern with
   judgment-free local adaptation. Not for pure text substitution or design.
 - **terraform-planner**: Use before any Terraform operations.
-- **tunnel-doctor**: Use for triaging service reachability or routing issues.
 
 <!-- markdownlint-disable MD041 -->
 
