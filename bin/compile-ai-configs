@@ -13,27 +13,33 @@ BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$(dirname "$BIN_DIR")"
 AI="$DOTFILES_DIR/ai"
 LINK="$DOTFILES_DIR/link"
-AI_MEMORY="${HOME}/.ai/memory"
 
 echo "🔨 Compiling tool-agnostic AI configurations..."
 
 # --- Laws: single source of truth -------------------------------------------
-# ~/.ai/memory/laws.md is canonical — it's what Claude reads at runtime via the
-# @MEMORY.md -> @laws.md chain, and it lives in the auto-synced ai-memory repo.
-# That repo has a filesystem watcher that auto-commits AND PUSHES on change, so
-# this compiler must NEVER write into it (that would trip the "never push" law).
-# Instead we derive the committed bootstrap cache ai/laws.md FROM it (rules only,
-# frontmatter/wrapper stripped) so fresh machines and the inline copies below
-# stay in lockstep without hand-syncing. All writes land inside dotfiles only.
+# Naminé is canonical for laws. ai/laws.md is the committed cache the non-Claude
+# tools inline; refresh it from the global law notes when the namine CLI can
+# reach its server, otherwise keep the committed copy.
 refresh_laws_cache() {
-  [[ -f "$AI_MEMORY/laws.md" ]] || return 0
-  local tmp; tmp="$(mktemp)"
-  # Keep everything after the "## Rules" heading, then drop leading blank lines.
-  awk 'found { print } /^## Rules/ { found = 1 }' "$AI_MEMORY/laws.md" \
-    | sed '/./,$!d' > "$tmp"
-  if [[ -s "$tmp" ]] && ! cmp -s "$tmp" "$AI/laws.md"; then
-    cp "$tmp" "$AI/laws.md"
-    echo "  - Refreshed ai/laws.md from ~/.ai/memory/laws.md"
+  command -v namine >/dev/null 2>&1 || return 0
+  local tmp slugs slug; tmp="$(mktemp)"
+  slugs="$(namine list --type law --binding global 2>/dev/null \
+    | awk -F' *[|] *' 'NR > 1 { print $1 }')" || slugs=""
+  if [[ -n "$slugs" ]]; then
+    {
+      printf '<!-- markdownlint-disable MD041 -->\n'
+      for slug in $slugs; do
+        # `namine show` prints YAML frontmatter, then the body.
+        namine show "$slug" | awk '
+          /^---$/ { n++; next }
+          n == 1 && /^title: / { sub(/^title: /, ""); printf "\n### %s\n\n", $0 }
+          n >= 2 { print }'
+      done
+    } > "$tmp"
+    if ! cmp -s "$tmp" "$AI/laws.md"; then
+      cp "$tmp" "$AI/laws.md"
+      echo "  - Refreshed ai/laws.md from Naminé"
+    fi
   fi
   rm -f "$tmp"
 }
