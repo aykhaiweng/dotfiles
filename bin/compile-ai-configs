@@ -25,17 +25,18 @@ echo "🔨 Compiling tool-agnostic AI configurations..."
 # into CLAUDE.md / GEMINI.md / ANTIGRAVITY.md.
 
 # 1. Compile link/.claude/CLAUDE.md
+# Persona, memory policy, orchestration and ADR conventions live in Naminé
+# (pinned notes + the adr-conventions skill); only the host-local import stays.
 cat << 'EOF' > "$LINK_DIR/.claude/CLAUDE.md"
 # Claude — Global
 
+Persona, memory policy and orchestration policy are pinned Naminé notes and
+arrive in tier 1 at session start. ADR conventions are the `adr-conventions`
+skill: `get` it before writing an ADR. If tier 1 did not arrive, call the
+`namine` MCP `context` tool with `full: true` before anything else.
+
 EOF
-cat "$AI_SOURCE_DIR/persona.md" >> "$LINK_DIR/.claude/CLAUDE.md"
-echo "" >> "$LINK_DIR/.claude/CLAUDE.md"
-cat "$AI_SOURCE_DIR/memory_policy_claude.md" >> "$LINK_DIR/.claude/CLAUDE.md"
-echo "" >> "$LINK_DIR/.claude/CLAUDE.md"
-cat "$AI_SOURCE_DIR/agents.md" >> "$LINK_DIR/.claude/CLAUDE.md"
-echo "" >> "$LINK_DIR/.claude/CLAUDE.md"
-cat "$AI_SOURCE_DIR/adr.md" >> "$LINK_DIR/.claude/CLAUDE.md"
+sed -n '/^## Host-local context/,$p' "$AI_SOURCE_DIR/memory_policy_claude.md" >> "$LINK_DIR/.claude/CLAUDE.md"
 echo "  - Generated link/.claude/CLAUDE.md"
 
 # 2. Compile link/.gemini/GEMINI.md
