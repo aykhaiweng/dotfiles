@@ -43,3 +43,4 @@ Otherwise return:
 
 - Concise summary of changes (files touched, what changed in each)
 - Verification command(s) run and their output
+- **Not done:** every spec'd item (test, check, grep, report section) you skipped, changed, or replaced with something else, each with why. Never count a skipped item as done, and never claim existing coverage for a test the spec asked you to write; write "none" if nothing was skipped.
