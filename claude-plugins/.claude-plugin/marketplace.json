@@ -1,0 +1,46 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "dotfiles",
+  "description": "Local Claude Code plugins kept in ~/.dotfiles",
+  "owner": {
+    "name": "aykhaiweng"
+  },
+  "plugins": [
+    {
+      "name": "marksman-lsp",
+      "description": "Markdown language server (marksman) for heading and link navigation",
+      "version": "1.0.0",
+      "source": "./plugins/marksman-lsp",
+      "category": "development",
+      "strict": false,
+      "lspServers": {
+        "marksman": {
+          "command": "marksman",
+          "args": ["server"],
+          "extensionToLanguage": {
+            ".md": "markdown",
+            ".markdown": "markdown"
+          }
+        }
+      }
+    },
+    {
+      "name": "bash-lsp",
+      "description": "Bash language server (bash-language-server) for shell script intelligence",
+      "version": "1.0.0",
+      "source": "./plugins/bash-lsp",
+      "category": "development",
+      "strict": false,
+      "lspServers": {
+        "bash": {
+          "command": "bash-language-server",
+          "args": ["start"],
+          "extensionToLanguage": {
+            ".sh": "shellscript",
+            ".bash": "shellscript"
+          }
+        }
+      }
+    }
+  ]
+}
