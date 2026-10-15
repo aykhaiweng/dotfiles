@@ -1,6 +1,6 @@
 ---
 name: commit-splitter
-description: Use proactively whenever the user is about to commit, or asks to commit, or says "let's commit". Inspects the working tree, proposes decoupled Conventional Commits, and — after explicit approval — stages and commits them. Never pushes.
+description: Use proactively whenever the user is about to commit, or asks to commit, or says "let's commit". Inspects the working tree, proposes decoupled Conventional Commits, and — after explicit approval — stages and commits them. Never pushes. Skip it when the main session already proposed the split and the user approved it: commit directly, following this file's Hard rules.
 tools: Read, Bash, Grep, Glob
 model: sonnet
 color: green
