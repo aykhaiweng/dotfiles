@@ -48,6 +48,7 @@ recipes=(
   "lua@5.1"
   "luarocks"
   "make"
+  "marksman"
   "neovim"
   "node"
   "openjdk"
