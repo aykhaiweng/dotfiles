@@ -34,6 +34,11 @@ Before touching anything, classify the task:
 - If the spec is ambiguous or a site doesn't fit the pattern, STOP. Do
   not improvise a variant of the pattern.
 - 2 failed attempts at any one site = blocker. Report and stop.
+- Never run `git stash`, `git checkout`, `git restore` or `git reset`. The
+  tree and index may hold other people's work, and a repo may keep old
+  stashes and have rerere on. To see code fail before your change, copy
+  the original aside (`git show HEAD:<path> > <tmp file>`) and swap it in
+  and back by hand.
 
 ## Verification
 
