@@ -17,9 +17,11 @@ ZSH_THEME="example"
 plugins=(
   branch
   brew
+  direnv
   docker
   docker-compose
   fzf
+  gcloud
   git
   git-auto-fetch
   pyenv
