@@ -16,4 +16,6 @@ if [[ -d "$HOME/.pyenv" ]]; then
         eval "$(pyenv init -)"
         eval "$(pyenv virtualenv-init -)"
     fi
+    # .zshrc sources this twice; keep the shims ahead of Homebrew's python
+    path_prepend "$PYENV_ROOT/shims"
 fi

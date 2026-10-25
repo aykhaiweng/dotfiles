@@ -86,11 +86,17 @@ function path_remove() {
   echo "$path"
 }
 
-# Prepend a directory to $PATH if it exists and isn't already there
+# Prepend a directory to $PATH if it exists, moving it to the front if it's
+# already there (e.g. /opt/homebrew/bin placed after /usr/bin by path_helper)
 function path_prepend() {
+  local arg rest
   for arg in "$@"; do
-    if [[ -d "$arg" && ! ":$PATH:" == *":$arg:"* ]]; then
-      export PATH="$arg:$PATH"
+    if [[ -d "$arg" ]]; then
+      rest=":$PATH:"
+      while [[ "$rest" == *":$arg:"* ]]; do rest="${rest//:$arg:/:}"; done
+      rest="${rest#:}"
+      rest="${rest%:}"
+      export PATH="$arg${rest:+:$rest}"
     fi
   done
 }

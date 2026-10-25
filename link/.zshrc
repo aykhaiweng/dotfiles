@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Keep PATH entries unique; .sharedrc is sourced twice below
+typeset -U path PATH
+
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
