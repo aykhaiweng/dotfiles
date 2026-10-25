@@ -3,7 +3,7 @@
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 [ -f ~/fzf-git.sh/fzf-git.sh ] && source ~/fzf-git.sh/fzf-git.sh
 
-if [[ -d $HOME/.fzf ]]; then
+if is_installed fzf; then
     export FZF_EZA_OPTS="--tree --color=always --long --git --icons=always --no-user --no-permissions --group-directories-first {} | head -200"
     export FZF_DEFAULT_COMMAND="fd --hidden --strip-cwd-prefix --no-ignore --exclude .git"
     export FZF_DEFAULT_OPTS="--height 50% --border=rounded --inline-info --layout=reverse"
@@ -20,7 +20,7 @@ if [[ -d $HOME/.fzf ]]; then
             cd)             fzf --preview "eza $FZF_EZA_OPTS" "$@" ;;
             export|unset)   fzf --preview "eval \"echo \$\" {}" "$@" ;;
             ssh)            fzf --preview "dig {}" "$@" ;;
-            *)              fzf --preview "$FZF_CTRL_T_OPTS" "$@" ;;
+            *)              fzf --preview "bat --style=numbers --color=always --line-range :500 {}" "$@" ;;
         esac
     }
 fi
