@@ -74,8 +74,12 @@ detail.
 
 ## Print the prompt
 
-One fenced block, ready to paste into a new session:
+Print the prompt inside a fenced code block in the reply, so it can be copied
+in one go: a line with three backticks and `text` before it, a line with three
+backticks after it. Never print it as plain text or a blockquote. The block
+below shows the exact output, fence lines included:
 
+````markdown
 ```text
 Continue <task> in <repo path> on branch <branch> (HEAD <sha>).
 Read the hand-off first: Naminé note `<slug>` (namine MCP `get`, slug "<slug>"; <link>)   ← or: the file <path>
@@ -83,6 +87,7 @@ In short: <two to four lines: where it stands and the next step>.
 Open decisions for me: <each, with your recommended default> | none.
 Start with: <the first concrete action>.
 ```
+````
 
 Put the key facts inline as well, so the prompt still works if the note
 cannot be read. Keep it under about 15 lines. Leave out the user's laws and
@@ -90,5 +95,5 @@ preferences: the new session loads them itself.
 
 ## Reply
 
-One line saying where the note is (its link or path), then the prompt block.
-Nothing else.
+One line saying where the note is (its link or path), then the prompt in its
+fenced `text` code block. Nothing else.
