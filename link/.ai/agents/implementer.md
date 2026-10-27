@@ -6,6 +6,7 @@ description: Executes pre-specified implementation tasks. Use proactively
   sweeps — that's mechanic.
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: sonnet
+effort: medium
 color: blue
 ---
 

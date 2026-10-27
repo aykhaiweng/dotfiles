@@ -7,6 +7,7 @@ description: Applies a known pattern across many files where each site
   do NOT use for anything requiring a design decision.
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: haiku
+effort: medium
 color: yellow
 ---
 
