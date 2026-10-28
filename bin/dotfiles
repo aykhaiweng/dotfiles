@@ -51,6 +51,11 @@ function is_dotfiles_running() {
   [[ "$DOTFILES_SCRIPT_RUNNING" ]] || return 1
 }
 
+# Test if the shell runs under a coding agent (Claude Code sets CLAUDECODE)
+function is_agent() {
+  [[ "$CLAUDECODE" ]] || return 1
+}
+
 # Test if this script was run via the "dotfiles" bin script (vs. via curl/wget)
 function is_dotfiles_bin() {
   [[ "$(basename $0 2>/dev/null)" == dotfiles ]] || return 1
