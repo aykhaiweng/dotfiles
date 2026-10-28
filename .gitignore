@@ -22,12 +22,6 @@ Session.vim
 /link/.rbenv/versions/
 /link/.rbenv/version
 
-# Don't commit tmux plugins, tpm will install them.
-/link/.tmux/plugins
-
-# Don't commit tmux resurrect state.
-/link/.tmux/resurrect
-
 # Don't commit the localrc
 /link/.userrc
 

@@ -64,7 +64,6 @@ recipes=(
   "rust"
   "sevenzip"
   "the_silver_searcher"
-  "tmux"
   "tree"
   "tree-sitter"
   "tree-sitter-cli"
