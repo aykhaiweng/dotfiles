@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+# Fuzzy-pick a workspace (zellij session per project dir) and switch to it.
+
+here="$(cd "$(dirname "$0")" && pwd)"
+self="$here/ws"
+
+# Segment for the zjstatus bar: branch, dirty mark, ahead/behind.
+git_segment() {
+    local g=(git --no-optional-locks) branch out counts behind ahead
+    "${g[@]}" rev-parse --git-dir >/dev/null 2>&1 || return 0
+    branch="$("${g[@]}" symbolic-ref --short -q HEAD || "${g[@]}" rev-parse --short HEAD)"
+    out="$(printf '\xee\x82\xa0') $branch"
+    [[ -n "$("${g[@]}" status --porcelain)" ]] && out+="*"
+    if counts="$("${g[@]}" rev-list --left-right --count '@{u}...HEAD')"; then
+        read -r behind ahead <<<"$counts"
+        ((ahead > 0)) && out+=" ↑$ahead"
+        ((behind > 0)) && out+=" ↓$behind"
+    fi
+    echo "$out"
+}
+
+preview() {
+    local dir="$1" name="$2"
+    if [[ "$dir" != "-" ]]; then
+        git -C "$dir" --no-optional-locks status -sb 2>/dev/null | head -20
+        echo
+    fi
+    "$here/agents" ls --workspace "$name"
+}
+
+pick() {
+    local sel name dir
+    # S lines are running sessions, D lines are project dirs; sort key puts
+    # running workspaces first.
+    sel="$(
+        {
+            zellij list-sessions --short 2>/dev/null | sed 's/^/S\t/'
+            printf 'D\t%s\n' "$HOME/.dotfiles"
+            find "$HOME/Projects" -maxdepth 4 \( -name node_modules -o -name .worktrees \) -prune -o -name .git -prune -print 2>/dev/null |
+                while IFS= read -r g; do printf 'D\t%s\n' "$(dirname "$g")"; done
+        } | awk -F'\t' -v home="$HOME" '
+            function nm(p,   a, n, s) { n = split(p, a, "/"); s = a[n]; gsub(/\./, "", s); return s }
+            $1 == "S" { run[$2] = 1; next }
+            $1 == "D" && !($2 in seen) { seen[$2] = 1; dirs[++nd] = $2 }
+            END {
+                for (i = 1; i <= nd; i++) {
+                    name = nm(dirs[i]); d = dirs[i]; used[name] = 1
+                    short = d; if (index(d, home) == 1) short = "~" substr(d, length(home) + 1)
+                    printf "%s\t%s\t%s\t%s\t%s\n", (name in run) ? 0 : 1, (name in run) ? "●" : " ", name, short, d
+                }
+                for (s in run) if (!(s in used)) printf "0\t●\t%s\t-\t-\n", s
+            }' |
+            LC_ALL=C sort -t $'\t' -k1,1 -k3,3 |
+            awk -F'\t' '{ printf "%s %-24s %s\t%s\t%s\n", $2, $3, $4, $3, $5 }' |
+            fzf --delimiter=$'\t' --with-nth=1 --layout=reverse --no-multi --prompt 'workspace> ' \
+                --preview "$(printf '%q' "$self") _preview {3} {2}"
+    )" || exit 0
+    IFS=$'\t' read -r _ name dir <<<"$sel"
+    if [[ "$dir" != "-" ]]; then
+        exec "$here/zj" "$dir"
+    fi
+    exec "$here/zj" --session "$name"
+}
+
+case "${1:-}" in
+git) git_segment 2>/dev/null ;;
+_preview) preview "$2" "$3" ;;
+"") pick ;;
+*)
+    echo "usage: ws [git]" >&2
+    exit 2
+    ;;
+esac
