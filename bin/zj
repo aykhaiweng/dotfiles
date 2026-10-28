@@ -3,18 +3,32 @@
 # Attach to the zellij session for a directory, creating it if needed.
 # A layout named after the session (eg. layouts/dotfiles.kdl) seeds new sessions.
 
-if [[ -n "$ZELLIJ" ]]; then
-    echo "Already inside zellij; switch sessions with Ctrl g, Ctrl o, w."
-    exit 1
+# zj --session NAME attaches to an existing session without needing its dir.
+if [[ "$1" == "--session" ]]; then
+    [[ -n "$2" ]] || { echo "usage: zj [DIR | --session NAME]" >&2; exit 2; }
+    if [[ -n "$ZELLIJ" ]]; then
+        exec zellij action switch-session "$2"
+    fi
+    exec zellij attach "$2"
 fi
 
 this_dir="$(realpath "${1:-$PWD}")"
 session_name="$(basename "$this_dir" | sed "s/[\.]//g")"
 layout="$HOME/.config/zellij/layouts/$session_name.kdl"
 
+running=0
+zellij list-sessions --short 2>/dev/null | grep -qx "$session_name" && running=1
+
+# Inside zellij, switch-session creates the session when it does not exist.
+if [[ -n "$ZELLIJ" ]]; then
+    args=(zellij action switch-session "$session_name" --cwd "$this_dir")
+    [[ -f "$layout" && $running -eq 0 ]] && args+=(--layout "$layout")
+    exec "${args[@]}"
+fi
+
 cd "$this_dir" || exit 1
 
-if [[ -f "$layout" ]] && ! zellij list-sessions --short 2>/dev/null | grep -qx "$session_name"; then
+if [[ -f "$layout" && $running -eq 0 ]]; then
     exec zellij --session "$session_name" --new-session-with-layout "$layout"
 fi
 exec zellij attach --create "$session_name"
