@@ -12,6 +12,17 @@ layout {
 
                 mode_normal          "#[fg=#A6E3A1,bold] NORMAL "
                 mode_locked          "#[fg=#6C7086] LOCKED "
+                mode_tmux            "#[fg=#1E1E2E,bg=#F9E2AF,bold] PREFIX "
+                mode_scroll          "#[fg=#89B4FA,bold] SCROLL "
+                mode_enter_search    "#[fg=#89B4FA,bold] SEARCH "
+                mode_search          "#[fg=#89B4FA,bold] SEARCH "
+                mode_rename_tab      "#[fg=#F9E2AF,bold] RENAME "
+                mode_rename_pane     "#[fg=#F9E2AF,bold] RENAME "
+                mode_pane            "#[fg=#CBA6F7,bold] PANE "
+                mode_tab             "#[fg=#CBA6F7,bold] TAB "
+                mode_resize          "#[fg=#CBA6F7,bold] RESIZE "
+                mode_move            "#[fg=#CBA6F7,bold] MOVE "
+                mode_session         "#[fg=#CBA6F7,bold] SESSION "
                 mode_default_to_mode "normal"
 
                 tab_normal "#[fg=#6C7086] {name} "
