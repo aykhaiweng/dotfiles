@@ -1,0 +1,39 @@
+// Default workspace layout. zjstatus shows git for the focused pane and agent
+// counts for this session.
+layout {
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zjstatus" {
+                format_left   "{mode} #[fg=#89B4FA,bold]{session} {tabs}"
+                format_right  "{command_git} {command_agents}"
+                format_space  ""
+
+                hide_frame_for_single_pane "false"
+
+                mode_normal          "#[fg=#A6E3A1,bold] NORMAL "
+                mode_locked          "#[fg=#6C7086] LOCKED "
+                mode_default_to_mode "normal"
+
+                tab_normal "#[fg=#6C7086] {name} "
+                tab_active "#[fg=#CBA6F7,bold] {name} "
+
+                // No shell in zjstatus; bash expands $HOME since PATH may lack the dotfiles bin
+                command_git_command         "bash -c \"\\\"$HOME/.dotfiles/bin/ws\\\" git\""
+                command_git_cwd             "{focused_pane_cwd}"
+                command_git_interval        "5"
+                command_git_format          "#[fg=#F9E2AF]{stdout}"
+                command_git_hideonemptystdout "true"
+
+                command_agents_command         "bash -c \"\\\"$HOME/.dotfiles/bin/agents\\\" count\""
+                command_agents_interval        "3"
+                command_agents_format          "#[fg=#CBA6F7]{stdout} "
+                command_agents_hideonemptystdout "true"
+            }
+        }
+        children
+        pane size=2 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+    tab
+}

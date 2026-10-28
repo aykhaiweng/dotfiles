@@ -17,6 +17,11 @@ keybinds clear-defaults=true {
         bind "F2" { Run "lazygit" { floating true; close_on_exit true; }; }
         bind "F3" { Run "lazydocker" { floating true; close_on_exit true; }; }
         bind "F4" { Run "htop" { floating true; close_on_exit true; }; }
+
+        // Workspace switcher, agent manager, and a new Claude pane
+        bind "F1" { Run "ws" { floating true; close_on_exit true; }; }
+        bind "F5" { Run "agents" { floating true; close_on_exit true; }; }
+        bind "Alt c" { Run "claude" { name "claude"; close_on_exit true; }; }
     }
     pane {
         bind "left" { MoveFocus "left"; }
@@ -279,6 +284,8 @@ plugins {
     }
     // Pinned release: zellij fetches this wasm at runtime
     vim-zellij-navigator location="https://github.com/hiasr/vim-zellij-navigator/releases/download/0.3.0/vim-zellij-navigator.wasm"
+    // Pinned release: zellij fetches this wasm at runtime
+    zjstatus location="https://github.com/dj95/zjstatus/releases/download/v0.25.0/zjstatus.wasm"
 }
 
 // Plugins to load in the background when a new session starts
@@ -320,6 +327,7 @@ default_mode "locked"
 // Default: "default"
 // 
 // default_layout "compact"
+default_layout "workspace"
  
 // The folder in which Zellij will look for layouts
 // (Requires restart)
