@@ -27,6 +27,7 @@ Before touching anything, classify the task:
 
 ## Hard rules
 
+- The shell tool is named `Bash`, capitalised; there is no `bash` tool.
 - Enumerate ALL target sites first (`grep`/`glob` per the spec) and list
   the count. Then work through the list. Never report success without
   accounting for every site on that list — done, skipped (with reason),
