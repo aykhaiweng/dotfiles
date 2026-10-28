@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Agents parse ls output, so they keep the plain command: no colours, icons or columns.
+is_agent && return
+
 if is_installed eza; then
   export EZA_DEFAULT_OPTS="--color=always --long --git --icons=always --group-directories-first --time-style=long-iso"
 
