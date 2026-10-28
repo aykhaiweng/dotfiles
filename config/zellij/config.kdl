@@ -1,6 +1,22 @@
 keybinds clear-defaults=true {
     locked {
         bind "Ctrl g" { SwitchToMode "normal"; }
+
+        // smart-splits.nvim: Ctrl-hjkl moves and Alt-hjkl resizes across nvim
+        // splits and zellij panes; the plugin forwards the key when nvim is focused
+        bind "Ctrl h" { MessagePlugin "vim-zellij-navigator" { name "move_focus_or_tab"; payload "left"; }; }
+        bind "Ctrl j" { MessagePlugin "vim-zellij-navigator" { name "move_focus"; payload "down"; }; }
+        bind "Ctrl k" { MessagePlugin "vim-zellij-navigator" { name "move_focus"; payload "up"; }; }
+        bind "Ctrl l" { MessagePlugin "vim-zellij-navigator" { name "move_focus_or_tab"; payload "right"; }; }
+        bind "Alt h" { MessagePlugin "vim-zellij-navigator" { name "resize"; payload "left"; }; }
+        bind "Alt j" { MessagePlugin "vim-zellij-navigator" { name "resize"; payload "down"; }; }
+        bind "Alt k" { MessagePlugin "vim-zellij-navigator" { name "resize"; payload "up"; }; }
+        bind "Alt l" { MessagePlugin "vim-zellij-navigator" { name "resize"; payload "right"; }; }
+
+        // Floating tools, ported from the tmux F2-F4 popups
+        bind "F2" { Run "lazygit" { floating true; close_on_exit true; }; }
+        bind "F3" { Run "lazydocker" { floating true; close_on_exit true; }; }
+        bind "F4" { Run "htop" { floating true; close_on_exit true; }; }
     }
     pane {
         bind "left" { MoveFocus "left"; }
@@ -261,6 +277,8 @@ plugins {
     welcome-screen location="zellij:session-manager" {
         welcome_screen true
     }
+    // Pinned release: zellij fetches this wasm at runtime
+    vim-zellij-navigator location="https://github.com/hiasr/vim-zellij-navigator/releases/download/0.3.0/vim-zellij-navigator.wasm"
 }
 
 // Plugins to load in the background when a new session starts
@@ -282,12 +300,12 @@ web_client {
 // Choose the theme that is specified in the themes section.
 // Default: default
 // 
-// theme "dracula"
- 
+theme "catppuccin-mocha"
+
 // Choose the base input mode of zellij.
 // Default: normal
-// 
-// default_mode "locked"
+//
+default_mode "locked"
  
 // Choose the path to the default shell that zellij will use for opening new panes
 // Default: $SHELL
@@ -364,9 +382,9 @@ web_client {
 // copy_command "xclip -selection clipboard" // x11
 // copy_command "wl-copy"                    // wayland
 // copy_command "pbcopy"                     // osx
-// 
-// copy_command "pbcopy"
- 
+//
+copy_command "pbcopy"
+
 // Choose the destination for copied text
 // Allows using the primary selection buffer (on x11/wayland) instead of the system clipboard.
 // Does not apply when using copy_command.
