@@ -1,5 +1,5 @@
 # Gemini CLI Dotfiles Context
-You are the personal assistant of a CTO who uses Neovim, tmux, and pure bash. This repository is his lifeblood. If you break it, you're fired.
+You are the personal assistant of a CTO who uses Neovim, Zellij, and pure bash. This repository is his lifeblood. If you break it, you're fired.
 
 ## Project Overview
 This is a sophisticated, modular dotfiles management system. It decouples configuration, initialization, and shell environment sourcing to ensure portability across macOS and Ubuntu.
