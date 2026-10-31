@@ -1,7 +1,7 @@
 ---
 name: one-shot
-description: "Build a whole spec, plan step or large change end to end with no intervention, taking every default, and report the decisions made so the user can reverse them later. Flags: --commit, --push, --deploy, --migrate, --token-budget <n>, --workflow, --goal, --worktree, --background. Use when the user invokes /one-shot or asks to build something large unattended with all defaults (e.g. a step spec such as docs/plans/ui/step16c-spec.md). Not for small changes: those are /quick-change."
-argument-hint: "<spec, plan or change> [--commit] [--push] [--deploy] [--migrate] [--token-budget <n>] [--workflow | --goal] [--worktree] [--background]"
+description: "Build a whole spec, plan step or large change end to end with no intervention, taking every default, and report the decisions made so the user can reverse them later. Flags: --commit, --push, --deploy, --migrate, --token-budget <n>, --workflow, --goal, --build-agent <type>, --worktree, --background. Use when the user invokes /one-shot or asks to build something large unattended with all defaults (e.g. a step spec such as docs/plans/ui/step16c-spec.md). Not for small changes: those are /quick-change."
+argument-hint: "<spec, plan or change> [--commit] [--push] [--deploy] [--migrate] [--token-budget <n>] [--workflow | --goal] [--build-agent <type>] [--worktree] [--background]"
 ---
 
 # One shot
@@ -21,12 +21,18 @@ user's behalf. The invocation is the approval: the Plan and Impact is shown, not
 | `--token-budget <n>` | A hard ceiling on tokens for the run (`500k`, `1.2m`, `800000`) | default: the agent's estimate |
 | `--workflow` | Runs the build as a dynamic Workflow (this flag is the user's opt-in) | not with `--goal` |
 | `--goal` | Runs entirely in this session as one goal-driven loop: no Workflow, no fan-out | not with `--workflow` |
+| `--build-agent <type>` | The subagent type that does every build step (in a Workflow, a goal or neither) | default `implementer` |
 | `--worktree` | Builds in a fresh git worktree branched from the current `HEAD`; the current tree is never touched | |
 | `--background` | Steps 2 onward run as one background agent; this session is free at once | |
 
 `--workflow` and `--goal` together: stop and say pick one. `--migrate` without `--deploy`: say it does nothing alone and
-carry on. Neither: run the parts in this session, handing well-specified
-pieces to subagents (`implementer`, `mechanic`) where they fit, and never call Workflow.
+carry on. Neither: run the parts in this session, handing each well-specified build piece to the build agent, and never
+call Workflow.
+
+**The build agent** is `--build-agent`, else always `implementer`. It writes the code and tests of every part. Other work
+keeps its own agent: reviews and the final checks run in this session (or as general agents that can load skills), and
+read-only exploration may use `Explore`. A build agent that cannot load skills never runs `/security-review` or
+`/code-review` itself; this session does.
 
 ## Never loosened
 
@@ -68,12 +74,14 @@ Part by part, each to green before the next:
 - with `--commit`, commit the part (only its files, never `git add -A`) with the attribution lines this session was given.
 
 **`--workflow`:** load the `workflow-authoring` skill and write one Workflow per phase (build, then verify and review),
-pipelined over the target's parts, with every `agent()` call carrying the options the session's hooks require. Pass the
+pipelined over the target's parts, with every `agent()` call carrying the options the session's hooks require and every
+build call `agentType: '<build agent>'`. Pass the
 budget in `args` and stop launching agents once `budget.spent()` passes it. Check each phase's results yourself before
 the next: re-run its checks, never take an agent's "green" on its word.
 
 **`--goal`:** do it all in this session, one part at a time, in a loop of build → check → fix until the goal's checks
-all pass. No Workflow and no parallel fan-out; subagents only for a single bounded piece when it saves context.
+all pass. No Workflow and no parallel fan-out; a subagent (the build agent) only for a single bounded piece when it saves
+context.
 
 **Budget running out:** at 85% spent, stop starting new parts. Finish or cleanly park the current one (committed if
 `--commit`, else a list of what is uncommitted), and report what is left as the next run's target.
@@ -104,7 +112,7 @@ merging it back is the user's call. Prefer it whenever other work is going on in
 
 Do step 1 in this session (the goal, the budget, the Plan and Impact), then hand steps 2 to 4, the Decisions log and the
 Reply to one background agent (`run_in_background: true`; with `--workflow` the Workflow itself runs in the background),
-and say in one line that it is running. Give it the flags, the target, the goal, the budget and the attribution lines.
+and say in one line that it is running. Give it the flags, the target, the goal, the budget, the build agent and the attribution lines.
 It cannot ask, so it stops and reports wherever this skill would: a migration without `--migrate`, an unclear failure, a
 rule that needs the user. When it reports, re-run its final checks and read its commits before relaying them; don't take
 its counts on its word. `--background` combines with `--worktree`, which is the safer choice for a long run.
