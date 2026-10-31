@@ -72,7 +72,6 @@ recipes=(
   "vim"
   "webp"
   "wget"
-  "zellij"
   "zsh"
 )
 
