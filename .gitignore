@@ -51,3 +51,6 @@ extras/zsh/plugins
 
 # antigravity
 .antigravitycli/
+
+# vscode
+*.code-workspace
