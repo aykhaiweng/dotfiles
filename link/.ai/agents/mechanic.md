@@ -58,4 +58,6 @@ verification command, treat that as a blocker and stop.
 
 - Site count: found N, changed N (list files)
 - Verification command and its output
+- **Assumed:** every site where you adapted the pattern in a way the spec didn't spell out, each with `file:line`;
+  write "none" if there were none
 - **Not done:** every spec'd item (test, check, grep, report section) you skipped, changed, or replaced with something else, each with why. Never count a skipped item as done, and never claim existing coverage for a test the spec asked you to write; write "none" if nothing was skipped.
