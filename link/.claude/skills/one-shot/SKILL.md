@@ -1,6 +1,6 @@
 ---
 name: one-shot
-description: "Build a whole spec, plan step or large change end to end with no intervention, taking every default after an adversarial advisor has challenged it, keeping every unattended decision reversible, and report the decisions made (with the options considered and why) so the user can reverse them later. Each part is built test-first. Flags: --commit, --push, --deploy, --migrate, --token-budget <n>, --workflow, --goal, --build-agent <type>, --advisor part|decision, --advisor-model <model>, --worktree, --background. Use when the user invokes /one-shot or asks to build something large unattended with all defaults (e.g. a step spec such as docs/plans/ui/step16c-spec.md). Bigger than /quick-change (one small change); work that still needs a design call with the user takes the normal Plan and Impact flow."
+description: "Build a whole spec, plan step or large change end to end with no intervention, taking every default (challenged by an adversarial advisor only when --advisor is given), keeping every unattended decision reversible, and report the decisions made (with the options considered and why) so the user can reverse them later. Each part is built test-first. Flags: --commit, --push, --deploy, --migrate, --token-budget <n>, --workflow, --goal, --build-agent <type>, --advisor part|decision, --advisor-model <model>, --worktree, --background. Use when the user invokes /one-shot or asks to build something large unattended with all defaults (e.g. a step spec such as docs/plans/ui/step16c-spec.md). Bigger than /quick-change (one small change); work that still needs a design call with the user takes the normal Plan and Impact flow."
 argument-hint: "<spec, plan or change> [--commit] [--push] [--deploy] [--migrate] [--token-budget <n>] [--workflow | --goal] [--build-agent <type>] [--advisor part|decision] [--advisor-model <model>] [--worktree] [--background]"
 ---
 
@@ -25,13 +25,14 @@ deploy, worktree, background) before step 1.
 | `--workflow` | Runs the build as a dynamic Workflow (this flag is the user's opt-in) | not with `--goal` |
 | `--goal` | Runs entirely in this session as one goal-driven loop: no Workflow, no fan-out | not with `--workflow` |
 | `--build-agent <type>` | The subagent type that does every build step (in a Workflow, a goal or neither) | default `implementer` |
-| `--advisor part\|decision` | How often the adversarial advisor challenges decisions: once per part (all its decisions together), or once per decision | default `part` |
-| `--advisor-model <model>` | The model the advisor runs on (`opus`, `sonnet`, `haiku`, …), always at effort `high` | default `opus` |
+| `--advisor part\|decision` | Turns the adversarial advisor on, and says how often it challenges decisions: once per part (all its decisions together), or once per decision | default: no advisor |
+| `--advisor-model <model>` | The model the advisor runs on (`opus`, `sonnet`, `haiku`, …), always at effort `high` | with `--advisor`; default `opus` |
 | `--worktree` | Builds in a fresh git worktree branched from the current `HEAD`; the current tree is never touched | |
 | `--background` | Steps 2 onward run as one background agent; this session is free at once | |
 
 `--workflow` and `--goal` together: stop and say pick one. `--migrate` without `--deploy`: say it does nothing alone and
-carry on. `--advisor` with any value other than `part` or `decision`: stop and say which two it takes. Neither: run the parts in this session, handing each well-specified build piece to the build agent, and never
+carry on. `--advisor` with any value other than `part` or `decision`: stop and say which two it takes. `--advisor-model` without
+`--advisor`: say it does nothing alone and carry on. Neither: run the parts in this session, handing each well-specified build piece to the build agent, and never
 call Workflow.
 
 **The build agent** is `--build-agent`, else always `implementer`. It writes the code and tests of every part. Other work
@@ -59,11 +60,11 @@ and the exact go it needs.
 - **Budget.** With `--token-budget`, that is the ceiling. Without it, estimate from the target (its parts, the files
   they touch, the reviews and fixes after) and state it with one line of reasoning; take a stated budget in the target
   or the user's message (`+500k`) over the estimate. Keep about 15% back for the reviews, fixes and the report.
-- Print the Plan (parts, files, checks, mode, advisor mode and model, budget) and Impact in one block, then carry on in the same turn.
+- Print the Plan (parts, files, checks, mode, advisor mode and model or "no advisor", budget) and Impact in one block, then carry on in the same turn.
 
 ## 2. Decide by default, challenged, reversible
 
-Every open question gets a decision, never a question to the user, in three steps.
+Every open question gets a decision, never a question to the user: propose, challenge (only with `--advisor`), gate.
 
 **Propose** the default, and note which rung chose it and the other options seen:
 1. what the target, its ADR or the user said;
@@ -71,7 +72,8 @@ Every open question gets a decision, never a question to the user, in three step
 3. the existing pattern in the code next to it;
 4. the simplest choice that meets the goal and is easiest to reverse.
 
-**Challenge** it with the adversarial advisor (see "Adversarial advisor") before building on it: with `--advisor part`, all of
+**Challenge** it, only when `--advisor` is given, with the adversarial advisor (see "Adversarial advisor") before building on it. Without
+the flag there is no advisor call at all: the default stands, and the log's Advisor column reads `none`. With `--advisor part`, all of
 a part's decisions at once before the part is built; with `--advisor decision`, each one as it comes up. A rung 1 decision
 is the user's or the target's, so the advisor can flag a contradiction in it but never overturn it.
 
@@ -85,10 +87,12 @@ notification that is sent, a resource created outside the repo, a file deleted t
    the options written up (see "Decisions log").
 
 Log each decision as it is made (see "Decisions log"). Mark as **check this first**: a decision taken against the
-advisor's objection, a reversible variant taken in place of a one-way choice, and a rung 4 decision that would have
+advisor's objection (with `--advisor`), a reversible variant taken in place of a one-way choice, and a rung 4 decision that would have
 been costly to get wrong.
 
 ## Adversarial advisor
+
+Only with `--advisor`. Without it, skip this section entirely.
 
 A second opinion briefed to disagree, so a default isn't taken just because it came first.
 
@@ -127,7 +131,7 @@ Part by part, each to green before the next, in two dispatches of the build agen
 
 **`--workflow`:** load the `workflow-authoring` skill and write one Workflow per phase (build, then verify and review),
 pipelined over the target's parts, with every `agent()` call carrying the options the session's hooks require and every
-build call `agentType: '<build agent>'`. The advisor runs as its own `agent()` call before the builds it
+build call `agentType: '<build agent>'`. With `--advisor`, the advisor runs as its own `agent()` call before the builds it
 challenges, with `{ model: '<advisor model>', effort: 'high' }`, once per part or once per decision as `--advisor` says.
 This session applies its verdicts before the build calls run. Pass the
 budget in `args` and stop launching agents once `budget.spent()` passes it. Check each phase's results yourself before
@@ -157,8 +161,8 @@ context.
 
 As `shared/ship.md` says; prefer `--worktree` whenever other work is going on in the same tree. With `--background`,
 the work handed over is steps 2 to 4, the Decisions log and the Reply (with `--workflow` the Workflow itself runs in
-the background), and the agent also gets the goal, the budget, the build agent and the advisor mode and model; it runs
-the advisor itself. It also stops on a migration without `--migrate` and on a one-way decision with no reversible
+the background), and the agent also gets the goal, the budget, the build agent and the advisor mode and model (if `--advisor` was given); it runs
+the advisor itself only then. It also stops on a migration without `--migrate` and on a one-way decision with no reversible
 variant.
 
 ## Run files
@@ -182,7 +186,7 @@ Count only real choices: anything the target left open, a default taken over an 
 part dropped or parked. Not every line of code.
 
 **Builder assumptions** are the layer underneath: each item on a build agent's `Assumed:` line becomes a row with
-Advisor `builder` (this session's own decisions keep the advisor's verdict there). The whole-diff review in step 4 rules
+Advisor `builder` (this session's own decisions keep the advisor's verdict there, or `none` without `--advisor`). The whole-diff review in step 4 rules
 on each one: kept, or fixed in its own commit. The table stays one log, sorted by part.
 
 Under the table, write up each decision using the `explain` skill's
