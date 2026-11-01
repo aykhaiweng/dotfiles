@@ -24,6 +24,8 @@ expect() {
   fi
 }
 json() { jq -n --arg cwd "$1" --arg f "${2:-}" --arg s "${3:-s1}" '{session_id:$s, cwd:$cwd, tool_input:{file_path:$f}}'; }
+# ok <name> <test command...>: count a plain condition as a pass or a failure
+ok() { local name=$1; shift; if "$@"; then pass=$((pass + 1)); else fail=$((fail + 1)); echo "FAIL $name"; fi; }
 
 repo="$work/repo"
 git init -q "$repo"
@@ -59,7 +61,7 @@ count() { [[ -f "$runs" ]] && wc -l <"$runs" | tr -d ' ' || echo 0; }
 
 expect "gate: no check argument does nothing" 0 "" "$gate" <<<"$(json "$repo")"
 expect "gate: a clean tree skips the check" 0 "" "$gate" "$check" <<<"$(json "$repo")"
-[[ $(count) == 0 ]] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL gate: check ran on a clean tree"; }
+ok "gate: a clean tree never runs the check" [ "$(count)" = 0 ]
 
 echo dirty >>"$repo/tracked"
 expect "gate: a red check on a changed tree blocks the turn" 2 "red run 1 of 3" "$gate" "$check" <<<"$(json "$repo")"
@@ -72,8 +74,8 @@ touch "$repo/ok" # untracked, so it changes the tree fingerprint too
 expect "gate: a green check lets the turn end" 0 "" "$gate" "$check" <<<"$(json "$repo")"
 before=$(count)
 expect "gate: an unchanged green tree skips the check" 0 "" "$gate" "$check" <<<"$(json "$repo")"
-[[ $(count) == "$before" ]] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL gate: check re-ran on an unchanged green tree"; }
-[[ -z "$(git -C "$repo" diff --cached --name-only)" ]] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL gate: the real index was changed"; }
+ok "gate: an unchanged green tree never re-runs the check" [ "$(count)" = "$before" ]
+ok "gate: the real index is never changed" [ -z "$(git -C "$repo" diff --cached --name-only)" ]
 expect "gate: a cwd outside git does nothing" 0 "" "$gate" "$check" <<<"$(json "$work")"
 
 # A gitignored nested worktree (namine ignores .worktrees/) must not stop the gate from running.
