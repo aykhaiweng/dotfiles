@@ -1,0 +1,12 @@
+# Guards of the global laws, copied from Naminé by bin/compile-ai-configs. Edit them in Naminé.
+git-workflow:
+  - on: shell
+    deny: '(^|[;&|] *)git( +-\S+| +-C +\S+)* +(commit|push)\b(?! +origin +(refs/tags/)?archive/[^\s:;&|]+ *($|[;&|]))'
+    message: 'Law: commit and push only on a type/slug feature branch (feat/, fix/, chore/, refactor/, test/, docs/, perf/, claude/). Branch first. Exception: git push origin archive/<tag>.'
+    unless_ref: '{feat,fix,chore,refactor,test,docs,perf,claude}/**'
+  - on: shell
+    deny: '(^|[;&|] *)git( +-\S+| +-C +\S+)* +push\b.*( -f( |$)| --force| \+?(\S*:)?(refs/heads/)?(main|master|dev|staging)( |$))'
+    message: 'Law: no force-push, and never push to main, master, dev or staging.'
+  - on: shell
+    deny: '(^|[;&|] *)gh +pr +(merge|ready)\b|(^|[;&|] *)gh +pr +review\b.*--approve'
+    message: 'Law: open draft PRs only. The user merges, approves and marks them ready.'
