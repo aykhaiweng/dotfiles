@@ -18,16 +18,17 @@ Why: Wrong assumptions found before the code lands cost a sentence and after it 
 
 ### 'Git workflow: feature branches, decoupled commits, draft PRs'
 
-Once the Plan is approved, an agent works on a feature branch through to a draft PR without asking per commit, and never commits to, pushes to or merges into main, master, dev or staging.
+Once the Plan is approved, an agent works on a feature branch through to a draft PR without asking per commit, and never commits to, pushes to or merges into main, master, dev or staging. Exception: the dotfiles repo, below.
 - **How to apply:**
   - **Branch:** from a protected branch, create `type/slug` first, the type a Conventional Commit type (e.g. `feat/invoice-export`).
   - **Commits:** one logical change each, after each green test run with the pre-commit hook passing. `type(scope): subject` plus a 2–4 line body: what, why, and the alternatives rejected. A ticket named by the task, branch or prompt goes in a final `Refs: TICKET-ID` line, never in the scope.
-  - **Push:** `git push -u origin HEAD` only. Never `--force`, `-f`, `--force-with-lease`, or a refspec naming a protected branch.
+  - **Push:** `git push -u origin HEAD` only. Never `--force`, `-f`, `--force-with-lease`, or a refspec naming a protected branch. Exception: `git push origin archive/<tag>` publishes an archive tag from any branch.
   - **PR:** `gh pr create --draft` against the branch the work started from, with summary, test evidence (command + result), coverage before/after, and migration or rollback notes where they apply. Report the branch, the commits (short hash + subject) and the PR link.
   - Never merge, approve or mark a PR ready (`gh pr merge`, `gh pr ready`, `gh pr review --approve`). Amend, rebase and reset need an explicit ask.
+  - **Dotfiles exception:** in `/Users/aykhaiweng/.dotfiles` an agent commits straight to `main` and pushes with `git -C /Users/aykhaiweng/.dotfiles push origin HEAD`; no feature branch, no PR. Every commit and push there is written as `git -C /Users/aykhaiweng/.dotfiles …`, since that prefix is what the guard exempts. Commit rules (decoupled Conventional Commits, specific paths, no `--no-verify`) and the no-force rule still apply.
 - Big or destructive changes still stop for Plan approval; that approval is where autonomy starts.
 
-Why: Decoupled commits are easy to revert and review and a recorded rejected alternative stops it being re-proposed, while the user reviews at the draft PR and keeps protected branches and merging; guards can only allowlist branch names, hence type/slug.
+Why: Decoupled commits are easy to revert and review and a recorded rejected alternative stops it being re-proposed, while the user reviews at the draft PR and keeps protected branches and merging; guards can only allowlist branch names, hence type/slug. The archive-tag exception lets an agent preserve a snapshot before a rewrite without touching any branch. The dotfiles exception is the owner's call (2026-11-01, "change the law"); guards see only the command text and the branch, not the repo, so it is keyed on the `git -C <dotfiles path>` prefix.
 
 ### Goal-driven execution
 
@@ -45,13 +46,15 @@ Why: Decoupled commits are easy to revert and review and a recorded rejected alt
 
 Why: A checkable goal tells you when you're done and proves it to the user, and a test weakened to go green turns that proof into a lie.
 
-### Never mutate databases
+### Never mutate production databases
 
-Read-only queries only; run reads whenever.
-- **How to apply:** no `INSERT`/`UPDATE`/`DELETE`/`DROP`/migrations without
-  an explicit instruction in the current message.
+Read-only queries only on production databases; run reads anywhere, whenever. Local dev databases may be written without asking.
+- **How to apply:**
+  - **Production:** any hosted or remote database (a cloud instance, a teammate's or an organization's server, anything reached over the network rather than on this machine). No `INSERT`/`UPDATE`/`DELETE`/`DROP`/`TRUNCATE`/migrations or restores there without an explicit instruction in the current message.
+  - **Local dev:** databases running on this machine: local Docker or Postgres instances, test databases (`namine_test`), `wt-<name>` worktree databases, throwaway containers, and main's local Naminé database. Writes, migrations, seeds and restores are fine; still say what you ran.
+  - **When unsure** whether a database is production (an unfamiliar URL, a tunnel, a forwarded port, a connection string from someone else), treat it as production and ask.
 
-Why: The data is prod-adjacent and mistakes are not reversible.
+Why: Production data is shared and mistakes there are not reversible; local dev databases are the user's own and can be rebuilt, so guarding them only slows work down (user, 2026-11-01).
 
 ### 'Simplicity first: change only what was asked, and match the code around you'
 
@@ -66,3 +69,15 @@ Why: The data is prod-adjacent and mistakes are not reversible.
   - Once it works, do one refactor pass over the code you wrote this task, committed separately as `refactor`.
 
 Why: Every extra line has to be read, tested and maintained, small consistent diffs are easy to review, revert and bisect, and a parallel copy leaves two versions to keep in sync for good.
+
+### Worktree locations and wt- naming
+
+Where a worktree goes depends on who makes it, and anything a worktree needs a key or name for is called `wt-<worktree name>`.
+
+- **How to apply:**
+  - **The user's worktrees** sit in `<repo>/.worktrees/<name>`. Leave them where they are; never move them.
+  - **Claude's worktrees** are made with the built-in `EnterWorktree` tool (leave with `ExitWorktree`), which puts them in `<repo>/.claude/worktrees/<name>`. Never hand-roll `git worktree add .worktrees/…` or a sibling directory.
+  - **Names and keys:** every name or key a worktree needs (Docker Compose project, database, image tag, container, volume, cache or data directory) is `wt-<name>`. `<name>` is the worktree's directory name, which is its branch with `/` turned into `-`. Drop Claude's `worktree-` branch prefix, so it reads `wt-foo`, not `wt-worktree-foo`.
+  - Never share one of those names or keys between two worktrees, or between a worktree and main.
+
+Why: User, 2026-11-01: worktrees from both the user and Claude, each with its own environment, need one predictable home per author and one naming scheme so nothing collides or gets cleaned up by mistake.

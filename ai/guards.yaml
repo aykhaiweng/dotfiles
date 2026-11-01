@@ -1,7 +1,7 @@
 # Guards of the global laws, copied from Naminé by bin/compile-ai-configs. Edit them in Naminé.
 git-workflow:
   - on: shell
-    deny: '(^|[;&|] *)git( +-\S+| +-C +\S+)* +(commit|push)\b(?! +origin +(refs/tags/)?archive/[^\s:;&|]+ *($|[;&|]))'
+    deny: '(^|[;&|] *)git(?! +-C +/Users/aykhaiweng/\.dotfiles( |$))( +-\S+| +-C +\S+)* +(commit|push)\b(?! +origin +(refs/tags/)?archive/[^\s:;&|]+ *($|[;&|]))'
     message: 'Law: commit and push only on a type/slug feature branch (feat/, fix/, chore/, refactor/, test/, docs/, perf/, claude/). Branch first. Exception: git push origin archive/<tag>.'
     unless_ref: '{feat,fix,chore,refactor,test,docs,perf,claude}/**'
   - on: shell
