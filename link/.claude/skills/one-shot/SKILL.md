@@ -182,6 +182,10 @@ of a part reads the part's earlier run files first, so it starts from what faile
 Decisions log stays the summary; run files are the record behind it. With `--commit` they are committed with their
 part.
 
+Each run file opens with `Started:` and ends with `Finished:` (`date '+%F %T'`). `runs/timings.md` gets one line
+appended per dispatch, part check, gate run and review, never rewritten:
+`| <stage> | <part> | <start> | <end> | <minutes> | <pass, fail or flaky> |`.
+
 ## Decisions log
 
 Keep it as you go, and put it in two places: a "Decisions (owner may reverse)" section at the end of the target's spec
@@ -207,17 +211,20 @@ Structure (TL;DR, What it is, Major changes, Pros, Cons, Consequences, Other eff
   says how to reverse it and what that costs.
 - **Compact** for the rest: the same headings, one line each, no diagram. Alternatives is never left out.
 
-The spec's section and the hand-off note hold every write-up. The reply holds the table and the full write-ups.
+Write the write-ups once, in step 4. The spec's section and the hand-off note hold every write-up. The reply holds the
+table, a one-line TL;DR under each **check this first** row and a link to the spec's section, not the write-ups
+themselves; the one-way decisions waiting on the user are the exception, written in full in the reply.
 
 ## Reply
 
 1. **Done:** what was built, part by part, with the commits (short sha and subject) or the uncommitted file list.
 2. **Checks:** each part's RED (the tests failing before its code) and GREEN commands with their counts, the test diff
    checks, then the whole check; the reviews run and what they found and fixed.
-3. **Decisions you can reverse:** the log table with the **check this first** rows on top, then those rows' full
-   write-ups. The compact ones are in the spec's section, which this links to.
+3. **Decisions you can reverse:** the log table with the **check this first** rows on top, each with its one-line
+   TL;DR, and a link to the spec's section, which holds every write-up.
 4. **Waiting on you:** anything stopped for a rule (with the exact go it needs), each one-way decision with its full
    write-up and the options to pick from, and anything parked by the budget.
-5. **Budget:** used against the ceiling, and whether it was given or estimated.
+5. **Budget:** used against the ceiling, and whether it was given or estimated; the wall-clock time per phase (build,
+   part checks, gate, reviews, report) from `runs/timings.md`, and any tests logged as flaky.
 6. The push and the deploy (with its rollback tag and the migrations `--migrate` applied), each only if its flag was
    set; with `--worktree`, its path and branch; and the hand-off note's link.
