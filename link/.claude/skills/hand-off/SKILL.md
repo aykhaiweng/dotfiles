@@ -26,6 +26,9 @@ Read the state; don't write it from memory.
 - **Gotchas** found, each with its fix.
 - **Background work** still running (jobs, workflows, agents): a fresh session
   cannot see it, so name it and where its output lands.
+- **Compaction log:** if this session keeps one (an active `log` note tagged
+  `compaction-log`, Naminé ADR 0105), its slug. The new session takes it over,
+  so the run's checklist moves with it.
 
 No secrets: no tokens, passwords or connection strings with credentials. Point
 to where they are documented instead (e.g. `docs/development.md`).
@@ -48,6 +51,8 @@ to where they are documented instead (e.g. `docs/development.md`).
 **Gotchas:** symptom, cause, fix.
 
 **Read first:** files, notes or docs, with paths.
+
+**Compaction log:** `<slug>`, or omit this line when there is none.
 ```
 
 Keep it short enough to read in a minute. Plain words first, then the exact
@@ -85,9 +90,13 @@ Continue <task> in <repo path> on branch <branch> (HEAD <sha>).
 Read the hand-off first: Naminé note `<slug>` (namine MCP `get`, slug "<slug>"; <link>)   ← or: the file <path>
 In short: <two to four lines: where it stands and the next step>.
 Open decisions for me: <each, with your recommended default> | none.
+Take over compaction log `<slug>`: get it, continue the run from it, and update it as you go.   ← only when there is one
 Start with: <the first concrete action>.
 ```
 ````
+
+The take-over line makes the new session's first `update` of the log claim it, so
+it is handed back to that session after compaction.
 
 Put the key facts inline as well, so the prompt still works if the note
 cannot be read. Keep it under about 15 lines. Leave out the user's laws and
