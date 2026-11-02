@@ -120,8 +120,14 @@ Part by part, each to green before the next, in two dispatches of the build agen
 - **RED:** a tests-only brief: the part's test list, the test paths, the command. It writes the tests and returns the
   failing output; it touches no code outside the test paths. Run the tests yourself and confirm each new one fails
   for the stated reason. A test that already passes goes back through step 2.
-- **GREEN:** a code brief: the part's spec, the RED tests (read-only), the command. Then run its check yourself and
-  loop until it passes, and confirm the test diff since RED is empty (`shared/tdd.md`).
+- **GREEN:** a code brief: the part's spec, the RED tests (read-only), the command. Send it to the RED agent with
+  `SendMessage`, so it keeps what it already read; start a fresh build agent only when that one is gone. Then run the
+  part's check yourself and loop until it passes, and confirm the test diff since RED is empty (`shared/tdd.md`).
+- **The part's check** is the part's test files only (e.g. `vitest run <files>`, through the timed config for files the
+  repo runs serially), never the whole gate, which runs once in step 4. Benchmarks only when the part touches the
+  benchmark runner or a benchmarked path.
+- **Test lock:** when the repo's docs name one (e.g. `scripts/with-test-lock`), every test, benchmark and gate command
+  runs through it, here and in step 4.
 - A part with no behaviour to pin (docs, config) says so in the Plan and takes one dispatch.
 - Each dispatch writes a run file (see "Run files"), and each builder's `Assumed:` line goes into the Decisions log;
 - never skip, delete or weaken a test to go green;
@@ -148,6 +154,9 @@ context.
 
 - Run the whole check: the repo's gate, the end-to-end tests, and the review of the whole diff the repo requires. Fix and
   re-run until green.
+- **A failing gate:** rerun only the failing files, alone and once, with nothing else running. If they pass, log them as
+  **flaky** (file and error) for the report and don't fix them; if they fail again, the failure is real. After a fix,
+  rerun only the affected files, then the whole gate once more at the end.
 - Update the docs the target names (reference, concepts, plans, the ADR's status).
 - Confirm the current tree's `git status --porcelain` matches what step 1 noted (with `--worktree`, nothing leaked
   out of the worktree through Bash). Anything new there is reported, never cleaned up silently.

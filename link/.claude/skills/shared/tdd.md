@@ -28,7 +28,8 @@ delete or weaken a test to go green.
 
 ## Check
 
-The session re-runs the tests and the repo's gate itself, and never takes a subagent's "green" on its word. A
+The session re-runs the tests of what changed itself, and never takes a subagent's "green" on its word. The repo's
+whole gate runs where the calling skill says (`/one-shot`: once, at the finish). A
 refactor, if any, comes after green, in its own `refactor` commit, with the tests unchanged.
 
 ## Report lines
