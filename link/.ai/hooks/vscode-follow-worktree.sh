@@ -1,6 +1,7 @@
 #!/bin/bash
-# CwdChanged hook: when Claude Code runs in VS Code's integrated terminal and the session moves into
-# another git checkout (EnterWorktree into .claude/worktrees/<name>, or a cd into a sibling worktree),
+# Registered twice: as a PostToolUse hook on EnterWorktree (which fires no CwdChanged) and as a CwdChanged
+# hook (a cd into a sibling worktree). Both inputs carry the session's new directory as `cwd`.
+# When Claude Code runs in VS Code's integrated terminal and the session moves into another git checkout,
 # open that checkout in a new VS Code window, as the extension's own "Open worktree" button does.
 # It does nothing outside VS Code's terminal, for a cd that stays in the same checkout, or for a
 # checkout already opened (or started in) this session, so moving back to the main checkout opens
