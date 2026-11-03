@@ -12,7 +12,9 @@ Read `~/.claude/skills/shared/tdd.md` (the test-driven loop) and `~/.claude/skil
 deploy, background) before step 2.
 
 **Always in this tree and branch.** The change is made, verified and committed in the current working tree, on the
-branch it is on. Never spawn a worktree: no `EnterWorktree`, no `isolation: "worktree"` on the subagent, and none for
+branch it is on, `main` and the other protected branches included: never branch first. On a protected branch,
+`--commit` commits there and `--push` is skipped: say that the owner pushes it (git-workflow law, quick-change
+exception), and give the push command as a `! git push` line. Never spawn a worktree: no `EnterWorktree`, no `isolation: "worktree"` on the subagent, and none for
 `--background` either. A `--worktree` in the arguments is not a flag here: say so and work in this tree.
 
 ## Flags
@@ -37,8 +39,7 @@ one line each, **Plan** (files, what changes, and the test list: the rule names 
 Stop and say why instead, suggesting the normal flow, when the change:
 - touches auth, tokens, sessions, row-level security, reach, invites, OAuth or existence-leak answers;
 - needs a migration, a new public interface (API, schema, CLI) or a package install;
-- spans more than a handful of files, or needs a design decision the request does not settle;
-- is on a branch the git-workflow law protects for this repo and `--commit` is set (branch first, or ask).
+- spans more than a handful of files, or needs a design decision the request does not settle.
 
 ## 2. Make it
 
