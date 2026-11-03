@@ -1,7 +1,7 @@
 ---
 name: quick-change
-description: "Make one small, well-understood change test-first through a subagent (implementer by default), verify it, and optionally commit, push and deploy it. Flags: --commit, --push, --deploy, --agent <type>, --worktree, --background. Use when the user invokes /quick-change or asks for a quick change with any of these flags. Smaller than /one-shot (a spec or plan step built unattended); anything needing a design call, a refactor, a migration or security-sensitive work takes the normal Plan and Impact flow instead."
-argument-hint: "<the change> [--commit] [--push] [--deploy] [--agent <type>] [--worktree] [--background]"
+description: "Make one small, well-understood change test-first through a subagent (implementer by default), verify it, and optionally commit, push and deploy it. Flags: --commit, --push, --deploy, --agent <type>, --background. Always works in the current tree and branch, never a worktree. Use when the user invokes /quick-change or asks for a quick change with any of these flags. Smaller than /one-shot (a spec or plan step built unattended); anything needing a design call, a refactor, a migration or security-sensitive work takes the normal Plan and Impact flow instead."
+argument-hint: "<the change> [--commit] [--push] [--deploy] [--agent <type>] [--background]"
 ---
 
 # Quick change
@@ -9,7 +9,11 @@ argument-hint: "<the change> [--commit] [--push] [--deploy] [--agent <type>] [--
 Make `$ARGUMENTS` (the change, plus any flags) test-first and carry it as far as the flags say.
 
 Read `~/.claude/skills/shared/tdd.md` (the test-driven loop) and `~/.claude/skills/shared/ship.md` (commit, push,
-deploy, worktree, background) before step 2.
+deploy, background) before step 2.
+
+**Always in this tree and branch.** The change is made, verified and committed in the current working tree, on the
+branch it is on. Never spawn a worktree: no `EnterWorktree`, no `isolation: "worktree"` on the subagent, and none for
+`--background` either. A `--worktree` in the arguments is not a flag here: say so and work in this tree.
 
 ## Flags
 
@@ -20,7 +24,6 @@ deploy, worktree, background) before step 2.
 | `--push` | Pushes after the commit | implies `--commit` |
 | `--deploy` | Deploys the committed change to this workspace's development deployment | implies `--commit` |
 | `--agent <type>` | Which subagent makes the change | default `implementer` |
-| `--worktree` | The change is made, verified and committed in a fresh git worktree, not the current tree | |
 | `--background` | Steps 2 onward run as one background agent; this session is free at once | |
 
 Each step runs only when the one before it succeeded. A failed check stops everything after it.
@@ -46,7 +49,8 @@ files, and to report the change, the `RED:` and `Assumed:` lines and the check o
 subagent is always `implementer`, even for a typo-sized change. A change with no behaviour to pin (a typo in a
 comment, a doc line) says so in the Plan and skips RED.
 
-`--worktree` and `--background`: as `shared/ship.md` says, with steps 2 to 6 of this skill as the work handed over.
+`--background`: as `shared/ship.md` says, with steps 2 to 6 of this skill as the work handed over, in this tree (the
+background agent gets no worktree).
 
 ## 3. Verify
 
@@ -66,6 +70,5 @@ As `shared/ship.md` says.
 ## Reply
 
 What changed (`file:line`), the RED and verify commands with their counts, the assumptions the builder made, then
-the commit (short sha and subject), the push, and the deploy with its rollback, each only if its flag was set. With
-`--worktree`, the worktree's path and branch. With `--background`, this reply comes when the agent reports; at
+the commit (short sha and subject), the push, and the deploy with its rollback, each only if its flag was set. With `--background`, this reply comes when the agent reports; at
 launch, only the Plan, Impact and "running" line. Say plainly what was skipped and why.
