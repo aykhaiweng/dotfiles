@@ -1,7 +1,7 @@
 ---
 name: scope
-description: "Explore and plan a change before it is built: read the code and context, ask the user every open design question, and write a spec that /one-shot can build without defaulting anything, ending with the recommended /one-shot command (or /quick-change when the blast radius is small). Flags: --one-shot (run that command at the end). Use when the user invokes /scope, or asks to scope, explore or plan a change for /one-shot. The planning half of /one-shot: /one-shot builds a finished spec unattended; /scope makes that spec with the user. Writes no code."
-argument-hint: "<the change, issue, ADR or thread> [--one-shot]"
+description: "Explore and plan a change before it is built: read the code and context, ask the user only the decisions that need them (each explained in full), recommend the rest for one sign-off, and write a spec that /one-shot can build without defaulting anything, ending with the recommended /one-shot command (or /quick-change when the blast radius is small). Flags: --one-shot (run that command at the end), --recommend (no questions: every decision is a recommendation to approve). Use when the user invokes /scope, or asks to scope, explore or plan a change for /one-shot. The planning half of /one-shot: /one-shot builds a finished spec unattended; /scope makes that spec with the user. Writes no code."
+argument-hint: "<the change, issue, ADR or thread> [--one-shot] [--recommend]"
 ---
 
 # Scope
@@ -17,7 +17,8 @@ none, and edits no file but the spec.
 
 | Flag | Does |
 |---|---|
-| (none) | Explores, asks, writes the spec, and ends with the recommended `/one-shot` command, or `/quick-change` for a small change |
+| (none) | Explores, asks the few decisions that need the user, recommends the rest, writes the spec, and ends with the recommended `/one-shot` command, or `/quick-change` for a small change |
+| `--recommend` | No dialogs: every decision, the ones that would be asked included, goes in the recommendations table for one sign-off (step 3) |
 | `--one-shot` | The same, then runs that command (the `one-shot` skill, with the spec and the recommended flags) |
 
 ## 1. Orient
@@ -46,21 +47,48 @@ For each, note:
   reversible variant if one exists.
 
 Never drop a question because it seems obvious: an obvious default is still `/one-shot`'s to take unless the user takes
-it here.
+it here, so it goes in the recommendations table.
 
-## 3. Ask everything
+Then sort each question into one of two groups:
 
-Ask the user every open question, none defaulted. Use `AskUserQuestion` in rounds of up to four, one-way and costly
-questions first, the recommended option first in each and marked "(Recommended)". Each question must stand alone (the
-user may see only the dialog): name the thing it is about and why it is open.
+- **Ask** only when at least one holds: it is one-way; it changes a security boundary or an existence answer; it fixes a
+  public contract (an API, a schema, a file format, a CLI command or flag); it changes what a user sees or does; or the
+  two best options are close and the choice is a matter of taste or product direction. Aim for six or fewer; if more
+  qualify, keep the costliest and move the two-way rest to **Recommend**.
+- **Recommend** everything else: names, internal structure, part order, test lists, where the spec goes, the `/one-shot`
+  flags, and any choice the code or memory already points one way.
 
-- An answer that opens new questions (a new part, a changed interface) puts them in the next round.
+With `--recommend`, every question is **Recommend**.
+
+## 3. Ask the few, recommend the rest
+
+The user must understand each decision before they make it. Short questions they cannot follow are worse than none.
+
+**Asked questions**, in rounds of at most three (prefer one or two), one-way and costly ones first:
+
+1. **Brief in chat first.** Before each dialog, write a section per question: what it is about and why it is open,
+   in plain words before technical ones; what each option means concretely (what the user would see, type or get, an
+   example where one helps); what each costs and whether it can be undone; and the recommendation with its reason.
+   Use a small diagram or file snippet when the options differ in shape.
+2. **Then the dialog** (`AskUserQuestion`). The dialog may be all the user sees, so each question is a full sentence
+   that names the thing, the stakes and the recommendation. Each option's description is one to three sentences: what
+   happens if chosen, what it costs, one-way or two-way. Use `preview` (single-select) to show what each option looks
+   like: the file, the command output, the diagram. The recommended option comes first, marked "(Recommended)".
+
+**Recommendations**, after the asked questions (their answers may change them): one table in chat, numbered, with the
+decision, the recommendation, the reason in one plain sentence, and the main alternative. Then one dialog: "Accept all N
+recommendations in the table above?", with the options to accept all or to name the rows to change. A changed row that
+turns out to need a real choice becomes an asked question in the next round. Approved rows are the user's decisions,
+not defaults.
+
+- An answer that opens new questions (a new part, a changed interface) sorts them again and puts them in the next round.
 - An answer that contradicts a law or the target's ADR: stop and ask whether to change the rule or make an exception,
   as the memory policy says. Never write the contradiction into the spec.
-- A one-way choice the user takes is written down as theirs, with its reversible variant noted as rejected, so
-  `/one-shot`'s gate reads it as the user's go and does not stop on it.
-- Keep going until the list is empty. If the user says to stop asking, the rest are written as **Open** in the spec,
-  never as defaults, and the recommended command leaves `--one-shot` unrun (see step 5).
+- A one-way choice is never settled by the table's "accept all" alone. In the table it is listed first, marked
+  **one-way**, and needs its own explicit go. The user's go is written down as theirs, with the reversible variant noted
+  as rejected, so `/one-shot`'s gate reads it as the user's go and does not stop on it.
+- Keep going until every question is asked or approved. If the user says to stop, the rest are written as **Open** in
+  the spec, never as defaults, and the recommended command leaves `--one-shot` unrun (see step 5).
 
 ## 4. Write the spec
 
@@ -72,7 +100,8 @@ user may see only the dialog): name the thing it is about and why it is open.
    one line per rule the tests pin, named for the rule; its gate command; the reviews the repo requires after it.
    A part with no behaviour to pin says so.
 3. **Decisions (settled by the owner):** every question from step 3, one row each: decision, chosen, instead of, one-way
-   or two-way, and who settled it (the user on `<date>`, or the note or ADR it came from).
+   or two-way, and who settled it (the user on `<date>`, asked or approved from the recommendations table, or the note
+   or ADR it came from).
 4. **One-way items:** each with the user's go, quoted, and the reversible variant rejected.
 5. **Open:** only if the user stopped the asking; each question with its options and the recommendation.
 6. **Out of scope:** what was considered and left out, so a builder does not add it.
@@ -104,7 +133,8 @@ flag is there:
 ## Reply
 
 1. **Spec:** its path, and its parts in one line each.
-2. **Decisions:** the settled table (or a link to it in the spec), with the one-way items on top.
+2. **Decisions:** the settled table (or a link to it in the spec), with the one-way items on top, each marked asked or
+   approved.
 3. **Open:** anything left open, or "none".
 4. **Next:** the recommended `/one-shot` (or, for a small change, `/quick-change`) command, alone on its line, or that
    `/one-shot` is running now.
