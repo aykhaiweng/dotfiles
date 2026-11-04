@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+
+# Fuzzy-pick a workspace (one tmux session per workspace) and switch to it.
+#
+# A workspace is the nearest ancestor dir holding a .project.wayk marker;
+# without one, the git repo (worktrees fold into their main repo).
+
+MARKER=".project.wayk"
+here="$(cd "$(dirname "$0")" && pwd)"
+self="$here/ws"
+
+usage() {
+    cat <<'EOF'
+usage: ws                 fzf picker over workspaces; enter switches to it
+       ws resolve         stdin: one dir per line; stdout: name<TAB>root per line
+       ws -h | --help
+EOF
+}
+
+# Root dir of the workspace containing $1: nearest $MARKER ancestor, else the
+# main repo of its git worktree, else $1 itself.
+workspace_root() {
+    local dir="$1" d common
+    [ -d "$dir" ] || {
+        printf '%s\n' "$dir"
+        return
+    }
+    d="$(cd -P "$dir" 2>/dev/null && pwd)" || d="$dir"
+    local probe="$d"
+    while [ -n "$probe" ] && [ "$probe" != "/" ]; do
+        if [ -e "$probe/$MARKER" ]; then
+            printf '%s\n' "$probe"
+            return
+        fi
+        probe="$(dirname "$probe")"
+    done
+    if common="$(git -C "$d" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" && [ -n "$common" ]; then
+        # <repo>/.git -> <repo>; a bare repo folds to its own dir.
+        case "$common" in
+        */.git) printf '%s\n' "${common%/.git}" ;;
+        *) printf '%s\n' "$common" ;;
+        esac
+        return
+    fi
+    printf '%s\n' "$d"
+}
+
+# tmux session name for a workspace root: basename with dots stripped.
+workspace_name() {
+    local base
+    base="$(basename "$1")"
+    printf '%s\n' "${base//./}"
+}
+
+# `ws resolve`: batch form of workspace_root + workspace_name for bin/agents.
+cmd_resolve() {
+    local dir root
+    while IFS= read -r dir || [ -n "$dir" ]; do
+        [ -n "$dir" ] || continue
+        root="$(workspace_root "$dir")"
+        printf '%s\t%s\n' "$(workspace_name "$root")" "$root"
+    done
+}
+
+# One line per workspace: marker dirs and git repos under ~/Projects (repos
+# inside a marked tree fold into it) plus ~/.dotfiles; running sessions first.
+candidates() {
+    local projects="$HOME/Projects" roots marked sessions r name
+    roots="$(
+        {
+            [ -d "$projects" ] && find "$projects" -maxdepth 5 \
+                \( -name node_modules -o -name .venv -o -name .worktrees -o -name Library \) -prune -o \
+                \( -name "$MARKER" -o -name .git \) -print 2>/dev/null |
+                while IFS= read -r p; do
+                    d="$(dirname "$p")"
+                    # Worktrees (.git is a file) resolve to their main repo.
+                    workspace_root "$d"
+                done
+            [ -d "$HOME/.dotfiles" ] && printf '%s\n' "$HOME/.dotfiles"
+        } | sort -u
+    )"
+    marked="$(
+        if [ -d "$projects" ]; then
+            find "$projects" -maxdepth 5 -name "$MARKER" -print 2>/dev/null | while IFS= read -r p; do dirname "$p"; done
+        fi
+    )"
+    sessions="$(tmux list-sessions -F '#{session_name}' 2>/dev/null)"
+    {
+        while IFS= read -r r; do
+            [ -n "$r" ] || continue
+            # Fold repos inside a marked tree into it.
+            if [ -n "$marked" ]; then
+                skip=0
+                while IFS= read -r m; do
+                    case "$r/" in
+                    "$m"/?*) skip=1 ;;
+                    esac
+                done <<<"$marked"
+                [ "$skip" = 1 ] && continue
+            fi
+            name="$(workspace_name "$r")"
+            if grep -qxF -- "$name" <<<"$sessions"; then
+                printf '0\t%s\t%s\n' "$name" "$r"
+            else
+                printf '1\t%s\t%s\n' "$name" "$r"
+            fi
+        done <<<"$roots"
+    } | sort -t$'\t' -k1,1 -k2,2 | awk -F'\t' '{ printf "%s%s\t%s\n", ($1==0?"● ":"  "), $2, $3 }' 
+}
+
+# fzf preview: git status of the root, then the workspace's agents.
+preview() {
+    local name="$1" root="$2"
+    printf '%s\n%s\n\n' "$name" "$root"
+    git -C "$root" status -sb 2>/dev/null | head -20
+    printf '\n'
+    "$here/agents" ls --workspace "$name" 2>/dev/null
+}
+
+# Create the tmux session at root if missing (exact name match), then attach
+# from outside tmux or switch-client from inside.
+switch_to() {
+    local name="$1" root="$2"
+    tmux has-session -t "=$name" 2>/dev/null || tmux new-session -d -s "$name" -c "$root"
+    if [ -n "${TMUX:-}" ]; then
+        tmux switch-client -t "=$name"
+    else
+        tmux attach-session -t "=$name"
+    fi
+}
+
+pick() {
+    command -v fzf >/dev/null || {
+        echo "ws: fzf not found" >&2
+        exit 1
+    }
+    local line name root
+    line="$(candidates | fzf --prompt='workspace> ' --delimiter=$'\t' --with-nth=1 \
+        --preview "'$self' _preview {1} {2}" --preview-window=right:50%)" || return 0
+    [ -n "$line" ] || return 0
+    name="$(cut -f1 <<<"$line")"
+    name="${name#● }"
+    name="${name#  }"
+    root="$(cut -f2 <<<"$line")"
+    switch_to "$name" "$root"
+}
+
+case "${1:-}" in
+"") pick ;;
+resolve) cmd_resolve ;;
+_preview) preview "$2" "$3" ;;
+-h | --help) usage ;;
+*)
+    usage >&2
+    exit 2
+    ;;
+esac
