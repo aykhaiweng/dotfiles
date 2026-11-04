@@ -91,4 +91,7 @@ for entry in \
     persona principles memory_policy orchestration agents adr laws user_context
 done
 
+# Claude's settings.json: tracked base + this machine's untracked overlay.
+"$BIN_DIR/claude-settings-merge"
+
 echo "✨ AI configurations compiled successfully!"

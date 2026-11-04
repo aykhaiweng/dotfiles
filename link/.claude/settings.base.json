@@ -1,0 +1,216 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh pr create --draft:*)",
+      "mcp__namine__remember",
+      "mcp__namine__update"
+    ]
+  },
+  "model": "opus",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "mcp__namine__remember|mcp__namine__update",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code PostToolUse",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code PreToolUse",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__namine__remember|mcp__namine__update",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code PreToolUse session",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/workflow-model-pin.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/worktree-guard.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code SessionEnd",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code SessionStart laws",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code SessionStart laws:2/2",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code SessionStart pinned",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code SessionStart pinned:2/2",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code SessionStart compaction",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/session-title.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code SubagentStart laws",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code SubagentStart laws:2/2",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code SubagentStart pinned",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code SubagentStart pinned:2/2",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code UserPromptSubmit",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/session-title.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "antigravity@antigravity-for-claude-code": true,
+    "bash-lsp@dotfiles": true,
+    "cc-plugin-you-should-know@builtin": true,
+    "claude-md-management@anthropic-plugin-directory": true,
+    "marksman-lsp@dotfiles": true,
+    "mcp-server-dev@anthropic-plugin-directory": true,
+    "plugin-dev@anthropic-plugin-directory": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "antigravity-for-claude-code": {
+      "source": {
+        "source": "github",
+        "repo": "yuting0624/antigravity-for-claude-code"
+      }
+    },
+    "dotfiles": {
+      "source": {
+        "source": "directory",
+        "path": "$HOME/.dotfiles/claude-plugins"
+      }
+    }
+  },
+  "modelSettings": {
+    "claude-fable-5-1": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "medium",
+      "autoCompactWindow": 900000
+    },
+    "claude-sonnet-5-5": {
+      "effortLevel": "high"
+    }
+  },
+  "advisorModel": "fable",
+  "tui": "fullscreen",
+  "autoMemoryEnabled": false,
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "editorMode": "normal",
+  "preferredNotifChannel": "auto",
+  "autoCompactEnabled": true,
+  "idleCompaction": false,
+  "switchModelsOnFlag": false,
+  "remoteControlAtStartup": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true
+}
