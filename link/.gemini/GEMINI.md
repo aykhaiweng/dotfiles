@@ -145,17 +145,18 @@ Why: Wrong assumptions found before the code lands cost a sentence and after it 
 
 ### 'Git workflow: feature branches, decoupled commits, draft PRs'
 
-Once the Plan is approved, an agent works on a feature branch through to a draft PR without asking per commit, and never commits to, pushes to or merges into main, master, dev or staging. Exception: the dotfiles repo, below.
+Once the Plan is approved, an agent works on a feature branch through to a draft PR without asking per commit, and never pushes to or merges into main, master, dev or staging. Exceptions: `/quick-change` on a protected branch, and the dotfiles repo, below.
 - **How to apply:**
   - **Branch:** from a protected branch, create `type/slug` first, the type a Conventional Commit type (e.g. `feat/invoice-export`).
+  - **Quick-change exception:** a `/quick-change` run from a protected branch makes and commits the change there, on that branch, and stops before the push: the owner pushes it. No PR. The commit rules below still apply.
   - **Commits:** one logical change each, after each green test run with the pre-commit hook passing. `type(scope): subject` plus a 2–4 line body: what, why, and the alternatives rejected. A ticket named by the task, branch or prompt goes in a final `Refs: TICKET-ID` line, never in the scope.
-  - **Push:** `git push -u origin HEAD` only. Never `--force`, `-f`, `--force-with-lease`, or a refspec naming a protected branch. Exception: `git push origin archive/<tag>` publishes an archive tag from any branch.
+  - **Push:** `git push -u origin HEAD` only, and only from a `type/slug` branch. Never `--force`, `-f`, `--force-with-lease`, or a refspec naming a protected branch. Exception: `git push origin archive/<tag>` publishes an archive tag from any branch.
   - **PR:** `gh pr create --draft` against the branch the work started from, with summary, test evidence (command + result), coverage before/after, and migration or rollback notes where they apply. Report the branch, the commits (short hash + subject) and the PR link.
   - Never merge, approve or mark a PR ready (`gh pr merge`, `gh pr ready`, `gh pr review --approve`). Amend, rebase and reset need an explicit ask.
   - **Dotfiles exception:** in `/Users/aykhaiweng/.dotfiles` an agent commits straight to `main` and pushes with `git -C /Users/aykhaiweng/.dotfiles push origin HEAD`; no feature branch, no PR. Every commit and push there is written as `git -C /Users/aykhaiweng/.dotfiles …`, since that prefix is what the guard exempts. Commit rules (decoupled Conventional Commits, specific paths, no `--no-verify`) and the no-force rule still apply.
 - Big or destructive changes still stop for Plan approval; that approval is where autonomy starts.
 
-Why: Decoupled commits are easy to revert and review and a recorded rejected alternative stops it being re-proposed, while the user reviews at the draft PR and keeps protected branches and merging; guards can only allowlist branch names, hence type/slug. The archive-tag exception lets an agent preserve a snapshot before a rewrite without touching any branch. The dotfiles exception is the owner's call (2026-11-01, "change the law"); guards see only the command text and the branch, not the repo, so it is keyed on the `git -C <dotfiles path>` prefix.
+Why: Decoupled commits are easy to revert and review and a recorded rejected alternative stops it being re-proposed, while the user reviews at the draft PR and keeps protected branches and merging; guards can only allowlist branch names, hence type/slug. The archive-tag exception lets an agent preserve a snapshot before a rewrite without touching any branch. The dotfiles exception is the owner's call (2026-11-01, "change the law"); guards see only the command text and the branch, not the repo, so it is keyed on the `git -C <dotfiles path>` prefix. The quick-change exception is the owner's call (2026-11-03): "it goes to commit and I have to push it myself if it's on main. The push law should only cover pushing." A local commit is undone by the owner before it leaves the machine, so only the push is guarded.
 
 ### Goal-driven execution
 
@@ -199,15 +200,19 @@ Why: Every extra line has to be read, tested and maintained, small consistent di
 
 ### Worktree locations and wt- naming
 
-Where a worktree goes depends on who makes it, and anything a worktree needs a key or name for is called `wt-<worktree name>`.
+Where a worktree goes depends on who makes it, and anything a worktree needs a key or name for is called `<project>-wt-<worktree name>`.
 
 - **How to apply:**
   - **The user's worktrees** sit in `<repo>/.worktrees/<name>`. Leave them where they are; never move them.
   - **Claude's worktrees** are made with the built-in `EnterWorktree` tool (leave with `ExitWorktree`), which puts them in `<repo>/.claude/worktrees/<name>`. Never hand-roll `git worktree add .worktrees/…` or a sibling directory.
-  - **Names and keys:** every name or key a worktree needs (Docker Compose project, database, image tag, container, volume, cache or data directory) is `wt-<name>`. `<name>` is the worktree's directory name, which is its branch with `/` turned into `-`. Drop Claude's `worktree-` branch prefix, so it reads `wt-foo`, not `wt-worktree-foo`.
+  - **Names and keys:** every name or key a worktree needs (Docker Compose project, image tag, container, volume, CLI user, cache, state or data directory) is `<project>-wt-<name>`, e.g. `namine-dev-namine-wt-foo`.
+    - `<project>` is `<owner>-<repo>` of the `origin` remote (`github.com/namine-dev/namine` → `namine-dev-namine`), lowercased, with anything outside `[a-z0-9-]` turned into `-`. A repo with no `origin` uses its main checkout's directory name.
+    - `<name>` is the worktree's directory name, which is its branch with `/` turned into `-`. Drop Claude's `worktree-` branch prefix, so it reads `…-wt-foo`, not `…-wt-worktree-foo`.
+  - **A seeded database** (a copy of main's data) adds the local time it was made: `<project>-wt-<name>-<YYYYMMDDHHMMSS>` (`date +%Y%m%d%H%M%S`). A new seed gets a new name; the key stays stable everywhere else.
+  - **Too long:** a key over its system's limit (63 bytes for a Postgres database) is refused before anything is created, naming the key, its length and the limit. Never truncate or hash it; rename the worktree.
   - Never share one of those names or keys between two worktrees, or between a worktree and main.
 
-Why: User, 2026-11-01: worktrees from both the user and Claude, each with its own environment, need one predictable home per author and one naming scheme so nothing collides or gets cleaned up by mistake.
+Why: User, 2026-11-01: worktrees from both the user and Claude, each with its own environment, need one predictable home per author and one naming scheme so nothing collides or gets cleaned up by mistake. User, 2026-11-02 (/scope of scripts/wt-stack): prefix keys with the project, and timestamp seeded databases, so keys from different repos and different seeds never collide on one machine.
 
 <!-- markdownlint-disable MD041 -->
 
