@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Builds link/.claude/settings.json (untracked: Claude Code reads it and writes to it) from
+#   settings.base.json     tracked and portable: "$HOME" in any string becomes this machine's home
+#   settings.machine.json  untracked: this machine's paths and anything confidential
+# deep-merged with the machine file winning (jq '*': objects merge, arrays and scalars replace).
+# Claude Code saves /config, /model and "always allow" into settings.json, so before overwriting
+# it this checks the file still matches the last build and stops if not: move those changes into
+# the base or machine file first, or rerun with CLAUDE_SETTINGS_FORCE=1 to drop them.
+# Usage: claude-settings-merge [dir]   (default: <dotfiles>/link/.claude)
+set -euo pipefail
+
+dir=${1:-"$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/link/.claude"}
+base="$dir/settings.base.json" machine="$dir/settings.machine.json"
+out="$dir/settings.json" last="$dir/.settings.last-build.json"
+
+[[ -f "$base" ]] || { echo "claude-settings-merge: missing $base" >&2; exit 1; }
+inputs=("$base")
+if [[ -f "$machine" ]]; then inputs+=("$machine"); else echo "  - No ${machine##*/}; building from the base alone"; fi
+
+built=$(jq -S -s --arg home "$HOME" '
+  (.[0] | walk(if type == "string" then gsub("\\$HOME"; $home) else . end)) * (.[1] // {})' \
+  "${inputs[@]}")
+
+if [[ -f "$out" && "${CLAUDE_SETTINGS_FORCE:-}" != 1 ]]; then
+  current=$(jq -S . "$out")
+  # Without a snapshot (first run on a machine) only an exact match is safe to overwrite.
+  if [[ -f "$last" ]]; then ref=$(cat "$last"); else ref=$built; fi
+  if [[ "$current" != "$ref" && "$current" != "$built" ]]; then
+    {
+      echo "claude-settings-merge: ${out} has changes that are not in the base or machine file:"
+      diff <(echo "$ref") <(echo "$current") || true
+      echo "Move them into ${base##*/} or ${machine##*/}, or rerun with CLAUDE_SETTINGS_FORCE=1 to drop them."
+    } >&2
+    exit 1
+  fi
+fi
+
+printf '%s\n' "$built" >"$out.tmp" && mv "$out.tmp" "$out"
+printf '%s\n' "$built" >"$last"
+echo "  - Generated ${out##*/link/} from ${inputs[*]##*/}"
