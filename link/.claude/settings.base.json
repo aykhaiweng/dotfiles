@@ -4,7 +4,8 @@
       "Bash(gh pr create --draft:*)",
       "mcp__namine__remember",
       "mcp__namine__update"
-    ]
+    ],
+    "defaultMode": "auto"
   },
   "model": "opus",
   "hooks": {
@@ -166,12 +167,12 @@
   },
   "enabledPlugins": {
     "antigravity@antigravity-for-claude-code": true,
-    "bash-lsp@dotfiles": true,
+    "bash-lsp@dotfiles": false,
     "cc-plugin-you-should-know@builtin": true,
-    "claude-md-management@anthropic-plugin-directory": true,
+    "claude-md-management@anthropic-plugin-directory": false,
     "marksman-lsp@dotfiles": true,
-    "mcp-server-dev@anthropic-plugin-directory": true,
-    "plugin-dev@anthropic-plugin-directory": true,
+    "mcp-server-dev@anthropic-plugin-directory": false,
+    "plugin-dev@anthropic-plugin-directory": false,
     "typescript-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
@@ -212,5 +213,9 @@
   "switchModelsOnFlag": false,
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "skillOverrides": {
+    "cowork-plugin-management:cowork-plugin-customizer": "off",
+    "cowork-plugin-management:create-cowork-plugin": "off"
+  }
 }
