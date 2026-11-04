@@ -6,9 +6,13 @@
 # Claude Code saves /config, /model and "always allow" into settings.json, so before overwriting
 # it this checks the file still matches the last build and stops if not: move those changes into
 # the base or machine file first, or rerun with CLAUDE_SETTINGS_FORCE=1 to drop them.
-# Usage: claude-settings-merge [dir]   (default: <dotfiles>/link/.claude)
+# --diff only prints what changed in settings.json since the last build (a unified diff, last
+# build first) and writes nothing; it exits 0 with no changes, 1 with some, like diff(1).
+# Usage: claude-settings-merge [--diff] [dir]   (default dir: <dotfiles>/link/.claude)
 set -euo pipefail
 
+diff_only=
+[[ "${1:-}" == --diff ]] && { diff_only=1; shift; }
 dir=${1:-"$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/link/.claude"}
 base="$dir/settings.base.json" machine="$dir/settings.machine.json"
 out="$dir/settings.json" last="$dir/.settings.last-build.json"
@@ -20,6 +24,14 @@ if [[ -f "$machine" ]]; then inputs+=("$machine"); else echo "  - No ${machine##
 built=$(jq -S -s --arg home "$HOME" '
   (.[0] | walk(if type == "string" then gsub("\\$HOME"; $home) else . end)) * (.[1] // {})' \
   "${inputs[@]}")
+
+if [[ -n "$diff_only" ]]; then
+  [[ -f "$out" ]] || { echo "claude-settings-merge: no $out to compare" >&2; exit 2; }
+  # Without a snapshot, compare against what a build would produce now.
+  if [[ -f "$last" ]]; then ref=$(cat "$last"); else ref=$built; fi
+  diff -u --label "last build" --label "settings.json" <(echo "$ref") <(jq -S . "$out")
+  exit
+fi
 
 if [[ -f "$out" && "${CLAUDE_SETTINGS_FORCE:-}" != 1 ]]; then
   current=$(jq -S . "$out")

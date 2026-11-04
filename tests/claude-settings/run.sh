@@ -43,5 +43,16 @@ echo '{"model":"haiku"}' >"$d/settings.base.json"; rm "$d/settings.machine.json"
 "$merge" "$d" >/dev/null; code=$?
 ok "a base edit rebuilds without the machine file" test "$code:$(get .model)" = 0:haiku
 
+# --diff reports what Claude Code changed since the last build and never writes.
+fresh diff; "$merge" "$d" >/dev/null
+out=$("$merge" --diff "$d"); code=$?
+ok "--diff with no changes exits 0 and prints nothing" test "$code:$out" = "0:"
+jq '.theme = "dark"' "$d/settings.json" >"$d/t" && mv "$d/t" "$d/settings.json"
+before=$(cat "$d/settings.json")
+out=$("$merge" --diff "$d"); code=$?
+ok "--diff with changes exits 1" test "$code" = 1
+ok "--diff shows the added setting" grep -q '^+ *"theme": "dark"' <<<"$out"
+ok "--diff leaves settings.json untouched" test "$(cat "$d/settings.json")" = "$before"
+
 echo "$pass passed, $fail failed"
 [[ $fail == 0 ]]

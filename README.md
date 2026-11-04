@@ -40,7 +40,8 @@ Claude Code writes to `settings.json` itself (`/config`, `/model`, "always
 allow", `namine setup`). If it changed since the last build, the merge stops
 and prints the diff instead of overwriting it: move the changes into the base
 or machine file and rerun, or drop them with
-`CLAUDE_SETTINGS_FORCE=1 bin/claude-settings-merge`.
+`CLAUDE_SETTINGS_FORCE=1 bin/claude-settings-merge`. To see those changes at any
+time without building, run `bin/claude-settings-merge --diff`.
 
 On a new machine, create `settings.machine.json`, then run the merge once with
 `CLAUDE_SETTINGS_FORCE=1`, since the existing `settings.json` won't match a
