@@ -1,0 +1,382 @@
+#!/usr/bin/env bash
+
+# List and manage agent CLIs (Claude, Codex, OpenCode, Agy) by workspace.
+# Workspace identity comes from `ws resolve`.
+
+AGENT_RE='^(claude|claude\.exe|codex|opencode|agy)$'
+ROWS_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/agents/rows"
+here="$(cd "$(dirname "$0")" && pwd)"
+self="$here/agents"
+
+usage() {
+    cat <<'EOF'
+usage: agents [--all | --workspace W]       fzf UI over running agents
+       agents ls [--all | --workspace W] [--json]
+       agents count                         one line for the tmux status bar
+       agents new [--workspace W] [--cwd DIR] [-- claude args...]
+       agents -h | --help
+
+UI keys: enter jump, ctrl-x kill, ctrl-n new claude here, ctrl-r reload, ctrl-a all/workspace
+EOF
+}
+
+TAB=$'\t'
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/agents"
+
+# One TSV row per running agent:
+# workspace agent state pid age name tmux_target cwd pane_id bg_id
+# tmux_target is session:window ("-" outside tmux, "bg" for background).
+# age is seconds. Claude comes from `claude agents --json` (the only source,
+# ps would double-count its helper processes); the other agents come from ps and
+# are only listed when they run inside a tmux pane.
+collect() {
+    local tmp now
+    tmp="$(mktemp -d)" || return 1
+    now="$(date +%s)"
+
+    tmux list-panes -a -F "#{pane_pid}${TAB}#{pane_id}${TAB}#{session_name}:#{window_index}" 2>/dev/null >"$tmp/panes"
+
+    : >"$tmp/claude.raw"
+    if command -v claude >/dev/null 2>&1; then
+        claude agents --json 2>/dev/null | jq -r --argjson now "$now" '
+            .[] | ((.state // .status // "") | ascii_downcase) as $s
+            | [ .pid, .kind, (.id // "-"), ((.name // "-") | gsub("[\t\n]"; " ")), (.cwd // "-"),
+                ( if ($s | test("perm|approv")) then "permission"
+                  elif ($s | test("input|wait|block|need|ask")) then "input"
+                  elif ($s | test("work|busy|run")) then "working"
+                  elif ($s | test("idle|done|stop")) then "idle"
+                  else "other" end ),
+                (if .startedAt then ($now - (.startedAt / 1000 | floor)) else 0 end) ]
+            | @tsv' >"$tmp/claude.raw" 2>/dev/null
+    fi
+    cut -f1 "$tmp/claude.raw" >"$tmp/claude.pids"
+
+    # pid secs pane target base kind(C=claude from JSON, A=other agent); only
+    # processes that are agents, found by walking ppid up to a pane's pid.
+    ps -axo pid=,ppid=,etime=,comm= 2>/dev/null | AGENT_RE="$AGENT_RE" awk -v OFS='\t' \
+        -v panes="$tmp/panes" -v cl="$tmp/claude.pids" '
+        function secs(e,  d, a, n, t) {
+            d = 0
+            if (e ~ /-/) { split(e, a, "-"); d = a[1]; e = a[2] }
+            n = split(e, a, ":")
+            t = (n == 3) ? a[1] * 3600 + a[2] * 60 + a[3] : a[1] * 60 + a[2]
+            return d * 86400 + t
+        }
+        BEGIN {
+            re = ENVIRON["AGENT_RE"]
+            while ((getline line < panes) > 0) { split(line, f, "\t"); pane[f[1]] = f[2]; tgt[f[1]] = f[3] }
+            while ((getline line < cl) > 0) iscl[line] = 1
+        }
+        {
+            pid = $1; ppid[pid] = $2; et[pid] = $3
+            c = $0; sub(/^ *[0-9]+ +[0-9]+ +[^ ]+ +/, "", c); sub(/.*\//, "", c); base[pid] = c
+        }
+        END {
+            for (pid in base) {
+                a = (base[pid] ~ re && base[pid] !~ /^claude/)
+                if (!a && !(pid in iscl)) continue
+                p = pid; i = 0; found = ""
+                while (p != "" && p > 1 && i < 64) {
+                    if (p in pane) { found = p; break }
+                    p = ppid[p]; i++
+                }
+                if (a && found == "") continue
+                print pid, secs(et[pid]), (found == "" ? "-" : pane[found]), (found == "" ? "-" : tgt[found]), base[pid], (a ? "A" : "C")
+            }
+        }' >"$tmp/procs"
+
+    # claude rows (JSON), then other agents (ps) with their cwd from lsof.
+    awk -F'\t' -v OFS='\t' -v procs="$tmp/procs" '
+        BEGIN { while ((getline line < procs) > 0) { split(line, f, "\t"); pn[f[1]] = f[3]; tg[f[1]] = f[4] } }
+        {
+            bg = ($2 == "background")
+            print "claude", $6, $1, $7, $4, (bg ? "bg" : ($1 in tg ? tg[$1] : "-")), $5, (bg ? "-" : ($1 in pn ? pn[$1] : "-")), (bg ? $3 : "-")
+        }' "$tmp/claude.raw" >"$tmp/rows"
+    local pid secs pane target base kind cwd
+    while IFS="$TAB" read -r pid secs pane target base kind; do
+        [ "$kind" = A ] || continue
+        cwd="$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p' | head -1)"
+        printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$base" other "$pid" "$secs" - "$target" "${cwd:--}" "$pane" - >>"$tmp/rows"
+    done <"$tmp/procs"
+
+    # One ws call for every distinct cwd, joined back as the workspace column.
+    cut -f7 "$tmp/rows" | sort -u >"$tmp/cwds"
+    if [ -s "$tmp/cwds" ]; then
+        "$here/ws" resolve <"$tmp/cwds" | cut -f1 | paste "$tmp/cwds" - >"$tmp/map"
+        awk -F'\t' -v OFS='\t' 'NR == FNR { m[$1] = $2; next } { print (($7 in m) && m[$7] != "" ? m[$7] : "-"), $0 }' "$tmp/map" "$tmp/rows"
+    fi
+    rm -rf "$tmp"
+}
+
+# collect filtered to workspace $1 ("" = all), sorted by workspace, then state
+# (permission, input, working, idle, other), then age.
+rows() {
+    cached_rows | awk -F'\t' -v OFS='\t' -v ws="$1" '
+        ws != "" && $1 != ws { next }
+        { r = ($3 == "permission") ? 0 : ($3 == "input") ? 1 : ($3 == "working") ? 2 : ($3 == "idle") ? 3 : 4; print $1, r, $5, $0 }' |
+        sort -t"$TAB" -k1,1 -k2,2n -k3,3n | cut -f4-
+}
+
+# rows reused for 4s: the status bar polls count every second.
+cached_rows() {
+    local dir file now mtime tmpf
+    dir="$(dirname "$ROWS_CACHE")"
+    file="$ROWS_CACHE"
+    mkdir -p "$dir"
+    now="$(date +%s)"
+    mtime="$(stat -f %m "$file" 2>/dev/null || echo 0)"
+    if [ -z "${AGENTS_FRESH:-}" ] && [ $((now - mtime)) -lt 4 ]; then
+        cat "$file"
+        return
+    fi
+    tmpf="$(mktemp "$dir/rows.XXXXXX")" || { collect; return; }
+    collect >"$tmpf"
+    mv -f "$tmpf" "$file"
+    cat "$file"
+}
+
+# Padded columns; fzf mode appends hidden fields for the key bindings:
+# visible TAB pid agent tmux_target pane_id bg_id name cwd workspace
+render() {
+    local mode="${1:-}" color=0
+    if [ "$mode" = fzf ] || [ -t 1 ]; then color=1; fi
+    awk -F'\t' -v OFS='\t' -v mode="$mode" -v color="$color" -v home="$HOME" '
+        function age(s) { return s < 60 ? s "s" : s < 3600 ? int(s / 60) "m" : s < 86400 ? int(s / 3600) "h" : int(s / 86400) "d" }
+        function pad(v, w) { return sprintf("%-" w "s", v) }
+        function paint(st, txt) {
+            if (!color) return txt
+            return (st == "permission" ? "\033[31m" : st == "input" ? "\033[33m" : st == "working" ? "\033[32m" : st == "idle" ? "\033[2m" : "") txt "\033[0m"
+        }
+        {
+            n++; for (i = 1; i <= 10; i++) r[n, i] = $i
+            r[n, 11] = age($5); c = $8; if (index(c, home) == 1) c = "~" substr(c, length(home) + 1); r[n, 12] = c
+            if (length($1) > w1) w1 = length($1)
+            if (length($2) > w2) w2 = length($2)
+            if (length($3) > w3) w3 = length($3)
+            if (length(r[n, 11]) > w4) w4 = length(r[n, 11])
+            if (length($6) > w5) w5 = length($6)
+            if (length($7) > w6) w6 = length($7)
+        }
+        END {
+            for (k = 1; k <= n; k++) {
+                line = pad(r[k, 1], w1) "  " pad(r[k, 2], w2) "  " paint(r[k, 3], pad(r[k, 3], w3)) "  " pad(r[k, 11], w4) "  " pad(r[k, 6], w5) "  " pad(r[k, 7], w6) "  " r[k, 12]
+                if (mode == "fzf") print line, r[k, 4], r[k, 2], r[k, 7], r[k, 9], r[k, 10], r[k, 6], r[k, 8], r[k, 1]
+                else print line
+            }
+        }'
+}
+
+# Flags -> ws_filter ("" = all); defaults to the current tmux session.
+parse_scope() {
+    ws_filter=""
+    want_json=0
+    local explicit=0
+    while [ $# -gt 0 ]; do
+        case "$1" in
+        --all) ws_filter="" explicit=1 ;;
+        --workspace)
+            ws_filter="${2:?--workspace needs a name}"
+            explicit=1
+            shift
+            ;;
+        --json) want_json=1 ;;
+        *)
+            usage >&2
+            exit 2
+            ;;
+        esac
+        shift
+    done
+    if [ "$explicit" = 0 ] && [ -n "${TMUX:-}" ]; then
+        ws_filter="$(tmux display-message -p '#S' 2>/dev/null)"
+    fi
+}
+
+cmd_ls() {
+    parse_scope "$@"
+    if [ "$want_json" = 1 ]; then
+        rows "$ws_filter" | jq -Rn '[inputs | split("\t") | {workspace: .[0], agent: .[1], state: .[2], pid: (.[3] | tonumber),
+            age_seconds: (.[4] | tonumber), name: .[5], tmux_target: .[6], cwd: .[7], pane_id: .[8], bg_id: .[9]}]'
+    else
+        rows "$ws_filter" | render
+    fi
+}
+
+# All workspaces: "󰚩 N · K waiting"; empty when no agents ("· K waiting" only
+# when K > 0).
+cmd_count() {
+    rows "" | awk -F'\t' '{ n++ } $3 == "permission" || $3 == "input" { k++ }
+        END { if (n) printf "󰚩 %d%s\n", n, (k ? " · " k " waiting" : "") }'
+}
+
+# Jump: switch-client + select-window + select-pane, or `claude attach` for a
+# background agent.
+cmd_jump() {
+    local target="$1" pane="$2" bg="$3"
+    if [ "$target" = bg ]; then
+        if [ -n "${TMUX:-}" ]; then
+            tmux new-window -n "bg-$bg" "claude attach $(printf '%q' "$bg")"
+        else
+            exec claude attach "$bg"
+        fi
+        return
+    fi
+    if [ "$target" = "-" ] || [ "$pane" = "-" ]; then
+        echo "agents: not running in tmux, nothing to jump to" >&2
+        return 1
+    fi
+    tmux select-window -t "$target" && tmux select-pane -t "$pane" || return 1
+    if [ -n "${TMUX:-}" ]; then
+        tmux switch-client -t "${target%%:*}"
+    else
+        tmux attach-session -t "${target%%:*}"
+    fi
+}
+
+# Confirm, re-check the pid is still an agent, then TERM (or `claude stop`).
+cmd_kill() {
+    local pid="$1" agent="$2" bg="$3" name="$4" reply comm p
+    printf 'kill %s %s (pid %s)? [y/N] ' "$agent" "$name" "$pid"
+    read -r reply
+    case "$reply" in y | Y) ;; *) return 0 ;; esac
+    comm="$(ps -o comm= -p "$pid" 2>/dev/null)"
+    comm="${comm##*/}"
+    if ! [[ "$comm" =~ $AGENT_RE ]]; then
+        echo "agents: pid $pid is no longer an agent ($comm), not killing" >&2
+        sleep 1
+        return 1
+    fi
+    # Never kill the process tree this UI itself runs in.
+    p=$$
+    while [ -n "$p" ] && [ "$p" -gt 1 ]; do
+        if [ "$p" = "$pid" ]; then
+            echo "agents: refusing to kill the agent this UI runs under" >&2
+            sleep 1
+            return 1
+        fi
+        p="$(ps -o ppid= -p "$p" 2>/dev/null | tr -d ' ')"
+    done
+    if [ "$bg" != "-" ]; then
+        claude stop "$bg"
+    else
+        kill -TERM "$pid"
+    fi
+}
+
+# New tmux window running claude in the workspace's session.
+cmd_new() {
+    local ws="" cwd=""
+    while [ $# -gt 0 ]; do
+        case "$1" in
+        --workspace)
+            ws="${2:?--workspace needs a name}"
+            shift 2
+            ;;
+        --cwd)
+            cwd="${2:?--cwd needs a dir}"
+            shift 2
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            usage >&2
+            exit 2
+            ;;
+        esac
+    done
+    tmux info >/dev/null 2>&1 || {
+        echo "agents: no tmux server running" >&2
+        return 1
+    }
+    local session
+    if [ -n "$ws" ] && tmux has-session -t "=$ws" 2>/dev/null; then
+        session="$ws"
+    else
+        session="$(tmux display-message -p '#S' 2>/dev/null)"
+    fi
+    [ -n "$cwd" ] || cwd="$(tmux display-message -p -t "=$session:" '#{session_path}')"
+    local cmd="claude" a
+    for a in "$@"; do cmd+=" $(printf '%q' "$a")"; done
+    tmux new-window -t "=$session:" -c "$cwd" -n claude "$cmd"
+    if [ -n "${TMUX:-}" ] && [ "$(tmux display-message -p '#S')" != "$session" ]; then
+        tmux switch-client -t "=$session"
+    fi
+}
+
+# State file: line 1 = current workspace filter ("" = all), line 2 = home filter.
+scope_get() { sed -n '1p' "$1"; }
+
+# fzf reload source: rendered rows for the scope in state file $1.
+cmd_rows() {
+    rows "$(scope_get "$1")" | render fzf
+}
+
+# ctrl-a: flip between all workspaces and the home workspace, print the rows.
+cmd_toggle() {
+    local cur home
+    cur="$(sed -n '1p' "$1")"
+    home="$(sed -n '2p' "$1")"
+    if [ -n "$cur" ] || [ -z "$home" ]; then
+        printf '\n%s\n' "$home" >"$1"
+    else
+        printf '%s\n%s\n' "$home" "$home" >"$1"
+    fi
+    cmd_rows "$1"
+}
+
+# ctrl-n: new claude in the highlighted row's cwd.
+cmd_new_from_row() {
+    local cwd="$1" ws="$2"
+    [ "$cwd" = "-" ] && cwd=""
+    cmd_new --workspace "$ws" ${cwd:+--cwd "$cwd"}
+}
+
+cmd_ui() {
+    command -v fzf >/dev/null || {
+        echo "agents: fzf not found" >&2
+        exit 1
+    }
+    parse_scope "$@"
+    local state q_self q_state home=""
+    [ -n "${TMUX:-}" ] && home="$(tmux display-message -p '#S' 2>/dev/null)"
+    mkdir -p "$STATE_DIR"
+    state="$(mktemp "$STATE_DIR/scope.XXXXXX")"
+    trap 'rm -f "$state"' EXIT
+    printf '%s\n%s\n' "$ws_filter" "$home" >"$state"
+    q_self="$(printf '%q' "$self")"
+    q_state="$(printf '%q' "$state")"
+    AGENTS_FRESH=1 "$self" _rows "$state" | fzf --ansi --no-sort --delimiter="$TAB" --with-nth=1 \
+        --prompt='agents> ' \
+        --header='enter jump · ctrl-x kill · ctrl-n new · ctrl-r reload · ctrl-a all/workspace' \
+        --bind "enter:execute-silent($q_self _jump {4} {5} {6})+abort" \
+        --bind "ctrl-x:execute($q_self _kill {2} {3} {6} {7})+reload(AGENTS_FRESH=1 $q_self _rows $q_state)" \
+        --bind "ctrl-n:execute-silent($q_self _new-from-row {8} {9})+abort" \
+        --bind "ctrl-r:reload(AGENTS_FRESH=1 $q_self _rows $q_state)" \
+        --bind "ctrl-a:reload($q_self _toggle $q_state)"
+    return 0
+}
+
+case "${1:-}" in
+-h | --help) usage ;;
+ls)
+    shift
+    cmd_ls "$@"
+    ;;
+count) cmd_count ;;
+new)
+    shift
+    cmd_new "$@"
+    ;;
+_rows) cmd_rows "$2" ;;
+_toggle) cmd_toggle "$2" ;;
+_jump) cmd_jump "$2" "$3" "$4" ;;
+_kill) cmd_kill "$2" "$3" "$4" "$5" ;;
+_new-from-row) cmd_new_from_row "$2" "$3" ;;
+"" | --all | --workspace) cmd_ui "$@" ;;
+*)
+    usage >&2
+    exit 2
+    ;;
+esac
