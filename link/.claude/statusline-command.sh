@@ -141,6 +141,49 @@ cwd_url=$(file_url "$real_cwd")
 make_dir_c() { printf -v dir_c "${YELLOW}%s${RESET}" "$(osc_link "$cwd_url" "$dir")"; }
 make_dir_c
 
+# Git status next to the branch, in the usual prompt conventions (starship/p10k):
+#   upstream/downstream: ⇡N ahead (cyan, to push)   ⇣N behind (magenta, to pull)
+#   file changes:        +N staged (green)  !N modified/deleted (yellow)
+#                        ?N untracked (bright blue)  =N conflicted (red)  ✓ clean (green)
+# One `git status --porcelain=v2 --branch` call (no optional locks). Nothing is
+# shown on a detached HEAD, outside a repo, or on any git error. Without an
+# upstream there is no ⇡/⇣ segment.
+CYAN='\033[36m'
+MAGENTA='\033[35m'
+BRIGHT_BLUE='\033[94m'
+
+git_status_c=""
+add_st() { printf -v git_status_c '%s %b%s%b' "$git_status_c" "$1" "$2" "$RESET"; }
+
+if [ -n "$branch" ]; then
+  ahead=0; behind=0; staged=0; modified=0; untracked=0; conflicted=0
+  while IFS= read -r line; do
+    case "$line" in
+      "# branch.ab "*)
+        read -r _ _ ab_a ab_b <<<"$line"
+        ahead="${ab_a#+}"; behind="${ab_b#-}" ;;
+      "1 "*|"2 "*)
+        # XY: X = index (staged) state, Y = worktree state; "." means unchanged.
+        xy="${line:2:2}"
+        [ "${xy:0:1}" != "." ] && staged=$((staged + 1))
+        [ "${xy:1:1}" != "." ] && modified=$((modified + 1)) ;;
+      "u "*) conflicted=$((conflicted + 1)) ;;
+      "? "*) untracked=$((untracked + 1)) ;;
+    esac
+  done < <(git -C "$cwd" --no-optional-locks status --porcelain=v2 --branch 2>/dev/null)
+
+  case "$ahead$behind" in *[!0-9]*) ahead=0; behind=0 ;; esac
+  [ "$ahead" -gt 0 ]      && add_st "$CYAN" "⇡$ahead"
+  [ "$behind" -gt 0 ]     && add_st "$MAGENTA" "⇣$behind"
+  [ "$conflicted" -gt 0 ] && add_st "$RED" "=$conflicted"
+  [ "$staged" -gt 0 ]     && add_st "$GREEN" "+$staged"
+  [ "$modified" -gt 0 ]   && add_st "$YELLOW" "!$modified"
+  [ "$untracked" -gt 0 ]  && add_st "$BRIGHT_BLUE" "?$untracked"
+  if [ $((conflicted + staged + modified + untracked)) -eq 0 ]; then
+    add_st "$GREEN" "✓"
+  fi
+fi
+
 branch_c=""
 if [ -n "$branch" ]; then
   if [ -n "$is_wt" ]; then
@@ -148,6 +191,8 @@ if [ -n "$branch" ]; then
   else
     printf -v branch_c " ${GREEN}%s %s${RESET}" "$BRANCH_ICON" "$branch"
   fi
+  # git_status_c already starts with a space per segment.
+  branch_c="$branch_c$git_status_c"
 fi
 
 RED='\033[31m'
