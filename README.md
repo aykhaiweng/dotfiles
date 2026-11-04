@@ -21,6 +21,31 @@ from `ai/laws.md` — a committed cache the compiler refreshes from Naminé's
 global law notes whenever the `namine` CLI can reach its server. Edit laws in
 Naminé, then run the compiler.
 
+## Claude Code settings
+
+`~/.claude/settings.json` links to `link/.claude/settings.json`, which is
+generated and untracked. `bin/claude-settings-merge` (run last by
+`bin/compile-ai-configs`) builds it by deep-merging two files, the second
+winning on conflicts:
+
+- `link/.claude/settings.base.json` (tracked): everything portable: hooks,
+  plugins, models, permissions. Write paths as `$HOME/...`; the merge
+  substitutes this machine's home.
+- `link/.claude/settings.machine.json` (untracked): this machine's paths
+  (`permissions.additionalDirectories`) and anything confidential
+  (`autoMode`, which holds client details). Objects merge key by key; arrays
+  replace, so keep each array in one file.
+
+Claude Code writes to `settings.json` itself (`/config`, `/model`, "always
+allow", `namine setup`). If it changed since the last build, the merge stops
+and prints the diff instead of overwriting it: move the changes into the base
+or machine file and rerun, or drop them with
+`CLAUDE_SETTINGS_FORCE=1 bin/claude-settings-merge`.
+
+On a new machine, create `settings.machine.json`, then run the merge once with
+`CLAUDE_SETTINGS_FORCE=1`, since the existing `settings.json` won't match a
+build yet. Tests: `tests/claude-settings/run.sh`.
+
 ## Known Issues
 ### Google Axion running Ubuntu 24.04 LTS
 You're gonna need to `sudo apt update` and `sudo apt upgrade` before attempting to run this script.
