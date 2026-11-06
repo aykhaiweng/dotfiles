@@ -88,5 +88,50 @@ expect "gate: a clean tree with an ignored nested worktree skips the check" 0 ""
 echo change >"$ign/new-file"
 expect "gate: an ignored nested worktree doesn't hide a red check" 2 "red run 1 of 3" "$gate" "false" <<<"$(json "$ign" "" s3)"
 
+# --- worktree-deps ------------------------------------------------------------------------------
+deps="$hooks/worktree-deps.sh"
+# A fake pnpm logs each call; `install` makes node_modules, `run build` fails while $work/build-fails exists.
+mkdir -p "$work/bin"
+cat >"$work/bin/pnpm" <<EOF
+#!/bin/bash
+echo "\$*" >>"$work/pnpm.log"
+[[ \$1 == install ]] && mkdir -p node_modules
+[[ \$1 == run && -f "$work/build-fails" ]] && exit 1
+exit 0
+EOF
+chmod +x "$work/bin/pnpm"
+pn() { env PATH="$work/bin:$PATH" "$deps"; }
+ev() { jq -n --arg cwd "$1" --arg e "$2" '{cwd:$cwd, hook_event_name:$e}'; }
+calls() { [[ -f "$work/pnpm.log" ]] && wc -l <"$work/pnpm.log" | tr -d ' ' || echo 0; }
+dm="$work/deps"
+git init -q "$dm"
+echo "lockfileVersion: '9.0'" >"$dm/pnpm-lock.yaml"
+echo '{"scripts":{"build":"tsc"}}' >"$dm/package.json"
+git -C "$dm" add . && git -C "$dm" -c user.email=t@t -c user.name=t commit -q -m init
+dw="$dm/.claude/worktrees/wt-d"
+git -C "$dm" worktree add -q "$dw" -b wt-d
+dgit=$(git -C "$dw" rev-parse --absolute-git-dir)
+
+expect "deps: the main checkout is left alone" 0 "" pn <<<"$(ev "$dm" SessionStart)"
+ok "deps: the main checkout runs no pnpm" test "$(calls)" = 0
+expect "deps: a fresh worktree installs and builds" 0 "installed and built" pn <<<"$(ev "$dw" SessionStart)"
+ok "deps: success writes the ok stamp" test -f "$dgit/worktree-deps.ok"
+rm -f "$work/pnpm.log"
+expect "deps: a stamped worktree is left alone" 0 "" pn <<<"$(ev "$dw" CwdChanged)"
+ok "deps: a stamped worktree runs no pnpm" test "$(calls)" = 0
+
+# node_modules left behind by an earlier failed build is no proof of a finished setup.
+rm -f "$dgit/worktree-deps.ok"
+touch "$work/build-fails"
+expect "deps: node_modules without the stamp retries, and a failed build says so" 0 "build failed" pn <<<"$(ev "$dw" SessionStart)"
+ok "deps: a failed build writes no ok stamp" test ! -f "$dgit/worktree-deps.ok"
+ok "deps: a failed build writes the failed stamp" test -f "$dgit/worktree-deps.failed"
+rm -f "$work/pnpm.log"
+expect "deps: after a failure, a cd does not retry" 0 "" pn <<<"$(ev "$dw" CwdChanged)"
+ok "deps: after a failure, a cd runs no pnpm" test "$(calls)" = 0
+rm -f "$work/build-fails"
+expect "deps: after a failure, SessionStart retries" 0 "installed and built" pn <<<"$(ev "$dw" SessionStart)"
+ok "deps: a successful retry clears the failed stamp" test ! -f "$dgit/worktree-deps.failed"
+
 echo "$pass passed, $fail failed"
 ((fail == 0))
