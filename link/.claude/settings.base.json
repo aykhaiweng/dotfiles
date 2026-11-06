@@ -26,7 +26,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit",
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit|Skill|Agent|Workflow",
         "hooks": [
           {
             "type": "command",
@@ -87,7 +87,12 @@
           },
           {
             "type": "command",
-            "command": "namine agent-hook claude-code SessionStart laws:2/2",
+            "command": "namine agent-hook claude-code SessionStart laws:2/3",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code SessionStart laws:3/3",
             "timeout": 5
           },
           {
@@ -137,7 +142,12 @@
           },
           {
             "type": "command",
-            "command": "namine agent-hook claude-code SubagentStart laws:2/2",
+            "command": "namine agent-hook claude-code SubagentStart laws:2/3",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "namine agent-hook claude-code SubagentStart laws:3/3",
             "timeout": 5
           },
           {
