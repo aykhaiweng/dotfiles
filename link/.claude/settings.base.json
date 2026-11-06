@@ -1,4 +1,7 @@
 {
+  "env": {
+    "AGY_MODEL": "Gemini 4 Argon (High)"
+  },
   "permissions": {
     "allow": [
       "Bash(gh pr create --draft:*)",
