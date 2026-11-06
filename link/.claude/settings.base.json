@@ -115,6 +115,16 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x \"$HOME/.ai/hooks/worktree-deps.sh\" ] || exit 0; exec \"$HOME/.ai/hooks/worktree-deps.sh\"",
+            "timeout": 600,
+            "statusMessage": "Setting up worktree dependencies…"
+          }
+        ]
       }
     ],
     "SubagentStart": [
@@ -159,6 +169,18 @@
             "type": "command",
             "command": "$HOME/.claude/hooks/session-title.sh",
             "timeout": 5
+          }
+        ]
+      }
+    ],
+    "CwdChanged": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x \"$HOME/.ai/hooks/worktree-deps.sh\" ] || exit 0; exec \"$HOME/.ai/hooks/worktree-deps.sh\"",
+            "timeout": 600,
+            "statusMessage": "Setting up worktree dependencies…"
           }
         ]
       }
