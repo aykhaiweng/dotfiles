@@ -1,6 +1,6 @@
 ---
 name: explain
-description: "Explain a topic in depth (a technology, design choice, library, pattern, change, policy or decision), covering what it is, the major changes it brings, its pros, cons, consequences and other effects. Use when the user invokes /explain, or asks to explain X, for the tradeoffs of X, what changes if we adopt X, or the consequences of X. Do not use it for a quick factual lookup or a one-line definition; answer those directly."
+description: "Explain a topic in depth (a technology, design choice, library, pattern, change, policy or decision), covering what it is, the major changes it brings, its pros, cons, consequences and other effects, what a Product Owner, Solutions Architect and Senior Engineer each need from it, and a glossary. Use when the user invokes /explain, or asks to explain X, for the tradeoffs of X, what changes if we adopt X, or the consequences of X. Do not use it for a quick factual lookup or a one-line definition; answer those directly."
 argument-hint: "<topic>"
 ---
 
@@ -35,6 +35,23 @@ heading and say why in one line. Don't pad.
    is to reverse.
 7. **Other effects**: only the axes that matter, such as security, performance,
    cost, operations or team process.
+8. **By role**: what each of these three readers needs in order to act. Give
+   each its own short list, specific to this topic, and add what the sections
+   above don't already say instead of repeating them. End each list with the
+   decision or action that falls to that role.
+   - **Product Owner**: what users see and lose, the value against the cost and
+     time, the risk to users or the business, and what it does to scope.
+   - **Solutions Architect**: system boundaries and integrations, how data
+     moves, constraints and non-functional requirements (security, scale,
+     availability, compliance), lock-in, and how it fits the wider design.
+   - **Senior Engineer**: the code and files involved, failure modes and edge
+     cases, how to test and verify it, migration and rollback, and what it
+     costs to run and maintain.
+9. **Glossary**: every term in the answer that one of those three readers might
+   not know, including acronyms and project-specific names. Each entry is one
+   line in plain words, says what the term means here when that differs from
+   the general meaning, and comes in alphabetical order. Merge synonyms into
+   one entry.
 
 ## Diagrams
 
