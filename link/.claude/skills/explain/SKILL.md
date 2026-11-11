@@ -1,6 +1,6 @@
 ---
 name: explain
-description: "Explain a topic in depth (a technology, design choice, library, pattern, change, policy or decision), covering what it is, the major changes it brings, its pros, cons, consequences and other effects, what a Product Owner, Solutions Architect and Senior Engineer each need from it, and a glossary. Use when the user invokes /explain, or asks to explain X, for the tradeoffs of X, what changes if we adopt X, or the consequences of X. Do not use it for a quick factual lookup or a one-line definition; answer those directly."
+description: "Explain a topic in depth (a technology, design choice, library, pattern, change, policy or decision), covering what it is, the major changes it brings, its pros, cons, consequences and other effects, what a Product Owner, Solutions Architect and Senior Engineer each need from it, a recommendation and a glossary. Several items are explained one section each, with one shared glossary, and each option of an item gets its own pros, cons, consequences and other effects. Use when the user invokes /explain, or asks to explain X, for the tradeoffs of X, what changes if we adopt X, or the consequences of X. Do not use it for a quick factual lookup or a one-line definition; answer those directly."
 argument-hint: "<topic>"
 ---
 
@@ -19,8 +19,33 @@ it.
 
 ## Structure
 
-Use these sections, in this order. If one genuinely doesn't apply, keep the
+One topic gets the sections below once. Several separate items (a list of
+decisions, options or changes) get them once per item. Give each item a `##`
+heading numbered from 1 and named after it, with the title wrapped in `__` so
+it is underlined, and a row of 78 `═` on the line above it, after a blank line:
+
+```
+══════════════════════════════════════════════════════════════════════════════
+## 1. __Accepting ADR 0141__
+```
+
+Sections 1 to 9 go under it as `###` headings, so each item stands on its own.
+Never merge items into shared Pros, Cons, By role or Recommendation sections.
+
+The **Glossary** is its own `## Glossary` section at the very top of the
+answer, before the first item (or before the TL;DR of a single topic). It comes
+once and covers everything below it. Write it last, so it lists the terms the
+answer really uses, and print it first.
+
+Use these nine sections, in this order. If one genuinely doesn't apply, keep the
 heading and say why in one line. Don't pad.
+
+When an item has more than one way to go, leaving things as they are included,
+name each option with a letter. Replace sections 4 to 7 with one `### Options`
+section holding a `#### Option A: <name>` block per option, each with its own
+Pros, Cons, Consequences and Other effects, and add "(recommended)" to the
+heading of the option you would pick. Give each option its own column in the
+Major changes table. Sections 8 and 9 refer to options by letter.
 
 1. **TL;DR**: two or three sentences, covering what it is and the main tradeoff.
 2. **What it is**: plain words first, then the technical detail and how it
@@ -47,15 +72,18 @@ heading and say why in one line. Don't pad.
    - **Senior Engineer**: the code and files involved, failure modes and edge
      cases, how to test and verify it, migration and rollback, and what it
      costs to run and maintain.
-9. **Glossary**: every term in the answer that one of those three readers might
-   not know, including acronyms and project-specific names. Each entry is one
-   line in plain words, says what the term means here when that differs from
-   the general meaning, and comes in alphabetical order. Merge synonyms into
-   one entry.
+9. **Recommendation**: what you would do and why, in a sentence or two. If the
+   evidence doesn't favour one choice, say so and name what would settle it.
+
+The Glossary holds every term in the answer that one of those three readers
+might not know, including acronyms and project-specific names. Each entry is
+one line in plain words, says what the term means here when that differs from
+the general meaning, and comes in alphabetical order. Merge synonyms into one
+entry.
 
 ## Diagrams
 
-Always draw at least one, whatever the topic. Pick the shape that shows the
+Always draw at least one per item, whatever the topic. Pick the shape that shows the
 mechanism: boxes and arrows for what talks to what and what flows between
 them, a sequence for a request or a process step by step, a before/after pair
 for a change, a tree for a hierarchy. When the reader must choose between
@@ -68,6 +96,7 @@ options, draw each option so they can compare them.
 - One sentence under it says what to notice.
 
 Add **Alternatives** or **Open questions** only when they would change the
-reader's decision. List the sources you consulted at the end.
+reader's decision, inside the item they belong to. List the sources you
+consulted once, at the very end.
 
 Answer in the terminal. If the user names a focus, go deeper there.
