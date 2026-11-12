@@ -158,6 +158,12 @@ context.
   **flaky** (file and error) for the report and don't fix them; if they fail again, the failure is real. After a fix,
   rerun only the affected files, then the whole gate once more at the end.
 - Update the docs the target names (reference, concepts, plans, the ADR's status).
+- **Settled notes.** Where the repo deletes a spec once its work ships and keeps what only the spec recorded in memory
+  notes (in a Naminé repo: ADR 0072, `fact` notes named `settled-<area>`), draft those notes now, so deleting the spec
+  after the merge needs nothing more. They hold the owner's decisions, review findings refuted or left (with the
+  reason) and limits accepted on purpose. Check every bullet against the code, leave out what the ADR or the docs already
+  say, word a known defect as known and never as a decision, and cite the spec by path and section. Save them and name
+  them in the Reply as agent-drafted, for the owner to read.
 - Confirm the current tree's `git status --porcelain` matches what step 1 noted (with `--worktree`, nothing leaked
   out of the worktree through Bash). Anything new there is reported, never cleaned up silently.
 - `--push` and `--deploy`: as `shared/ship.md` says. A migration in the deploy needs `--migrate` or the user's words in
@@ -231,4 +237,4 @@ themselves; the one-way decisions waiting on the user are the exception, written
 5. **Budget:** used against the ceiling, and whether it was given or estimated; the wall-clock time per phase (build,
    part checks, gate, reviews, report) from the run files' `timings.md`, and any tests logged as flaky.
 6. The push and the deploy (with its rollback tag and the migrations `--migrate` applied), each only if its flag was
-   set; with `--worktree`, its path and branch; and the hand-off note's link.
+   set; with `--worktree`, its path and branch; the settled notes drafted, by name; and the hand-off note's link.
