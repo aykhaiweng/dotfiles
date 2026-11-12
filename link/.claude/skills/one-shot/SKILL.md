@@ -56,7 +56,7 @@ and the exact go it needs.
   named for the rule), its gate and the reviews the repo requires. Where the target has no test list for a part,
   write one: it is a design decision, so it goes through step 2 like any other.
 - Note `git status --porcelain` of the current tree, so the finish can confirm nothing leaked into it.
-- Run files go in `<target's directory>/runs/` (see "Run files").
+- Run files go in the session's scratchpad, never in the repository (see "Run files").
 - **Budget.** With `--token-budget`, that is the ceiling. Without it, estimate from the target (its parts, the files
   they touch, the reviews and fixes after) and state it with one line of reasoning; take a stated budget in the target
   or the user's message (`+500k`) over the estimate. Keep about 15% back for the reviews, fixes and the report.
@@ -133,7 +133,7 @@ Part by part, each to green before the next, in two dispatches of the build agen
 - never skip, delete or weaken a test to go green;
 - after a part that the repo's rules name for a review (auth, tokens, reach, sessions, RLS, OAuth, existence answers),
   run that review, fix confirmed findings in their own commits with a test, and log any left unfixed with the reason;
-- with `--commit`, commit the part (only its files and its run files, never `git add -A`) as `shared/ship.md` says.
+- with `--commit`, commit the part (only its files, never its run files and never `git add -A`) as `shared/ship.md` says.
 
 **`--workflow`:** load the `workflow-authoring` skill and write one Workflow per phase (build, then verify and review),
 pipelined over the target's parts, with every `agent()` call carrying the options the session's hooks require and every
@@ -176,13 +176,17 @@ variant.
 
 ## Run files
 
-One file per dispatch (builds, RED and GREEN, advisor, reviews), never rewritten: `runs/NN-<part>-<agent>.md` in the
-target's directory, `NN` counting up across the run. Each holds the brief as sent and the report as returned. A retry
-of a part reads the part's earlier run files first, so it starts from what failed rather than from scratch. The
-Decisions log stays the summary; run files are the record behind it. With `--commit` they are committed with their
-part.
+One file per dispatch (builds, RED and GREEN, advisor, reviews), never rewritten: `NN-<part>-<agent>.md`, `NN` counting
+up across the run, in `<scratchpad>/one-shot/<target's name>/runs/`: the session's scratchpad directory, or the system
+temp directory when the session has none. Give each agent the absolute path. Each holds the brief as sent and the
+report as returned. A retry of a part reads the part's earlier run files first, so it starts from what failed rather
+than from scratch.
 
-Each run file opens with `Started:` and ends with `Finished:` (`date '+%F %T'`). `runs/timings.md` gets one line
+Run files are never written into the repository and never committed: they are working notes for this run and go when
+the session does. So nothing may live only in one. The Decisions log is the record: a review finding left unfixed goes
+in it with the reason, and a flaky test goes in the Reply.
+
+Each run file opens with `Started:` and ends with `Finished:` (`date '+%F %T'`). `timings.md` beside them gets one line
 appended per dispatch, part check, gate run and review, never rewritten:
 `| <stage> | <part> | <start> | <end> | <minutes> | <pass, fail or flaky> |`.
 
@@ -225,6 +229,6 @@ themselves; the one-way decisions waiting on the user are the exception, written
 4. **Waiting on you:** anything stopped for a rule (with the exact go it needs), each one-way decision with its full
    write-up and the options to pick from, and anything parked by the budget.
 5. **Budget:** used against the ceiling, and whether it was given or estimated; the wall-clock time per phase (build,
-   part checks, gate, reviews, report) from `runs/timings.md`, and any tests logged as flaky.
+   part checks, gate, reviews, report) from the run files' `timings.md`, and any tests logged as flaky.
 6. The push and the deploy (with its rollback tag and the migrations `--migrate` applied), each only if its flag was
    set; with `--worktree`, its path and branch; and the hand-off note's link.
