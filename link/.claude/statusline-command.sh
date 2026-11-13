@@ -61,6 +61,14 @@ WORKTREE_ICON=$'\xf3\xb0\x99\x85' # U+F0645 (nf-md-file_tree)
 
 model=$(echo "$input" | jq -r '.model.display_name // empty')
 
+# Effort level (absent when the model has no reasoning effort), shown after the model name.
+effort=$(echo "$input" | jq -r '.effort.level // empty')
+case "$effort" in
+  low) effort="Low" ;; medium) effort="Medium" ;; high) effort="High" ;;
+  xhigh) effort="XHigh" ;; max) effort="Max" ;;
+esac
+[ -n "$effort" ] && model="$model $effort"
+
 used_tokens=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
 ctx_size=$(echo "$input" | jq -r '.context_window.context_window_size // 0')
 used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
